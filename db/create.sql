@@ -24,7 +24,8 @@ CREATE TABLE Purchases (
 );
 
 CREATE TABLE Inventory (
-    id INT NOT NULL PRIMARY KEY REFERENCES Users(id),
+    id INT NOT NULL REFERENCES Users(id),
     product_name VARCHAR(255) UNIQUE REFERENCES Products(name),
-    number_available INT NOT NULL
+    number_available INT NOT NULL,
+    PRIMARY KEY(id,product_name)
 );
