@@ -22,3 +22,9 @@ CREATE TABLE Purchases (
     pid INT NOT NULL REFERENCES Products(id),
     time_purchased timestamp without time zone NOT NULL DEFAULT (current_timestamp AT TIME ZONE 'UTC')
 );
+
+CREATE TABLE Inventory (
+    id INT NOT NULL PRIMARY KEY REFERENCES Users(id),
+    product_name VARCHAR(255) UNIQUE REFERENCES Products(name),
+    number_available INT NOT NULL
+);
