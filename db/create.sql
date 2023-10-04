@@ -29,5 +29,5 @@ CREATE TABLE Carts (
     product_id INT NOT NULL REFERENCES Products(id),
     quantity INT NOT NULL,
     price DECIMAL(12,2) NOT NULL,
-    PRIMARY KEY (buyer_id, product_name)
+    PRIMARY KEY (buyer_id, product_id)
 );
