@@ -25,7 +25,7 @@ CREATE TABLE Purchases (
 
 CREATE TABLE Carts (
     buyer_id INT NOT NULL REFERENCES Users(id),
-    seller_id INT NOT NULL REFERENCES Users(id),
+    seller_id INT NOT NULL REFERENCES Users(id), -- TODO: check seller-d != buyer_id
     product_id INT NOT NULL REFERENCES Products(id),
     quantity INT NOT NULL,
     price DECIMAL(12,2) NOT NULL,
