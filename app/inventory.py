@@ -16,7 +16,7 @@ def inventory(seller_id):
     seller_name = Inventory.getSellerName(seller_id)
     # return jsonify([item.__dict__ for item in items])
     return render_template('inventory.html',
-                           seller=seller_name,
+                           name=seller_name[0][0],
                            inv=items)
 
     # find the products current user has bought:
