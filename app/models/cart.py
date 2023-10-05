@@ -19,7 +19,7 @@ WHERE Carts.buyer_id = :id and Carts.product_id = Products.id
 ''',
                               id=id)
         # perhaps shold make it so price updates from product table as well as name
-        return [Cart(*row) for row in rows] if rows else None
+        return [Cart(*row) for row in rows] if rows else []
 
 
     @staticmethod

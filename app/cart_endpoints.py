@@ -6,14 +6,10 @@ bp = Blueprint('cart_bp', __name__)
 
 @bp.route('/cart')
 def showCart():
-    # get all available products for sale:
-    # find the products current user has bought:
+    # find items in cart of current user. 
     if current_user.is_authenticated:
         products = Cart.getCartByBuyerId(current_user.id)
-        for cart in products:
-            print(cart.prod_name)
-        # need to get product name by id for each item. 
     else:
-        products = None
-    # render the page by adding information to the index.html file
+        products = []
+    # render the cart_page template. 
     return render_template('cart_page.html', items=products)
