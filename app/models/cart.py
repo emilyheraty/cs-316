@@ -2,8 +2,9 @@ from flask import current_app as app
 
 
 class Cart:
-    def __init__(self, buyer_id, seller_id, product_id, quantity, price):
+    def __init__(self, buyer_id, name, seller_id, product_id, quantity, price):
         self.buyer_id = buyer_id
+        self.prod_name = name
         self.seller_id = seller_id
         self.product_id = product_id
         self.quantity = quantity
@@ -12,12 +13,13 @@ class Cart:
     @staticmethod
     def getCartByBuyerId(id):
         rows = app.db.execute('''
-SELECT buyer_id, prod_name, seller_id, product_id, quantity, price                              
-FROM Carts, Product
-WHERE Carts.buyer_id = :id and Carts.product_id = Product.id
+SELECT buyer_id, name, seller_id, product_id, quantity, Carts.price                             
+FROM Carts, Products
+WHERE Carts.buyer_id = :id and Carts.product_id = Products.id
 ''',
                               id=id)
-        return Cart(*(rows[0])) if rows else None
+        # perhaps shold make it so price updates from product table as well as name
+        return [Cart(*row) for row in rows] if rows else None
 
 
     @staticmethod
