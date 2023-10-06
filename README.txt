@@ -1,13 +1,22 @@
 Emily Heraty - Social Guru | finished endpoint for social guru
 models/feedback.py - feedback class definition w/ queries
 index.html - front end for temporary query display
-feedback.py - 
+added to index.py - gets user's 5 most recent reviews
+added to index.html - displays 5 most recent revuews on main page after login
 
-Claire Li - Sellers Guru
-- finished endpoint for sellers guru
+Claire Li - Sellers Guru | finished endpoint for sellers guru
+app/inventory.py: get the data from the website
+app/templates/inventory.html: frontend of the inventory
+app/models/inventory.py: sql queries for the inventory
+db/create.sql: added Sellers and Inventory tables
+db/load.sql: added code to load inventory.csv
 
-Catherine Mbata - Users Guru
-- finished enpoint for users guru
+Catherine Mbata - Users Guru | finished enpoint for users guru
+purchases.py - front end
+templates/purchases.py - defined purchases methods
+models/purchase.py - defined sql queries
+db/create.sql - modify definition for purchases table
+db/data/purchases.csv - add mock purchase data
 
 Ben Myerson - Carts Guru | finished endpoint for carts guru
 create.sql - added definition for carts table
