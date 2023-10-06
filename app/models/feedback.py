@@ -2,6 +2,7 @@ from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, DateT
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 from sqlalchemy import desc
+from flask import current_app as app
 
 Base = declarative_base()
 
@@ -16,7 +17,7 @@ class Feedback(Base):
     time_posted = Column(DateTime, default=datetime.utcnow)
 
     @staticmethod
-    def get_recent_feedback(cls, db, user_id, limit=5):
+    def get_recent_feedback(user_id, limit):
 
         sql = """
         SELECT * FROM Feedback
@@ -24,7 +25,7 @@ class Feedback(Base):
         ORDER BY time_posted DESC
         LIMIT :limit
         """
-        results = db.execute(sql, user_id=user_id, limit=limit)
+        results = app.db.execute(sql, user_id=user_id, limit=limit)
         
         feedbacks = []
         for result in results:
