@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<br><br>
+
+{% if current_user.is_authenticated %}
+<h2>Your recent purchases:</h2>
+<table class='table table-hover table-bordered container'>
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">Purchase ID</th>
+      <th scope="col">Time Purchased</th>
+      <th scope="col">Total Amount</th>
+      <th scope="col">Number of Items</th>
+      <th scope="col">Fulfillment Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for purchase in purchase_history%}
+      <tr>
+        <th scope="row">{{purchase.id}}</th>
+        <td>{{purchase.time_purchased}}</td>
+        <td>{{purchase.total_amount}}</td>
+        <td>{{purchase.number_of_items}}</td>
+        {% if purchase.fulfillment_status%}
+        <td>Fulfilled</td>
+        {% else %}
+        <td>Not Fulfilled</td>
+        {% endif %}
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p><a href="{{ url_for('users.login') }}">Log in</a> to see your purchase history!</p>
+{% endif %}
+
+{% endblock %}
