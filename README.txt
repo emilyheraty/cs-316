@@ -1,5 +1,6 @@
 Emily Heraty - Social Guru
 - finished endpoint for social guru
+-made feedback.py, Feedback.csv, added to index.py and index.html
 
 Claire Li - Sellers Guru
 - finished endpoint for sellers guru
