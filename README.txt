@@ -21,3 +21,6 @@ Judy Rhee - Products Guru
 
 link to gitlab: https://gitlab.oit.duke.edu/cyl13/cs-316-project
 
+link to milestone 3 video: https://clipchamp.com/watch/JHlCiQ56KZb
+
+
