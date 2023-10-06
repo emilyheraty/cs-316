@@ -1,5 +1,5 @@
 from flask_login import current_user
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, redirect
 from .models.cart import Cart
 bp = Blueprint('cart_bp', __name__)
 
@@ -13,3 +13,8 @@ def showCart():
         products = []
     # render the cart_page template. 
     return render_template('cart_page.html', items=products)
+
+@bp.route('/cart/add/<int:product_id>/<int:quantity>', methods=['POST'])
+def addToCart():
+
+    return redirect('/')
