@@ -4,8 +4,12 @@ index.html - front end for temporary query display
 added to index.py - gets user's 5 most recent reviews
 added to index.html - displays 5 most recent revuews on main page after login
 
-Claire Li - Sellers Guru
-- finished endpoint for sellers guru
+Claire Li - Sellers Guru | finished endpoint for sellers guru
+app/inventory.py: get the data from the website
+app/templates/inventory.html: frontend of the inventory
+app/models/inventory.py: sql queries for the inventory
+db/create.sql: added Sellers and Inventory tables
+db/load.sql: added code to load inventory.csv
 
 Catherine Mbata - Users Guru
 - finished enpoint for users guru
