@@ -3,8 +3,12 @@ models/feedback.py - feedback class definition w/ queries
 index.html - front end for temporary query display
 feedback.py - 
 
-Claire Li - Sellers Guru
-- finished endpoint for sellers guru
+Claire Li - Sellers Guru | finished endpoint for sellers guru
+app/inventory.py: get the data from the website
+app/templates/inventory.html: frontend of the inventory
+app/models/inventory.py: sql queries for the inventory
+db/create.sql: added Sellers and Inventory tables
+db/load.sql: added code to load inventory.csv
 
 Catherine Mbata - Users Guru
 - finished enpoint for users guru
