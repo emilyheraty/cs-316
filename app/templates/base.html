@@ -20,8 +20,9 @@
     .sidenav {
         height: 100%;
         background-color: #000;
-        overflow-x: hidden;
+        overflow: visible;
         padding-top: 20px;
+        padding-bottom: 1px;
     }
 
     .main {
@@ -42,6 +43,36 @@
         background-color: #000 !important;
         color: #fff;
     }
+
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #f9f9f9;
+      min-width: 100px;
+      box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+      z-index: 1;
+    }
+
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+
+    .dropdown-content a {
+      color: black;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      text-align: left;
+    }
+
+    .dropdown-content a:hover {
+      background-color: #ddd;
+    }
   </style>
 </head>
 
@@ -49,9 +80,16 @@
   <div class="sidenav">
     {% block msg %}
       <h1 style="color:aliceblue">Welcome to CompSci 316 Mini Amazon!</h1>
-      <div style="color: aliceblue; text-align: right; margin-bottom: 25px">
+      <div style="color: aliceblue; text-align: right; margin-bottom: 25px; margin-right: 25px;">
         {% if current_user.is_authenticated %}
-          Hello {{current_user.firstname}}! <a href="{{ url_for('users.logout') }}" type="button" class="btn btn-light">Log out</a>
+        <div class="dropdown">
+          <button class="btn btn-light"> <i class='far fa-user-circle'></i> Hello {{current_user.firstname}}!</button>
+          <div class="dropdown-content">
+            <a href="{{ url_for('users.account') }}">Account</a>
+            <a href="{{ url_for('purchases.purchases') }}">Purchases</a>
+            <a href="{{ url_for('users.logout') }}">Log out</a>
+          </div>
+        </div>
         {% else %}
           <a href="{{ url_for('users.login') }}" type="button" class="btn btn-light">Log in</a>
         {% endif %}
