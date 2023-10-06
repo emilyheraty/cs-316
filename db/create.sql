@@ -43,7 +43,7 @@ CREATE TABLE Carts (
 );
 CREATE TABLE Inventory (
     id INT NOT NULL REFERENCES Sellers(id),
-    product_name VARCHAR(255) UNIQUE REFERENCES Products(name),
+    product_name VARCHAR(255) REFERENCES Products(name),
     number_available INT NOT NULL,
     PRIMARY KEY(id,product_name)
 );
