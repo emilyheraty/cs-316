@@ -22,4 +22,3 @@ SELECT pg_catalog.setval('public.purchases_id_seq',
 \COPY Inventory FROM 'Inventory.csv' WITH DELIMITER ',' NULL '' CSV
 
 
-
