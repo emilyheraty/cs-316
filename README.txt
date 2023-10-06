@@ -1,7 +1,8 @@
 Emily Heraty - Social Guru | finished endpoint for social guru
 models/feedback.py - feedback class definition w/ queries
 index.html - front end for temporary query display
-feedback.py - 
+added to index.py - gets user's 5 most recent reviews
+added to index.html - displays 5 most recent revuews on main page after login
 
 Claire Li - Sellers Guru
 - finished endpoint for sellers guru
