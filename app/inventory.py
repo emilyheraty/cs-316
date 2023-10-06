@@ -19,6 +19,17 @@ def inventory(seller_id):
                            name=seller_name[0][0],
                            inv=items)
 
+# @bp.route('/inventory')
+# def getInventory():
+#     seller_name = Inventory.getSellerName(seller_id)
+#     if current_user.is_authenticated:
+#         items = Inventory.getInventory(current_user.id)
+#     else:
+#         items = []
+#     return render_template('inventory.html',
+#                            name=seller_name[0][0],
+#                            inv=items)
+    
     # find the products current user has bought:
     # if current_user.is_authenticated:
     #     purchases = Purchase.get_all_by_uid_since(
