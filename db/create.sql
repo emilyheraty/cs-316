@@ -27,7 +27,6 @@ CREATE TABLE Purchases (
     time_purchased timestamp without time zone NOT NULL DEFAULT (current_timestamp AT TIME ZONE 'UTC')
 );
 
-<<<<<<< HEAD
 CREATE TABLE Carts (
     buyer_id INT NOT NULL REFERENCES Users(id),
     seller_id INT NOT NULL REFERENCES Users(id), -- TODO: check seller-d != buyer_id
@@ -36,11 +35,9 @@ CREATE TABLE Carts (
     price DECIMAL(12,2) NOT NULL,
     PRIMARY KEY (buyer_id, product_id)
 );
-=======
 CREATE TABLE Inventory (
     id INT NOT NULL REFERENCES Sellers(id),
     product_name VARCHAR(255) UNIQUE REFERENCES Products(name),
     number_available INT NOT NULL,
     PRIMARY KEY(id,product_name)
 );
->>>>>>> claire-inventory

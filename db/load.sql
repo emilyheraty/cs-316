@@ -15,12 +15,10 @@ SELECT pg_catalog.setval('public.purchases_id_seq',
                          (SELECT MAX(id)+1 FROM Purchases),
                          false);
 
-<<<<<<< HEAD
 \COPY Carts FROM 'Carts.csv' WITH DELIMITER ',' NULL '' CSV
-=======
+
 \COPY Sellers FROM 'Sellers.csv' WITH DELIMITER ',' NULL '' CSV
 
 \COPY Inventory FROM 'Inventory.csv' WITH DELIMITER ',' NULL '' CSV
 
 
->>>>>>> claire-inventory
