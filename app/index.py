@@ -17,16 +17,21 @@ def index():
     if current_user.is_authenticated:
         purchases = Purchase.get_all_by_uid_since(
             current_user.id, datetime.datetime(1980, 9, 14, 0, 0, 0))
+        user_id = current_user.id
+        feedbacks = Feedback.get_recent_feedback(user_id, 5)
     else:
         purchases = None
+        feedbacks = []
     # render the page by adding information to the index.html file
-    user_id = current_user.id
-    feedbacks = Feedback.get_recent_feedback(user_id, 5)
+
     return render_template('index.html',
                            avail_products=products,
                            purchase_history=purchases, feedbacks = feedbacks)
 
 def recent_feedback():
-    user_id = current_user.id
-    feedbacks = Feedback.get_recent_feedback(user_id, 5)
+    if current_user.is_authenticated:
+        user_id = current_user.id
+        feedbacks = Feedback.get_recent_feedback(user_id, 5)
+    else:
+        feedbacks=[]
     return render_template('index.html', feedback=feedbacks)
