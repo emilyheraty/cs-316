@@ -14,3 +14,12 @@ SELECT pg_catalog.setval('public.products_id_seq',
 SELECT pg_catalog.setval('public.purchases_id_seq',
                          (SELECT MAX(id)+1 FROM Purchases),
                          false);
+
+\COPY Carts FROM 'Carts.csv' WITH DELIMITER ',' NULL '' CSV
+
+\COPY Sellers FROM 'Sellers.csv' WITH DELIMITER ',' NULL '' CSV
+
+\COPY Inventory FROM 'Inventory.csv' WITH DELIMITER ',' NULL '' CSV
+
+\COPY Feedback FROM 'Feedback.csv' WITH DELIMITER ',' NULL '' CSV
+
