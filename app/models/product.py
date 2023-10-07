@@ -31,12 +31,11 @@ WHERE available = :available
     def get_k_products(k):
         rows = app.db.execute('''
 SELECT *
-FROM Products
-WHERE id = :id
+FROM Products                             
 ORDER BY price DESC
-LIMIT k;
+LIMIT :k;
 ''',
-                              id=id)
+                              k=k)
     
         return rows
                           
