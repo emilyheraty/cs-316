@@ -20,9 +20,13 @@
 }
 </style>
 <h1>Account</h1>
-<h4>Profile</h4>
+<a class="card" style="text-decoration:none; color:inherit;" href="{{ url_for('users.profile') }}">
+    <h4>Profile</h4>
+    <p style="color:rgb(120, 119, 119)">View and edit account details</p>
+</a>
 <a class="card" style="text-decoration:none; color:inherit;" href="{{ url_for('purchases.purchases') }}">
     <h4>Purchases</h4>
+    <p style="color:rgb(120, 119, 119)">View and track recent purchases</p>
 </a>
 
 {% endblock %}
