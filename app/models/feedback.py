@@ -39,3 +39,25 @@ class Feedback(Base):
             feedbacks.append(feedback)
         
         return feedbacks
+
+    @staticmethod
+    def get_full_feedback(user_id):
+        sql = """
+        SELECT * FROM Feedback
+        WHERE user_id = :user_id
+        ORDER BY time_posted DESC
+        """
+
+        full_results = app.db.execute(sql, user_id=user_id)
+        full_feedback = []
+        for result in full_results:
+            feedback = Feedback()
+            feedback.id = full_results[0]
+            feedback.user_id = full_results[1]
+            feedback.product_id = full_results[2]
+            feedback.rating = full_results[3]
+            feedback.comment = full_results[4]
+            feedback.time_posted = full_results[5]
+            full_feedback.append(feedback)
+        
+        return full_feedback
