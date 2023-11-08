@@ -33,4 +33,7 @@ def create_app():
     from .feedback import bp as feedback_bp
     app.register_blueprint(feedback_bp)
 
+    from .purchases import bp as purchases_bp
+    app.register_blueprint(purchases_bp)
+
     return app

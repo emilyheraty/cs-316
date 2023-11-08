@@ -6,9 +6,9 @@ from flask import jsonify
 from .models.feedback import Feedback
 
 from flask import Blueprint
-bp = Blueprint('feedback_bp', __name__)
+bp = Blueprint('feedback', __name__)
 
-@bp.route('/recent_feedback/<int:user_id>')
+@bp.route('/recent_feedback')
 def recent_feedback():
     if current_user.is_authenticated:
         user_id = current_user.id
@@ -17,11 +17,11 @@ def recent_feedback():
         feedbacks=[]
     return render_template('recent_feedback.html', feedback=feedbacks)
 
-@bp.route('/full_feedback/<int:user_id>')
-def full_feedback():
+@bp.route('/all_feedback')
+def all_feedback():
     if current_user.is_authenticated:
         user_id = current_user.id
-        full_feedback = Feedback.get_full_feedback(user_id)
+        full_feedback = Feedback.get_all_feedback(user_id)
     else:
         full_feedback=[]
     return render_template('all_feedback.html', feedback=full_feedback)

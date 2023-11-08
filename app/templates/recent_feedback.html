@@ -1,3 +1,8 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if current_user.is_authenticated %}
 <h2>Your feedback:</h2>
 <table class="table">
     <thead class="thead-dark">
@@ -17,3 +22,9 @@
         {% endfor %}
     </tbody>
 </table>
+
+{% else %}
+<p><a href="{{ url_for('users.login') }}">Log in</a> to see your feedback history!</p>
+{% endif %}
+
+{% endblock %}

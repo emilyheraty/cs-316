@@ -19,6 +19,7 @@ def index():
             current_user.id, datetime.datetime(1980, 9, 14, 0, 0, 0))
         user_id = current_user.id
     else:
-        purchases = None
+        purchases = []
     # render the page by adding information to the index.html file
+    return render_template('index.html', avail_products=products, purchase_history=purchases)
 
