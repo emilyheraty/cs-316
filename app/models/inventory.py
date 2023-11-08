@@ -16,13 +16,56 @@ WHERE id = :id
 ''',
                                 id=id)
         return [Inventory(*row) for row in rows] # edit this for listing product name and num available
-    
+
     @staticmethod
-    def getSellerName(id):
+    def getSellerInfo(id):
         sid = app.db.execute('''
-SELECT DISTINCT firstname
-FROM Inventory,Users
-WHERE Inventory.id=:id AND Users.id=:id
+SELECT DISTINCT Sellers.id, firstname
+FROM Inventory,Sellers,Users
+WHERE Inventory.id=:id AND Sellers.id=:id AND Users.id=:id
 ''',
                                 id=id)
         return sid # edit this for listing product name and num available
+
+    @staticmethod
+    def addToInventory(id, product_name, number_available):
+        rows = app.db.execute('''
+INSERT INTO Inventory
+VALUES (:id, :product_name, :number_available)
+''', 
+                                product_name=product_name,
+                                number_available=number_available,
+                                id=id)
+    # make this into a try/catch
+
+
+#     @staticmethod
+#     def addProductToInventory(id, product_name, number_available):
+#         sid = app.db.execute('''
+# INSERT INTO Inventory
+# (SELECT Sellers.id, name, :number_available
+# FROM Products, Sellers
+# WHERE Products.name = :product_name
+# AND Sellers.id = :id)
+# ''',
+#                                 id=id)
+        # return sid # edit this for listing product name and num available
+
+#     @staticmethod
+#     def removeProductFromInventory(id, product_name):
+#         sid = app.db.execute('''
+# DELETE FROM Inventory
+# WHERE Inventory.id = :id AND Inventory.product_name = :product_name
+# ''',
+#                                 id=id)
+#         # return sid # edit this for listing product name and num available
+
+#     @staticmethod
+#     def changeQuantity(id, product_name, number_available):
+#         sid = app.db.execute('''
+# UPDATE Inventory
+# SET Inventory.number_available = :number_available
+# WHERE Inventory.id = :id AND Inventory.product_name = :product_name
+# ''',
+#                                 id=id)
+#         # return sid # edit this for listing product name and num available
