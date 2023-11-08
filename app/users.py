@@ -3,7 +3,7 @@ from werkzeug.urls import url_parse
 from flask_login import login_user, logout_user, current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, DecimalField
-from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
+from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Regexp
 
 from .models.user import User
 
@@ -39,8 +39,8 @@ def login():
 
 
 class RegistrationForm(FlaskForm):
-    firstname = StringField('First Name', validators=[DataRequired()])
-    lastname = StringField('Last Name', validators=[DataRequired()])
+    firstname = StringField('First Name', validators=[DataRequired(), Regexp("^[a-zA-Z \-.]*$ ", message="Invalid characters")])
+    lastname = StringField('Last Name', validators=[DataRequired(), Regexp("^[a-zA-Z \-.]*$", message="Invalid characters")])
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
     password2 = PasswordField(
@@ -79,11 +79,13 @@ def logout():
     logout_user()
     return redirect(url_for('index.index'))
 
+
 @bp.route('/account', methods=['GET'])
 def account():
     if current_user.is_authenticated is False:
         return redirect(url_for('users.login'))
     return render_template('account.html')
+
 
 @bp.route('/account/profile', methods=['GET'])
 def profile():
@@ -106,7 +108,8 @@ class EditForm(FlaskForm):
     def validate_email(self, email):
         if User.email_exists(email.data) and current_user.email != email.data:
             raise ValidationError('Already a user with this email.')
-        
+
+
 class EditPasswordForm(FlaskForm):
     currentpassword = PasswordField('Current Password', validators=[DataRequired()])
     password = PasswordField('New Password', validators=[DataRequired()])
@@ -115,6 +118,7 @@ class EditPasswordForm(FlaskForm):
                                        EqualTo('password')])
     save = SubmitField('Save')
     cancel = SubmitField('Cancel', render_kw={'formnovalidate': True})
+
 
 @bp.route('/account/profile/edit', methods=['GET', 'POST'])
 def edit():
@@ -136,6 +140,7 @@ def edit():
         elif(form.cancel.data):
             return redirect(url_for('users.profile'))
     return render_template('edit.html', form=form, user=user)
+
 
 @bp.route('/account/profile/changepassword', methods=['GET', 'POST'])
 def changepassword():

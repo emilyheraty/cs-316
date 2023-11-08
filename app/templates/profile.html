@@ -50,6 +50,17 @@
     {% endif %}
     <a style="text-align: right;" href="{{ url_for('users.edit') }}">Edit</a>
 </div>
+<p>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul>
+      {% for message in messages %}
+      <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+</p>
 
 
 {% endblock %}
