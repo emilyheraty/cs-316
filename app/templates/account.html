@@ -32,19 +32,14 @@
     <h4>Purchases</h4>
     <p style="color:rgb(120, 119, 119)">View and track recent purchases</p>
 </a>
-{% if current_user.is_seller %}
-<a class="card" style="text-decoration:none; color:inherit;" href="{{ url_for('inventory.inventory', seller_id=current_user.id) }}">
-    <h4>Inventory</h4>
-    <p style="color:rgb(120, 119, 119)">View and edit inventory</p>
-</a>
-<a class="card" style="text-decoration:none; color:inherit;" href="#">
-    <h4>Feedback</h4>
-    <p style="color:rgb(120, 119, 119)">View customer feedback</p>
-</a>
-{% endif %}
 {% if isseller == 1 %}
     <a class="card" style="text-decoration:none; color:inherit;" href="{{ url_for('inventory.inventory', seller_id = current_user.id) }}">
         <h4>Inventory</h4>
+        <p style="color:rgb(120, 119, 119)">View and edit inventory</p>
+    </a>
+    <a class="card" style="text-decoration:none; color:inherit;" href="#">
+        <h4>Feedback</h4>
+        <p style="color:rgb(120, 119, 119)">View customer feedback</p>
     </a>
 {% endif %}
 
