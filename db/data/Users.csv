@@ -1,3 +1,3 @@
-0,icecream@tastes.good,pbkdf2:sha256:260000$1GvmeoAkcWb89TyU$5f711eafb243c1c1a884715dd9bd6d185f29ccd3dab59ad19cc201a7260091cb,Joey,Shmoey,100 Chapel Dr,100.00,0
-1,sunnyday@cloudy.rain,pbkdf2:sha256:260000$1GvmeoAkcWb89TyU$5f711eafb243c1c1a884715dd9bd6d185f29ccd3dab59ad19cc201a7260091cb,Sunny,Day,100 Chapel Dr,100.00,0
-2,cyl13@duke.edu,help,Claire,Li,200 Example Dr, 100.00,0
+0,icecream@tastes.good,pbkdf2:sha256:260000$1GvmeoAkcWb89TyU$5f711eafb243c1c1a884715dd9bd6d185f29ccd3dab59ad19cc201a7260091cb,Joey,Shmoey, few, 20.0, 1
+1,cyl13@duke.edu,help,Claire,Li, hollows, 10.0, 1
+2,jpr38@duke.edu,help,JeanLuc,Rabideau, craven, 15.0, 0
