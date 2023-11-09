@@ -5,9 +5,12 @@
 <br><br>
 
 <h2> Inventory for {{name}} </h2>
+{{ pagination.info }}
+{{ pagination.links }}
 <table class='table table-hover table-bordered container'>
   <thead class="thead-dark">
     <tr>
+      <th scope="col">#</th>
       <th scope="col">Product Name</th>
       <th scope="col">Number Available</th>
     </tr>
@@ -15,11 +18,20 @@
   <tbody>
     {% for item in inv%}
       <tr>
+        <td>{{ loop.index + pagination.skip }}</td>
         <td>{{item.product_name}}</td>
         <td>{{item.number_available}}</td>
       </tr>
     {% endfor %}
   </tbody>
 </table>
+{{ pagination.links }}
+{% if current_user.is_authenticated %}
+  {% if current_user.id == id %}
+    <a href="{{ url_for('inventory.add_products', seller_id = current_user.id, isseller=1, error=0) }}" type="button" class="btn btn-light">Add Product</a>
+    <a href="{{ url_for('inventory.delete_products', seller_id = current_user.id, isseller=1, error=0) }}" type="button" class="btn btn-light">Delete Product</a>
+    <a href="{{ url_for('inventory.update_products', seller_id = current_user.id, isseller=1, error=0) }}" type="button" class="btn btn-light">Update Quantities</a>
+  {% endif %}
+{% endif %}
 
 {% endblock %}
