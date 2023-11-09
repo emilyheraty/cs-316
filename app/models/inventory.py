@@ -28,6 +28,16 @@ WHERE Inventory.id=:id AND Sellers.id=:id AND Users.id=:id
         return sid # edit this for listing product name and num available
 
     @staticmethod
+    def isSeller(id):
+        bool = app.db.execute('''
+SELECT DISTINCT is_seller
+FROM Users
+WHERE Users.id=:id
+''',
+                                id=id)
+        return bool
+
+    @staticmethod
     def addToInventory(id, product_name, number_available):
         rows = app.db.execute('''
 INSERT INTO Inventory

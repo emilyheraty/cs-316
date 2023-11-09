@@ -24,5 +24,10 @@
 <a class="card" style="text-decoration:none; color:inherit;" href="{{ url_for('purchases.purchases') }}">
     <h4>Purchases</h4>
 </a>
+{% if isseller == 1 %}
+    <a class="card" style="text-decoration:none; color:inherit;" href="{{ url_for('inventory.inventory', seller_id = current_user.id) }}">
+        <h4>Inventory</h4>
+    </a>
+{% endif %}
 
 {% endblock %}

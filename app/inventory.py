@@ -10,7 +10,7 @@ from wtforms import StringField, PasswordField, BooleanField, SubmitField, Decim
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 
 from .models.inventory import Inventory
-# from .models.inventory import addToInventory
+
 
 from flask import Blueprint
 bp = Blueprint('inventory', __name__)
@@ -38,7 +38,8 @@ def inventory(seller_id):
     return render_template('inventory.html',
                            id=seller_info[0][0],
                            name=seller_info[0][1],
-                           inv=items)
+                           inv=items,
+                           isseller=1)
 
 @bp.route('/inventory/<int:seller_id>/add', methods = ['GET', 'POST'])
 def add_products(seller_id):
