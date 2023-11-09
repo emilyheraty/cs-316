@@ -13,9 +13,27 @@ class Inventory:
 SELECT id, product_name, number_available
 FROM Inventory
 WHERE id = :id
+ORDER BY number_available DESC
 ''',
                                 id=id)
         return [Inventory(*row) for row in rows] # edit this for listing product name and num available
+    
+
+    @staticmethod
+    def getPartialInventory(id, per_page, off):
+        rows = app.db.execute('''
+SELECT id, product_name, number_available
+FROM Inventory
+WHERE id = :id
+ORDER BY number_available DESC
+LIMIT :per_page
+OFFSET :off
+''',
+                                id=id,
+                                per_page=per_page,
+                                off=off)
+        return [Inventory(*row) for row in rows] # edit this for listing product name and num available
+
 
     @staticmethod
     def getSellerInfo(id):

@@ -32,22 +32,23 @@ class UpdateQuantity(FlaskForm):
 
 @bp.route('/inventory/<int:seller_id>')
 def inventory(seller_id):
+    per_page = 4
     # get all available products for sale:
     items = Inventory.getInventory(seller_id)
-    print(items)
     page = request.args.get(get_page_parameter(), type=int, default=1)
+    offset = (page - 1) * per_page
+    items_partial = Inventory.getPartialInventory(seller_id, per_page, offset)
     search = False
     q = request.args.get('q')
     if q:
         search = True
-    pagination = Pagination(page=page, total=len(items), search=search, record_name='inventory items')
+    pagination = Pagination(page=page, per_page=per_page, offset=offset, total=len(items), search=search, record_name='items')
     seller_info = Inventory.getSellerInfo(seller_id)
-    print(seller_info)
     # return jsonify([item.__dict__ for item in items])
     return render_template('inventory.html',
                            id=seller_info[0][0],
                            name=seller_info[0][1],
-                           inv=items,
+                           inv=items_partial,
                            isseller=1,
                            pagination=pagination)
 
