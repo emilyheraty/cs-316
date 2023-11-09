@@ -158,8 +158,3 @@ def changepassword():
             flash('Password successfully changed')
             return redirect(url_for('users.profile'))
     return render_template('changepassword.html', form=form)
-
-
-
-
-    
