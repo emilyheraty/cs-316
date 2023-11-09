@@ -27,8 +27,9 @@ def gen_users(num_users):
                 print(f'{uid}', end=' ', flush=True)
             profile = fake.profile()
             email = profile['mail']
-            plain_password = f'pass{uid}'
-            password = generate_password_hash(plain_password)
+            # plain_password = f'pass{uid}'
+            # password = generate_password_hash(plain_password)
+            password = fake.sentence(nb_words=1)[:-1]
             name_components = profile['name'].split(' ')
             firstname = name_components[0]
             lastname = name_components[-1]
@@ -98,11 +99,11 @@ def gen_carts(num_carts, seller_ids):
                 print(f'{i}', end=' ', flush=True)
             bid = fake.random_int(min=0, max=num_users-1)
             sid = fake.random_element(elements=seller_ids)
-            if (bid, sid) in keyset:
+            pid = fake.random_int(min=0, max=num_products-1)
+            if (bid, pid) in keyset or bid==sid:
                 num -= 1
                 continue
-            keyset.add((bid, sid))
-            pid = fake.random_int(min=0, max=num_products-1)
+            keyset.add((bid, pid))
             quantity = fake.random_int(min=1, max=1000)
             price = f'{str(fake.random_int(max=500))}.{fake.random_int(max=99):02}'
             writer.writerow([bid, sid, pid, quantity, price])

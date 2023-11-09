@@ -6,6 +6,7 @@ from wtforms import StringField, PasswordField, BooleanField, SubmitField, Decim
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 
 from .models.user import User
+from .models.inventory import Inventory
 
 
 from flask import Blueprint
@@ -83,7 +84,10 @@ def logout():
 def account():
     if current_user.is_authenticated is False:
         return redirect(url_for('users.login'))
-    return render_template('account.html')
+        isseller = 0
+    else:
+        isseller = Inventory.isSeller(current_user.id)[0][0]
+    return render_template('account.html', isseller=isseller)
 
 
     

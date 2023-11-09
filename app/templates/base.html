@@ -87,6 +87,9 @@
           <div class="dropdown-content">
             <a href="{{ url_for('users.account') }}">Account</a>
             <a href="{{ url_for('purchases.purchases') }}">Purchases</a>
+            {% if isseller == 1 %}
+              <a href="{{ url_for('inventory.inventory', seller_id = current_user.id) }}">Inventory</a>
+            {% endif %}
             <a href="{{ url_for('users.logout') }}">Log out</a>
           </div>
         </div>

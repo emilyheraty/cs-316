@@ -4,8 +4,10 @@ import datetime
 from .models.feedback import Feedback
 from .models.product import Product
 from .models.purchase import Purchase
+from .models.inventory import Inventory
 from flask import current_app
 from flask import Blueprint
+from flask_paginate import Pagination, get_page_parameter
 bp = Blueprint('index', __name__)
 
 
@@ -19,14 +21,16 @@ def index():
             current_user.id, datetime.datetime(1980, 9, 14, 0, 0, 0))
         user_id = current_user.id
         feedbacks = Feedback.get_recent_feedback(user_id, 5)
+        is_seller = Inventory.isSeller(user_id)[0][0]
     else:
         purchases = None
         feedbacks = []
+        is_seller = 0
     # render the page by adding information to the index.html file
 
     return render_template('index.html',
                            avail_products=products,
-                           purchase_history=purchases, feedbacks = feedbacks)
+                           purchase_history=purchases, feedbacks = feedbacks, isseller=is_seller)
 
 def recent_feedback():
     if current_user.is_authenticated:
