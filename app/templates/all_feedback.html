@@ -3,7 +3,8 @@
 {% block content %}
 
 {% if current_user.is_authenticated %}
-<h2>Your feedback:</h2>
+<br>
+<h2>Your submitted feedback:</h2>
 <table class="table">
     <thead class="thead-dark">
         <tr>
@@ -23,6 +24,23 @@
     </tbody>
 </table>
 
+<br><br>
+
+<h2>Leave a review!</h2>
+<table class="table">
+<thead class="thead-dark">
+    <tr>
+        <th scope="col">Purchase Id</th>
+    </tr>
+</thead>
+<tbody>
+    {% for p in pending %}
+        <tr>
+           <td> <a href="{{ url_for('feedback.post_feedback', pid = p.pid) }}"> {{ p.pid }}</a> </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% else %}
 <p><a href="{{ url_for('users.login') }}">Log in</a> to see your feedback history!</p>
 {% endif %}

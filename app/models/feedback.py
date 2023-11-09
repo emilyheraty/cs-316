@@ -54,14 +54,33 @@ class Feedback():
             """,
             user_id = user_id, pid = pid, rating = rating, comment = comment,
             time_posted = time_posted)
-        id = rows[0][0]
-        return Feedback.get(id)
+        return 1
+    
+   # @staticmethod
+   # def get(id):
+   #     rows = app.db.execute("""
+   #         SELECT id, pid, rating
+   #         FROM Feedback
+   #         WHERE id = :id
+   #         """, id = id)
+   #     return Feedback(*(rows[0])) if rows else None
     
     @staticmethod
-    def get(id):
+    def pending_products(user_id):
         rows = app.db.execute("""
-            SELECT id, pid, rating
-            FROM Feedback
-            WHERE id = :id
-            """, id = id)
-        return Feedback(*(rows[0])) if rows else None
+        SELECT DISTINCT pid
+        FROM Purchases
+        WHERE uid = :user_id
+        """, user_id = user_id)
+        return rows
+    
+    @staticmethod
+    def get_purchase_name(user_id):
+        rows = app.db.execute("""
+            SELECT name
+            FROM Products, Purchases
+            WHERE Purchases.uid = :user_id
+                and Purchases.id = Products.id""", user_id = user_id)
+        return rows
+    
+

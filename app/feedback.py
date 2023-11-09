@@ -8,6 +8,7 @@ from flask import jsonify
 
 
 from .models.feedback import Feedback
+from .models.purchase import Purchase
 
 from flask import Blueprint
 bp = Blueprint('feedback', __name__)
@@ -26,26 +27,31 @@ def all_feedback():
     if current_user.is_authenticated:
         user_id = current_user.id
         full_feedback = Feedback.get_all_feedback(user_id)
+        pending = Feedback.pending_products (current_user.id)
+        purchase_name = Feedback.get_purchase_name(user_id)
     else:
         full_feedback=[]
-    return render_template('all_feedback.html', full_feedback=full_feedback)
+        pending = []
+    return render_template('all_feedback.html', full_feedback=full_feedback, pending = pending, purchase_name = purchase_name)
 
 class FeedbackForm(FlaskForm):
     rating = SelectField('Rating', choices=[('1', '1'), ('2', '2'), ('3', '3'),
                                              ('4', '4'), ('5', '5')],
                                               coerce = int, validators = [DataRequired()])
     comment = TextAreaField('Review', validators= [DataRequired()])
-    submit = SubmitField('Submit feedback')
+    submit = SubmitField('Submit')
 
 @bp.route('/post_feedback<int:pid>', methods=['GET', 'POST'])
 def post_feedback(pid):
     if current_user.is_authenticated is False:
         return redirect(url_for('users.login'))
     user_id = current_user.id
+    purchases = Purchase.get_all_by_uid(
+            current_user.id)
     form = FeedbackForm()
-    if form.validate_on_submit():
-        time_posted = datetime.now()
-        if Feedback.add_product_feedback(user_id, pid, form.rating.data, form.comment.data, time_posted):
+    if form.is_submitted():
+        if Feedback.add_product_feedback(user_id, pid, form.rating.data, form.comment.data, datetime.datetime.now()):
             flash('Feedback successfully submitted!')
-            return redirect(url_for('index.index'))
-    return render_template('post_feedback.html', title='Submit feedback', form=form)
+            return redirect(url_for('feedback.all_feedback'))
+    return render_template('post_feedback.html', title='Submit', form=form, purchases = purchases)
+
