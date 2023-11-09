@@ -8,6 +8,7 @@ from flask_login import login_user, logout_user, current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, DecimalField, IntegerField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
+from flask_paginate import Pagination, get_page_parameter
 
 from .models.inventory import Inventory
 
@@ -33,13 +34,20 @@ class UpdateQuantity(FlaskForm):
 def inventory(seller_id):
     # get all available products for sale:
     items = Inventory.getInventory(seller_id)
+    page = request.args.get(get_page_parameter(), type=int, default=1)
+    search = False
+    q = request.args.get('q')
+    if q:
+        search = True
+    pagination = Pagination(page=page, total=len(items), search=search, record_name='inventory items')
     seller_info = Inventory.getSellerInfo(seller_id)
     # return jsonify([item.__dict__ for item in items])
     return render_template('inventory.html',
                            id=seller_info[0][0],
                            name=seller_info[0][1],
                            inv=items,
-                           isseller=1)
+                           isseller=1,
+                           pagination=pagination)
 
 @bp.route('/inventory/<int:seller_id>/add', methods = ['GET', 'POST'])
 def add_products(seller_id):

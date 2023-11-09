@@ -7,13 +7,14 @@ from .models.purchase import Purchase
 from .models.inventory import Inventory
 from flask import current_app
 from flask import Blueprint
+from flask_paginate import Pagination, get_page_parameter
 bp = Blueprint('index', __name__)
 
 
 @bp.route('/')
 def index():
     # get all available products for sale:
-    products = Product.get_k_products(5)
+    products = Product.get_all(True)
     # find the products current user has bought:
     if current_user.is_authenticated:
         purchases = Purchase.get_all_by_uid_since(
