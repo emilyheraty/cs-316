@@ -24,35 +24,44 @@ class Feedback():
         
         feedbacks = []
         for result in results:
-            feedback = Feedback()
-            feedback.id = result[0]
-            feedback.user_id = result[1]
-            feedback.pid = result[2]
-            feedback.rating = result[3]
-            feedback.comment = result[4]
-            feedback.time_posted = result[5]
+            feedback = Feedback(
+            id = result[0],
+            user_id = result[1],
+            pid = result[2],
+            rating = result[3],
+            comment = result[4],
+            time_posted = result[5])
             feedbacks.append(feedback)
         
         return feedbacks
 
     @staticmethod
     def get_all_feedback(user_id):
-        sql = """
+        rows = app.db.execute("""
         SELECT * FROM Feedback
         WHERE user_id = :user_id
         ORDER BY time_posted DESC
-        """
-
-        full_results = app.db.execute(sql, user_id=user_id)
-        full_feedback = []
-        for result in full_results:
-            feedback = Feedback()
-            feedback.id = full_results[0]
-            feedback.user_id = full_results[1]
-            feedback.pid = full_results[2]
-            feedback.rating = full_results[3]
-            feedback.comment = full_results[4]
-            feedback.time_posted = full_results[5]
-            full_feedback.append(feedback)
+        """,
+        user_id=user_id)
         
-        return full_feedback
+        return [Feedback(*row) for row in rows]
+    
+    def add_product_feedback(user_id, pid, rating, comment, time_posted):
+        rows = app.db.execute("""
+            INSERT INTO Feedback(user_id, pid, rating, comment, time_posted)
+            VALUES(:user_id, :pid, :rating, :comment, :time_posted)
+            RETURNING id
+            """,
+            user_id = user_id, pid = pid, rating = rating, comment = comment,
+            time_posted = time_posted)
+        id = rows[0][0]
+        return Feedback.get(id)
+    
+    @staticmethod
+    def get(id):
+        rows = app.db.execute("""
+            SELECT id, pid, rating
+            FROM Feedback
+            WHERE id = :id
+            """, id = id)
+        return Feedback(*(rows[0])) if rows else None

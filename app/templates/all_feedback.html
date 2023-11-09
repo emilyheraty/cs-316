@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if current_user.is_authenticated %}
+<h2>Your feedback:</h2>
+<table class="table">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">Rating</th>
+            <th scope="col">Comment</th>
+            <th scope="col">Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for feedback in full_feedback %}
+        <tr>
+            <td>{{ feedback.rating }}</td>
+            <td>{{ feedback.comment }}</td>
+            <td>{{ feedback.time_posted }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% else %}
+<p><a href="{{ url_for('users.login') }}">Log in</a> to see your feedback history!</p>
+{% endif %}
+
+{% endblock %}
