@@ -22,7 +22,11 @@
   </tbody>
 </table>
 {% if current_user.is_authenticated %}
-<a href="{{ url_for('inventory.add_products', seller_id = current_user.id) }}" type="button" class="btn btn-light">Add Product</a>
+  {% if current_user.id == id %}
+    <a href="{{ url_for('inventory.add_products', seller_id = current_user.id) }}" type="button" class="btn btn-light">Add Product</a>
+    <a href="{{ url_for('inventory.delete_products', seller_id = current_user.id) }}" type="button" class="btn btn-light">Delete Product</a>
+    <a href="{{ url_for('inventory.update_products', seller_id = current_user.id) }}" type="button" class="btn btn-light">Update Quantities</a>
+  {% endif %}
 {% endif %}
 
 {% endblock %}

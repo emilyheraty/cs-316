@@ -20,6 +20,15 @@ class AddProduct(FlaskForm):
     quantity = IntegerField('Quantity', validators=[DataRequired()])
     submit = SubmitField('Add')
 
+class DeleteProduct(FlaskForm):
+    product_name = StringField('Product Name', validators=[DataRequired()])
+    submit = SubmitField('Delete')
+
+class UpdateQuantity(FlaskForm):
+    product_name = StringField('Product Name', validators=[DataRequired()])
+    new_quantity = IntegerField('New Quantity', validators=[DataRequired()])
+    submit = SubmitField('Update')
+
 @bp.route('/inventory/<int:seller_id>')
 def inventory(seller_id):
     # get all available products for sale:
@@ -44,3 +53,30 @@ def add_products(seller_id):
             flash('Added new product!')
             return redirect(url_for('inventory.inventory', seller_id=current_user.id))
     return render_template('inventory-addproduct.html', form=form)
+
+@bp.route('/inventory/<int:seller_id>/delete', methods = ['GET', 'POST'])
+def delete_products(seller_id):
+    seller_info = Inventory.getSellerInfo(seller_id)
+    if current_user.is_authenticated:
+        items = Inventory.getInventory(current_user.id)
+        form = DeleteProduct()
+        if form.validate_on_submit():
+            pname = form.product_name.data
+            Inventory.removeProductFromInventory(seller_id, pname)
+            flash('Removed a product!')
+            return redirect(url_for('inventory.inventory', seller_id=current_user.id))
+    return render_template('inventory-deleteproduct.html', form=form)
+
+@bp.route('/inventory/<int:seller_id>/updatequantity', methods = ['GET', 'POST'])
+def update_products(seller_id):
+    seller_info = Inventory.getSellerInfo(seller_id)
+    if current_user.is_authenticated:
+        items = Inventory.getInventory(current_user.id)
+        form = UpdateQuantity()
+        if form.validate_on_submit():
+            pname = form.product_name.data
+            amt = form.new_quantity.data
+            Inventory.updateProductQuantity(seller_id, pname, amt)
+            flash('Updated a product!')
+            return redirect(url_for('inventory.inventory', seller_id=current_user.id))
+    return render_template('inventory-updateproduct.html', form=form)
