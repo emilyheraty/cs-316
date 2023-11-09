@@ -34,6 +34,7 @@ class UpdateQuantity(FlaskForm):
 def inventory(seller_id):
     # get all available products for sale:
     items = Inventory.getInventory(seller_id)
+    print(items)
     page = request.args.get(get_page_parameter(), type=int, default=1)
     search = False
     q = request.args.get('q')
@@ -41,6 +42,7 @@ def inventory(seller_id):
         search = True
     pagination = Pagination(page=page, total=len(items), search=search, record_name='inventory items')
     seller_info = Inventory.getSellerInfo(seller_id)
+    print(seller_info)
     # return jsonify([item.__dict__ for item in items])
     return render_template('inventory.html',
                            id=seller_info[0][0],

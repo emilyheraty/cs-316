@@ -20,11 +20,12 @@ WHERE id = :id
     @staticmethod
     def getSellerInfo(id):
         sid = app.db.execute('''
-SELECT DISTINCT Sellers.id, firstname
-FROM Inventory,Sellers,Users
-WHERE Inventory.id=:id AND Sellers.id=:id AND Users.id=:id
+SELECT DISTINCT id, firstname
+FROM Users
+WHERE Users.id=:id
 ''',
                                 id=id)
+        print(sid)
         return sid # edit this for listing product name and num available
 
     @staticmethod
