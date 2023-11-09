@@ -4,6 +4,10 @@
 
 <h1>Delete Product from Inventory</h1>
 
+{% if error == 1 %}
+<h3 style="color:red">Could not delete product, please try again</h3>
+{% endif %}
+
 <form action="" method="post">
     {{ form.hidden_tag() }}
     <p>

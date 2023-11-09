@@ -50,10 +50,11 @@ def add_products(seller_id):
         if form.validate_on_submit():
             pname = form.product_name.data
             amt = form.quantity.data
-            Inventory.addToInventory(seller_id, pname, amt)
-            flash('Added new product!')
+            result = Inventory.addToInventory(seller_id, pname, amt)
+            if result == 0:
+                return render_template('inventory-addproduct.html', form=form,isseller=1, error=1)
             return redirect(url_for('inventory.inventory', seller_id=current_user.id))
-    return render_template('inventory-addproduct.html', form=form)
+    return render_template('inventory-addproduct.html', form=form, isseller=1, error=0)
 
 @bp.route('/inventory/<int:seller_id>/delete', methods = ['GET', 'POST'])
 def delete_products(seller_id):
@@ -63,10 +64,11 @@ def delete_products(seller_id):
         form = DeleteProduct()
         if form.validate_on_submit():
             pname = form.product_name.data
-            Inventory.removeProductFromInventory(seller_id, pname)
-            flash('Removed a product!')
+            result = Inventory.removeProductFromInventory(seller_id, pname)
+            if result == 0:
+                return render_template('inventory-deleteproduct.html', form=form,isseller=1, error=1)
             return redirect(url_for('inventory.inventory', seller_id=current_user.id))
-    return render_template('inventory-deleteproduct.html', form=form)
+    return render_template('inventory-deleteproduct.html', form=form, isseller=1, error=0)
 
 @bp.route('/inventory/<int:seller_id>/updatequantity', methods = ['GET', 'POST'])
 def update_products(seller_id):
@@ -77,7 +79,9 @@ def update_products(seller_id):
         if form.validate_on_submit():
             pname = form.product_name.data
             amt = form.new_quantity.data
-            Inventory.updateProductQuantity(seller_id, pname, amt)
-            flash('Updated a product!')
+            result = Inventory.updateProductQuantity(seller_id, pname, amt)
+            print(result)
+            if result == 0:
+                return render_template('inventory-updateproduct.html', form=form,isseller=1, error=1)
             return redirect(url_for('inventory.inventory', seller_id=current_user.id))
-    return render_template('inventory-updateproduct.html', form=form)
+    return render_template('inventory-updateproduct.html', form=form, isseller=1, error=0)

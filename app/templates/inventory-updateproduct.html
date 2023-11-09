@@ -4,6 +4,10 @@
 
 <h1>Update Inventory Product Quantity</h1>
 
+{% if error == 1 %}
+<h3 style="color:red">Could not update product quantity, please try again</h3>
+{% endif %}
+
 <form action="" method="post">
     {{ form.hidden_tag() }}
     <p>

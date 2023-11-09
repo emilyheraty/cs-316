@@ -39,28 +39,33 @@ WHERE Users.id=:id
 
     @staticmethod
     def addToInventory(id, product_name, number_available):
-        rows = app.db.execute('''
+        try:
+            rows = app.db.execute('''
 INSERT INTO Inventory
 VALUES (:id, :product_name, :number_available)
 ''', 
                                 product_name=product_name,
                                 number_available=number_available,
                                 id=id)
-    # make this into a try/catch
+            return 1
+        except Exception as e:
+            print("Cannot add this product to inventory. Check if this product is already in inventory.")
+            return 0
 
     @staticmethod
     def removeProductFromInventory(id, product_name):
-        sid = app.db.execute('''
+        res = app.db.execute('''
 DELETE FROM Inventory
 WHERE Inventory.id = :id AND Inventory.product_name = :product_name
 ''',
                                 product_name=product_name,
                                 id=id)
-        # return sid # edit this for listing product name and num available
+        return res
+
 
     @staticmethod
     def updateProductQuantity(id, product_name, number_available):
-        sid = app.db.execute('''
+        res = app.db.execute('''
 UPDATE Inventory
 SET number_available = :number_available
 WHERE Inventory.id = :id AND Inventory.product_name = :product_name
@@ -68,7 +73,7 @@ WHERE Inventory.id = :id AND Inventory.product_name = :product_name
                                 product_name=product_name,
                                 number_available=number_available,
                                 id=id)
-        # return sid # edit this for listing product name and num available
+        return res
 
 
 #     @staticmethod
