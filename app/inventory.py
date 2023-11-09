@@ -44,12 +44,16 @@ def inventory(seller_id):
         search = True
     pagination = Pagination(page=page, per_page=per_page, offset=offset, total=len(items), search=search, record_name='items')
     seller_info = Inventory.getSellerInfo(seller_id)
+    isseller = 0
+    if current_user.is_authenticated:
+        if current_user.id == seller_info[0][0]:
+            isseller = 1
     # return jsonify([item.__dict__ for item in items])
     return render_template('inventory.html',
                            id=seller_info[0][0],
                            name=seller_info[0][1],
                            inv=items_partial,
-                           isseller=1,
+                           isseller=isseller,
                            pagination=pagination)
 
 @bp.route('/inventory/<int:seller_id>/add', methods = ['GET', 'POST'])
