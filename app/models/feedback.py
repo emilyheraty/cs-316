@@ -47,7 +47,7 @@ class Feedback():
         return [Feedback(*row) for row in rows]
     
     def add_product_feedback(user_id, pid, rating, comment, time_posted):
-        try:
+        
             rows = app.db.execute("""
             INSERT INTO Feedback(user_id, pid, rating, comment, time_posted)
             VALUES(:user_id, :pid, :rating, :comment, :time_posted)
@@ -56,9 +56,7 @@ class Feedback():
             user_id = user_id, pid = pid, rating = rating, comment = comment,
             time_posted = time_posted)
             return 1
-        except:
-            print('Product already reviewed!')
-            return 0
+        
 
     @staticmethod
     def get_partial_feedback(user_id, per_page, off):

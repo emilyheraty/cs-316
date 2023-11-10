@@ -50,7 +50,7 @@ def all_feedback():
         full_feedback=[]
         pending = []
     pagination = Pagination(page=page, per_page=per_page, offset=offset, total=len(full_feedback), search=search, record_name='feedback')
-    pagination_2 = Pagination(page=page, per_page=per_page, offset=offset, total=len(pending), search=search, record_name='pending')
+    pagination_2 = Pagination(page=page, per_page=per_page, offset=offset, total=len(purchase_name), search=search, record_name='pending')
     return render_template('all_feedback.html', partial_feedback = partial_feedback, purchase_name = purchase_name, pagination = pagination, pending = pending, partial_pending = partial_pending, pagination_2 = pagination_2)
 
 class FeedbackForm(FlaskForm):
