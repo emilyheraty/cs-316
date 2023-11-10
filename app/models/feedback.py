@@ -47,15 +47,19 @@ class Feedback():
         return [Feedback(*row) for row in rows]
     
     def add_product_feedback(user_id, pid, rating, comment, time_posted):
-        
-            rows = app.db.execute("""
-            INSERT INTO Feedback(user_id, pid, rating, comment, time_posted)
-            VALUES(:user_id, :pid, :rating, :comment, :time_posted)
-            RETURNING id
-            """,
-            user_id = user_id, pid = pid, rating = rating, comment = comment,
-            time_posted = time_posted)
-            return 1
+        feedbackCount = app.db.execute("""
+        SELECT
+        COUNT(*)
+        FROM Feedback                             
+                                       """)
+        rows = app.db.execute("""
+        INSERT INTO Feedback(id, user_id, pid, rating, comment, time_posted)
+        VALUES(:id, :user_id, :pid, :rating, :comment, :time_posted)
+        RETURNING id
+                              """,
+        id=feedbackCount[0][0], user_id = user_id, pid = pid, rating = rating, comment = comment,
+        time_posted = time_posted)
+        return 1
         
 
     @staticmethod
