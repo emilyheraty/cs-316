@@ -86,6 +86,7 @@
           <button class="btn btn-light"> <i class='far fa-user-circle'></i> Hello {{current_user.firstname}}!</button>
           <div class="dropdown-content">
             <a href="{{ url_for('users.account') }}">Account</a>
+            <a href="{{ url_for('cart_bp.showCart') }}">Cart</a>
             <a href="{{ url_for('purchases.purchases') }}">Purchases</a>
             <a href="{{ url_for('feedback.all_feedback') }}">Feedback</a>
             {% if isseller == 1 %}

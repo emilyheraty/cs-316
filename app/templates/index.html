@@ -11,6 +11,7 @@
       <th scope="col">Product ID</th>
       <th scope="col">Product Name</th>
       <th scope="col">Price</th>
+      <th scope="col"></th>
     </tr>
   </thead>
   <tbody>
@@ -19,6 +20,9 @@
         <th scope="row">{{product.id}}</th>
         <td>{{product.name}}</td>
         <td>{{product.price}}</td>
+        <td width=100px>
+          <a href="/cart/add/{{product.id}}" type="button" class="btn btn-light">Add to Cart</a>
+        </td>
       </tr>
     {% endfor %}
   </tbody>
