@@ -23,5 +23,5 @@ def index():
     else:
         purchases = []
     # render the page by adding information to the index.html file
-    return render_template('index.html', avail_products=products, purchase_history=purchases)
+    return render_template('index.html', avail_products=products, purchase_history=purchases, isseller=current_user.is_seller)
 
