@@ -1,0 +1,30 @@
+{% extends "inventory.html" %}
+
+{% block content %}
+
+<h1>Update Inventory Product Quantity</h1>
+
+{% if error == 1 %}
+<h3 style="color:red">Could not update product quantity, please try again</h3>
+{% endif %}
+
+<form action="" method="post">
+    {{ form.hidden_tag() }}
+    <p>
+      {{ form.product_name.label }}<br/>
+      {{ form.product_name(size=100) }}<br/>
+      {% for error in form.product_name.errors %}
+      <span style="color: red;">[{{ error }}]</span>
+      {% endfor %}
+    </p>
+    <p>
+      {{ form.new_quantity.label }}<br/>
+      {{ form.new_quantity(size=32) }}<br/>
+      {% for error in form.new_quantity.errors %}
+      <span style="color: red;">[{{ error }}]</span>
+      {% endfor %}
+    </p>
+    <p>{{ form.submit() }}</p>
+  </form>
+  
+  {% endblock %}

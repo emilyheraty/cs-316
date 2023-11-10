@@ -2,41 +2,101 @@ from flask import render_template
 from flask_login import current_user
 import datetime
 from flask import jsonify
+from flask import redirect, url_for, flash, request
+from werkzeug.urls import url_parse
+from flask_login import login_user, logout_user, current_user
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, DecimalField, IntegerField
+from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
+from flask_paginate import Pagination, get_page_parameter
 
 from .models.inventory import Inventory
+
 
 from flask import Blueprint
 bp = Blueprint('inventory', __name__)
 
+class AddProduct(FlaskForm):
+    product_name = StringField('Product Name', validators=[DataRequired()])
+    quantity = IntegerField('Quantity', validators=[DataRequired()])
+    submit = SubmitField('Add')
+
+class DeleteProduct(FlaskForm):
+    product_name = StringField('Product Name', validators=[DataRequired()])
+    submit = SubmitField('Delete')
+
+class UpdateQuantity(FlaskForm):
+    product_name = StringField('Product Name', validators=[DataRequired()])
+    new_quantity = IntegerField('New Quantity', validators=[DataRequired()])
+    submit = SubmitField('Update')
 
 @bp.route('/inventory/<int:seller_id>')
 def inventory(seller_id):
+    per_page = 4
     # get all available products for sale:
     items = Inventory.getInventory(seller_id)
-    seller_name = Inventory.getSellerName(seller_id)
+    page = request.args.get(get_page_parameter(), type=int, default=1)
+    offset = (page - 1) * per_page
+    items_partial = Inventory.getPartialInventory(seller_id, per_page, offset)
+    search = False
+    q = request.args.get('q')
+    if q:
+        search = True
+    pagination = Pagination(page=page, per_page=per_page, offset=offset, total=len(items), search=search, record_name='items')
+    seller_info = Inventory.getSellerInfo(seller_id)
+    isseller = 0
+    if current_user.is_authenticated:
+        if current_user.id == seller_info[0][0]:
+            isseller = 1
     # return jsonify([item.__dict__ for item in items])
     return render_template('inventory.html',
-                           name=seller_name[0][0],
-                           inv=items)
+                           id=seller_info[0][0],
+                           name=seller_info[0][1],
+                           inv=items_partial,
+                           isseller=isseller,
+                           pagination=pagination)
 
-# @bp.route('/inventory')
-# def getInventory():
-#     seller_name = Inventory.getSellerName(seller_id)
-#     if current_user.is_authenticated:
-#         items = Inventory.getInventory(current_user.id)
-#     else:
-#         items = []
-#     return render_template('inventory.html',
-#                            name=seller_name[0][0],
-#                            inv=items)
-    
-    # find the products current user has bought:
-    # if current_user.is_authenticated:
-    #     purchases = Purchase.get_all_by_uid_since(
-    #         current_user.id, datetime.datetime(1980, 9, 14, 0, 0, 0))
-    # else:
-    #     purchases = None
-    # render the page by adding information to the index.html file
-    # return render_template('index.html',
-    #                        avail_products=products,
-    #                        purchase_history=purchases)
+@bp.route('/inventory/<int:seller_id>/add', methods = ['GET', 'POST'])
+def add_products(seller_id):
+    seller_info = Inventory.getSellerInfo(seller_id)
+    if current_user.is_authenticated:
+        items = Inventory.getInventory(current_user.id)
+        form = AddProduct()
+        if form.validate_on_submit():
+            pname = form.product_name.data
+            amt = form.quantity.data
+            result = Inventory.addToInventory(seller_id, pname, amt)
+            if result == 0:
+                return render_template('inventory-addproduct.html', form=form,isseller=1, error=1)
+            return redirect(url_for('inventory.inventory', seller_id=current_user.id))
+    return render_template('inventory-addproduct.html', form=form, isseller=1, error=0)
+
+@bp.route('/inventory/<int:seller_id>/delete', methods = ['GET', 'POST'])
+def delete_products(seller_id):
+    seller_info = Inventory.getSellerInfo(seller_id)
+    if current_user.is_authenticated:
+        items = Inventory.getInventory(current_user.id)
+        form = DeleteProduct()
+        if form.validate_on_submit():
+            pname = form.product_name.data
+            result = Inventory.removeProductFromInventory(seller_id, pname)
+            if result == 0:
+                return render_template('inventory-deleteproduct.html', form=form,isseller=1, error=1)
+            return redirect(url_for('inventory.inventory', seller_id=current_user.id))
+    return render_template('inventory-deleteproduct.html', form=form, isseller=1, error=0)
+
+@bp.route('/inventory/<int:seller_id>/updatequantity', methods = ['GET', 'POST'])
+def update_products(seller_id):
+    seller_info = Inventory.getSellerInfo(seller_id)
+    if current_user.is_authenticated:
+        items = Inventory.getInventory(current_user.id)
+        form = UpdateQuantity()
+        if form.validate_on_submit():
+            pname = form.product_name.data
+            amt = form.new_quantity.data
+            result = Inventory.updateProductQuantity(seller_id, pname, amt)
+            print(result)
+            if result == 0:
+                return render_template('inventory-updateproduct.html', form=form,isseller=1, error=1)
+            return redirect(url_for('inventory.inventory', seller_id=current_user.id))
+    return render_template('inventory-updateproduct.html', form=form, isseller=1, error=0)

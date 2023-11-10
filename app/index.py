@@ -4,8 +4,10 @@ import datetime
 from .models.feedback import Feedback
 from .models.product import Product
 from .models.purchase import Purchase
+from .models.inventory import Inventory
 from flask import current_app
 from flask import Blueprint
+from flask_paginate import Pagination, get_page_parameter
 bp = Blueprint('index', __name__)
 
 
