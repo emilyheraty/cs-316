@@ -21,6 +21,22 @@ WHERE Carts.buyer_id = :id and Carts.product_id = Products.id
         # perhaps shold make it so price updates from product table as well as name
         return [Cart(*row) for row in rows] if rows else []
 
+    @staticmethod
+    def getPartialCartByBuyerId(id, per_page, off):
+        rows = app.db.execute('''
+SELECT buyer_id, name, seller_id, product_id, quantity, Carts.price                             
+FROM Carts, Products
+WHERE Carts.buyer_id = :id and Carts.product_id = Products.id
+ORDER BY product_id
+LIMIT :per_page
+OFFSET :off
+''',
+                              id=id, 
+                              per_page=per_page,
+                              off=off)
+        # perhaps shold make it so price updates from product table as well as name
+        return [Cart(*row) for row in rows] if rows else []
+
 
 #TODO update quantity, price if (bid pid) are already in cart. 
     @staticmethod

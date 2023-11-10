@@ -1,23 +1,31 @@
 from flask_login import current_user
-from flask import Blueprint, render_template, redirect
+from flask import Blueprint, render_template, redirect, request
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, DecimalField, IntegerField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Regexp
 from .models.cart import Cart
 from .models.product import Product
+from flask_paginate import Pagination, get_page_parameter
 
 bp = Blueprint('cart_bp', __name__)
 
 
 @bp.route('/cart')
 def showCart():
-    # find items in cart of current user. 
     if current_user.is_authenticated:
-        products = Cart.getCartByBuyerId(current_user.id)
+        lineitems = Cart.getCartByBuyerId(current_user.id)
     else:
-        products = []
+        lineitems = []
+
+    per_page = 8
+    # get all available products for sale:
+    page = request.args.get(get_page_parameter(), type=int, default=1)
+    offset = (page - 1) * per_page
+    lineitems_partial = Cart.getPartialCartByBuyerId(current_user.id, per_page, offset)
+    search = request.args.get('q')
+    pagination = Pagination(page=page, per_page=per_page, offset=offset, total=len(lineitems), search=search, record_name='lineitems')
     # render the cart_page template. 
-    return render_template('cart_page.html', items=products)
+    return render_template('cart_page.html', items=lineitems_partial, pagination=pagination)
 
 @bp.route('/cart/add/<int:product_id>', methods=['GET', 'POST'])
 def addItemToCart(product_id):
