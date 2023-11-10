@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style> 
+    .card {
+        width: 700px;
+        height: 300px;
+        border: 2px solid #ddddddd2;
+        border-radius: 10px;
+        background-color: #fff;
+        padding: 20px;
+    }
+    .container {
+        padding: 2px 16px;
+    }
+</style>
+<div style="margin-left: 10px;">
+    <h1 style="margin: 30px 0px 20px 0px;">{{seller.firstname}} {{seller.lastname}}'s Profile</h1>
+    <div class="card" style="margin-bottom: 50px;">
+        <h4>Contact Information</h4>
+        <hr>
+        <h6>Name</h6> 
+        <p>{{seller.firstname}} {{seller.lastname}}</p>
+        <hr>
+        <h6>Email</h6>
+        <p>
+            <a href="mailto:{{seller.email}}"> {{seller.email}}</a>
+        </p>
+    </div>
+    
+    <h4>Products</h4>
+    {{pagination_products.info}}
+    <table class="table" style="width: 80%">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Product ID</th>
+                <th scope="col">Product Name</th>
+                <th scope="col">Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in seller_products %}
+            <tr>
+                <th scope="row">{{product.id}}</th>
+                <td>{{product.name}}</td>
+                <td>{{product.price}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {{pagination_products.links}}
+
+    <h4 style="margin-top: 50px;">Product Feedback</h4>
+    {{pagination_feedback.info}}
+    <table class="table" style="width: 80%">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Rating</th>
+                <th scope="col">Comment</th>
+                <th scope="col">Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for feedback in seller_feedback %}
+            <tr>
+                <td>{{ feedback.rating }}</td>
+                <td>{{ feedback.comment }}</td>
+                <td>{{ feedback.time_posted }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {{pagination_feedback.links}}
+</div>
+
+
+{% endblock %}
