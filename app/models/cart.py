@@ -21,24 +21,37 @@ WHERE Carts.buyer_id = :id and Carts.product_id = Products.id
         # perhaps shold make it so price updates from product table as well as name
         return [Cart(*row) for row in rows] if rows else []
 
+    @staticmethod
+    def getPartialCartByBuyerId(id, per_page, off):
+        rows = app.db.execute('''
+SELECT buyer_id, name, seller_id, product_id, quantity, Carts.price                             
+FROM Carts, Products
+WHERE Carts.buyer_id = :id and Carts.product_id = Products.id
+ORDER BY product_id
+LIMIT :per_page
+OFFSET :off
+''',
+                              id=id, 
+                              per_page=per_page,
+                              off=off)
+        # perhaps shold make it so price updates from product table as well as name
+        return [Cart(*row) for row in rows] if rows else []
 
+
+#TODO update quantity, price if (bid pid) are already in cart. 
     @staticmethod
     def addToCart(bid, sid, pid, quant, price):
         try:
             rows = app.db.execute("""
 INSERT INTO Carts(
-    bid, sid, pid, quant, price)
-VALUES(:bid, :sid, :pid, :quant, :price)
-RETURNING id
+    buyer_id, seller_id, product_id, quantity, price)
+VALUES(:buyer_id, :seller_id, :product_id, :quantity, :price)
 """,
-                                  bid=bid,
-                                  sid=sid,
-                                  pid=pid, quant=quant, price=price)
-            id = bid
-            return Cart.get(id)
+                                  buyer_id=bid,
+                                  seller_id=sid,
+                                  product_id=pid, quantity=quant, price=price)
+            return Cart.getCartByBuyerId(bid)
         except Exception as e:
-            # likely email already in use; better error checking and reporting needed;
-            # the following simply prints the error to the console:
             print(str(e))
             return None
 
