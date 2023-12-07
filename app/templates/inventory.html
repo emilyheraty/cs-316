@@ -17,12 +17,40 @@
   </thead>
   <tbody>
     {% for item in inv%}
+      <!-- {% if current_user.is_authenticated %}
+        {% if current_user.id == id %}
+          {% for item in inv%}
+            <tr>
+              <td>{{ loop.index + pagination.skip }}</td>
+              <td>{{item.product_name}}</td>
+              <td>{{item.number_available}} <a href="{{ url_for('inventory.update_products', seller_id = current_user.id, isseller=1, error=0) }}"> edit</a></td>
+            </tr>
+          {% endfor %}
+      {% else %}
+          {% for item in inv%}
+            <tr>
+              <td>{{ loop.index + pagination.skip }}</td>
+              <td>{{item.product_name}}</td>
+              <td>{{item.number_available}} </td>
+            </tr>
+          {% endfor %}
+        {% endif %}
+      {% endif %} -->
       <tr>
         <td>{{ loop.index + pagination.skip }}</td>
         <td>{{item.product_name}}</td>
-        <td>{{item.number_available}}</td>
+        {% if current_user.is_authenticated %}
+          {% if current_user.id == id %}
+            <td>{{item.number_available}} <a href="{{ url_for('inventory.update_products', seller_id = current_user.id, isseller=1, error=0) }}"> edit</a>
+          {% else %}
+            <td>{{item.number_available}} </td>
+          {% endif %}
+        {% else %}
+          <td>{{item.number_available}} </td>
+        {% endif %}
       </tr>
     {% endfor %}
+    
   </tbody>
 </table>
 {{ pagination.links }}
