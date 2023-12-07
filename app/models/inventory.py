@@ -84,6 +84,7 @@ WHERE Inventory.id = :id AND Inventory.product_name = :product_name
 
     @staticmethod
     def updateProductQuantity(id, product_name, number_available):
+        print("hereeeee")
         res = app.db.execute('''
 UPDATE Inventory
 SET number_available = :number_available
@@ -92,6 +93,7 @@ WHERE Inventory.id = :id AND Inventory.product_name = :product_name
                                 product_name=product_name,
                                 number_available=number_available,
                                 id=id)
+        print("updating")
         return res
 
 

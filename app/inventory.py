@@ -30,7 +30,7 @@ class UpdateQuantity(FlaskForm):
     new_quantity = IntegerField('New Quantity', validators=[DataRequired()])
     submit = SubmitField('Update')
 
-@bp.route('/inventory/<int:seller_id>')
+@bp.route('/inventory/<int:seller_id>', methods = ['GET', 'POST'])
 def inventory(seller_id):
     per_page = 4
     # get all available products for sale:
@@ -48,13 +48,35 @@ def inventory(seller_id):
     if current_user.is_authenticated:
         if current_user.id == seller_info[0][0]:
             isseller = 1
+            form_uq = UpdateQuantity()
+            print("got here")
+            if form_uq.validate_on_submit():
+                print("HELLO?")
+                pname = form_uq.product_name.data
+                print("HELEPEOO")
+                amt = form_uq.new_quantity.data
+                print(amt)
+                result = Inventory.updateProductQuantity(seller_id, pname, amt)
+                if result == 0:
+                    return render_template('inventory.html',
+                            id=seller_info[0][0],
+                            name=seller_info[0][1],
+                            inv=items_partial,
+                            isseller=isseller,
+                            pagination=pagination,
+                            form_uq=form_uq)
+                return redirect(url_for('inventory.inventory', seller_id=current_user.id))
+            else:
+                print("what the fuck")
+                print(form_uq.errors)
     # return jsonify([item.__dict__ for item in items])
     return render_template('inventory.html',
                            id=seller_info[0][0],
                            name=seller_info[0][1],
                            inv=items_partial,
                            isseller=isseller,
-                           pagination=pagination)
+                           pagination=pagination,
+                           form_uq=form_uq)
 
 @bp.route('/inventory/<int:seller_id>/add', methods = ['GET', 'POST'])
 def add_products(seller_id):

@@ -17,31 +17,23 @@
   </thead>
   <tbody>
     {% for item in inv%}
-      <!-- {% if current_user.is_authenticated %}
-        {% if current_user.id == id %}
-          {% for item in inv%}
-            <tr>
-              <td>{{ loop.index + pagination.skip }}</td>
-              <td>{{item.product_name}}</td>
-              <td>{{item.number_available}} <a href="{{ url_for('inventory.update_products', seller_id = current_user.id, isseller=1, error=0) }}"> edit</a></td>
-            </tr>
-          {% endfor %}
-      {% else %}
-          {% for item in inv%}
-            <tr>
-              <td>{{ loop.index + pagination.skip }}</td>
-              <td>{{item.product_name}}</td>
-              <td>{{item.number_available}} </td>
-            </tr>
-          {% endfor %}
-        {% endif %}
-      {% endif %} -->
       <tr>
         <td>{{ loop.index + pagination.skip }}</td>
         <td>{{item.product_name}}</td>
         {% if current_user.is_authenticated %}
           {% if current_user.id == id %}
-            <td>{{item.number_available}} <a href="{{ url_for('inventory.update_products', seller_id = current_user.id, isseller=1, error=0) }}"> edit</a>
+            <td>
+              <!-- {{item.number_available}} -->
+              <form action="{{ url_for('inventory.inventory', seller_id=current_user.id, product_id=item.id) }}" method="POST">
+                <input type="hidden" name="product_name" value="{{ item.product_name }}">
+                {{ form_uq.csrf_token }}
+                <input type="number" name="new_quantity" value="{{ item.number_available }}">
+                {% for error in form_uq.new_quantity.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+                {{ form_uq.submit() }}
+            </form>
+            </td>
           {% else %}
             <td>{{item.number_available}} </td>
           {% endif %}
@@ -50,7 +42,6 @@
         {% endif %}
       </tr>
     {% endfor %}
-    
   </tbody>
 </table>
 {{ pagination.links }}
