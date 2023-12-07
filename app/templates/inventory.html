@@ -13,6 +13,7 @@
       <th scope="col">#</th>
       <th scope="col">Product Name</th>
       <th scope="col">Number Available</th>
+      <th scope="col">Remove Product</th>
     </tr>
   </thead>
   <tbody>
@@ -32,6 +33,14 @@
                     <span style="color: red;">[{{ error }}]</span>
                 {% endfor %}
                 {{ form_uq.submit() }}
+            </form>
+            </td>
+            <td>
+              <!-- {{item.number_available}} -->
+              <form action="{{ url_for('inventory.inventory', seller_id=current_user.id, product_id=item.id) }}" method="POST">
+                <input type="hidden" name="product_name" value="{{ item.product_name }}">
+                {{ form_dp.csrf_token }}
+                {{ form_dp.submit() }}
             </form>
             </td>
           {% else %}
