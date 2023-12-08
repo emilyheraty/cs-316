@@ -31,16 +31,14 @@ class UpdateQuantity(FlaskForm):
     submit = SubmitField('Update')
 
 class Search(FlaskForm):
-    search_input = SearchField
+    search_input = SearchField('Product Name', validators=[DataRequired()])
     submit = SubmitField('Search')
 
 @bp.route('/inventory/<int:seller_id>', methods = ['GET', 'POST'])
 def inventory(seller_id):
-    per_page = 4
-    # add SEARCH BOX
-    
     # get all available products for sale:
     items = Inventory.getInventory(seller_id)
+    per_page = 4
     page = request.args.get(get_page_parameter(), type=int, default=1)
     offset = (page - 1) * per_page
     items_partial = Inventory.getPartialInventory(seller_id, per_page, offset)
@@ -51,11 +49,44 @@ def inventory(seller_id):
     pagination = Pagination(page=page, per_page=per_page, offset=offset, total=len(items), search=search, record_name='items')
     seller_info = Inventory.getSellerInfo(seller_id)
     isseller = 0
+
+    # make search box
+    form_search = Search()
+    form_uq = UpdateQuantity()
+    form_dp = DeleteProduct()
+    if form_search.validate_on_submit():
+        print("Heyyyy")
+        search_str = form_search.search_input.data
+        print(search_str)
+        result = Inventory.getInventoryProducts(search_str, per_page, offset, seller_id)
+        print("got hereeee ")
+        if len(result) == 0:
+            print("no results lol")
+            return render_template('inventory.html',
+                            id=seller_info[0][0],
+                            name=seller_info[0][1],
+                            inv=items_partial,
+                            isseller=isseller,
+                            pagination=pagination,
+                            form_uq=form_uq,
+                            form_dp=form_dp,
+                            form_search=form_search,
+                            err_message="No search results found")
+        else:
+            print(result)
+            return render_template('inventory.html',
+                            id=seller_info[0][0],
+                            name=seller_info[0][1],
+                            inv=result,
+                            isseller=isseller,
+                            pagination=pagination,
+                            form_uq=form_uq,
+                            form_dp=form_dp,
+                            form_search=form_search,
+                            err_message=0)
     if current_user.is_authenticated:
         if current_user.id == seller_info[0][0]:
             isseller = 1
-            form_uq = UpdateQuantity()
-            form_dp = DeleteProduct()
             print("got here")
             if form_uq.validate_on_submit():
                 print("HELLO?")
@@ -72,7 +103,9 @@ def inventory(seller_id):
                             isseller=isseller,
                             pagination=pagination,
                             form_uq=form_uq,
-                            form_dp=form_dp)
+                            form_dp=form_dp,
+                            form_search=form_search,
+                            err_message="error: could not update quantity")
                 return redirect(url_for('inventory.inventory', seller_id=current_user.id))
             else:
                 print("what the fuck")
@@ -91,7 +124,9 @@ def inventory(seller_id):
                             isseller=isseller,
                             pagination=pagination,
                             form_uq=form_uq,
-                            form_dp=form_dp)
+                            form_dp=form_dp,
+                            form_search=form_search,
+                            err_message="error: could not remove product")
                 return redirect(url_for('inventory.inventory', seller_id=current_user.id))
             else:
                 print("what the fuck")
@@ -104,7 +139,9 @@ def inventory(seller_id):
                            isseller=isseller,
                            pagination=pagination,
                            form_uq=form_uq,
-                           form_dp=form_dp)
+                           form_dp=form_dp,
+                           form_search=form_search,
+                           err_message=0)
 
 @bp.route('/inventory/<int:seller_id>/add', methods = ['GET', 'POST'])
 def add_products(seller_id):

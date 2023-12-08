@@ -36,6 +36,25 @@ OFFSET :off
 
 
     @staticmethod
+    def getInventoryProducts(str, per_page, off, id):
+        print("trying out this")
+        rows = app.db.execute('''
+SELECT id, product_name, number_available
+FROM Inventory
+WHERE product_name LIKE '%' || :str || '%'
+AND id=:id
+ORDER BY number_available DESC
+LIMIT :per_page
+OFFSET :off
+''',
+                                id=id,
+                                str=str,
+                                per_page=per_page,
+                                off=off)
+        print("still trying man")
+        return [Inventory(*row) for row in rows]
+
+    @staticmethod
     def getSellerInfo(id):
         sid = app.db.execute('''
 SELECT DISTINCT id, firstname
