@@ -15,6 +15,7 @@
         padding: 2px 16px;
     }
 </style>
+{% if seller.is_seller %}
 <div style="margin-left: 10px;">
     <h1 style="margin: 30px 0px 20px 0px;">{{seller.firstname}} {{seller.lastname}}'s Profile</h1>
     <div class="card" style="margin-bottom: 50px;">
@@ -28,7 +29,6 @@
             <a href="mailto:{{seller.email}}"> {{seller.email}}</a>
         </p>
     </div>
-    
     <h4>Products</h4>
     {{pagination_products.info}}
     {{pagination_products.links}}
@@ -75,6 +75,7 @@
     </table>
     {{pagination_feedback.links}}
 </div>
+{% endif %}
 
 
 {% endblock %}

@@ -175,24 +175,27 @@ def seller_public_profile(seller_id):
         search = True
 
     seller = User.get_profile_info(seller_id)
-    seller_inventory = Inventory.getInventory(seller_id)
-    seller_products = []
-    for item in seller_inventory:
-        product = Product.get_by_name(item.product_name)
-        seller_products.append(product)
-        
-    seller_feedback = Feedback.get_recent_feedback(seller_id, 10)
+    if(seller.is_seller):
+        seller_inventory = Inventory.getInventory(seller_id)
+        seller_products = []
+        for item in seller_inventory:
+            product = Product.get_by_name(item.product_name)
+            seller_products.append(product)
+            
+        seller_feedback = Feedback.get_recent_feedback(seller_id, 10)
 
-    page1, per_page1, offset1 = get_page_args(page_parameter='page1', per_page_parameter='per_page1')
-    page2, per_page2, offset2 = get_page_args(page_parameter='page2', per_page_parameter='per_page2')
+        page1, per_page1, offset1 = get_page_args(page_parameter='page1', per_page_parameter='per_page1')
+        page2, per_page2, offset2 = get_page_args(page_parameter='page2', per_page_parameter='per_page2')
 
 
 
-    products = seller_products[offset1: offset1 + per_page1]
-    feedback = seller_feedback[offset2: offset2 + per_page2]
-    pagination_products = Pagination(page=page1, per_page=per_page1, search=search, total=len(seller_products), href='/seller/0?page1={0}')
-    pagination_feedback = Pagination(page=page2, per_page=per_page2, total=len(seller_feedback), href='/seller/0?page2={0}')
+        products = seller_products[offset1: offset1 + per_page1]
+        feedback = seller_feedback[offset2: offset2 + per_page2]
+        pagination_products = Pagination(page=page1, per_page=per_page1, search=search, total=len(seller_products), href='/seller/0?page1={0}')
+        pagination_feedback = Pagination(page=page2, per_page=per_page2, total=len(seller_feedback), href='/seller/0?page2={0}')
 
-    return render_template('seller_profile.html', seller=seller, seller_products=products, seller_feedback=feedback,
-                            pagination_products=pagination_products, pagination_feedback=pagination_feedback)
+        return render_template('seller_profile.html', seller=seller, seller_products=products, seller_feedback=feedback,
+                                pagination_products=pagination_products, pagination_feedback=pagination_feedback)
+    else:
+        return render_template('seller_profile.html', seller=seller)
 
