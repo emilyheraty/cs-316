@@ -43,8 +43,8 @@ def login():
 
 
 class RegistrationForm(FlaskForm):
-    firstname = StringField('First Name', validators=[DataRequired(), Regexp("^[a-zA-Z \-.]*$ ", message="Invalid characters")])
-    lastname = StringField('Last Name', validators=[DataRequired(), Regexp("^[a-zA-Z \-.]*$", message="Invalid characters")])
+    firstname = StringField('First Name', validators=[DataRequired()])
+    lastname = StringField('Last Name', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
     password2 = PasswordField(

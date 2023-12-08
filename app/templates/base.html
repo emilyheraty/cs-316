@@ -92,6 +92,7 @@
             <a href="{{ url_for('feedback.all_feedback') }}">Feedback</a>
             {% if isseller == 1 %}
               <a href="{{ url_for('inventory.inventory', seller_id = current_user.id) }}">Inventory</a>
+              <a href="{{ url_for('purchases.orders', seller_id = current_user.id) }}">Orders</a>
             {% endif %}
             <a href="{{ url_for('users.logout') }}">Log out</a>
           </div>

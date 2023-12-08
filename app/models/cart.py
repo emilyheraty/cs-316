@@ -13,7 +13,7 @@ class Cart:
     @staticmethod
     def getCartByBuyerId(id):
         rows = app.db.execute('''
-SELECT buyer_id, name, seller_id, product_id, quantity, Carts.price                             
+SELECT buyer_id, name, Products.seller_id, product_id, quantity, Carts.price                             
 FROM Carts, Products
 WHERE Carts.buyer_id = :id and Carts.product_id = Products.id
 ''',
@@ -24,7 +24,7 @@ WHERE Carts.buyer_id = :id and Carts.product_id = Products.id
     @staticmethod
     def getPartialCartByBuyerId(id, per_page, off):
         rows = app.db.execute('''
-SELECT buyer_id, name, seller_id, product_id, quantity, Carts.price                             
+SELECT buyer_id, name, Products.seller_id, product_id, quantity, Carts.price                             
 FROM Carts, Products
 WHERE Carts.buyer_id = :id and Carts.product_id = Products.id
 ORDER BY product_id
@@ -54,4 +54,7 @@ VALUES(:buyer_id, :seller_id, :product_id, :quantity, :price)
         except Exception as e:
             print(str(e))
             return None
+
+        
+
 

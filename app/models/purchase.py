@@ -55,3 +55,29 @@ ORDER BY time_purchased DESC
 ''',
                               uid=uid)
         return rows
+
+    @staticmethod
+    def submitPurchase(uid, pid, time, amount, quantity, status):
+        try:
+            rows = app.db.execute("""
+INSERT INTO Purchases(uid, pid, time_purchased, total_amount, number_of_items, fulfillment_status)
+VALUES(:uid, :pid, :time, :amount, :qty, :status)
+""",
+                                  uid=uid,
+                                  pid=pid,
+                                  time=time,
+                                  amount=amount,
+                                  qty=quantity,
+                                  status=status)
+        except Exception as e:
+            print(str(e))
+
+    @staticmethod
+    def get_by_sellerid(seller_id):
+        rows = app.db.execute('''
+SELECT id, uid, pid, time_purchased, total_amount, number_of_items, fulfillment_status
+FROM Purchases, 
+WHERE id = :id
+''',
+                              id=id)
+        return Purchase(*(rows[0])) if rows else None
