@@ -35,7 +35,7 @@ def all_feedback():
         partial_feedback = Feedback.get_partial_feedback(user_id, per_page, offset)
         pending = Feedback.pending_products(user_id)
         partial_pending = Feedback.get_partial_pending(user_id, per_page, offset)
-        purchase_name = Feedback.get_purchase_name_pending(user_id)
+        purchase_name_pending = Feedback.get_purchase_name_pending(user_id)
         num = 0
         
             
@@ -54,9 +54,9 @@ def all_feedback():
     else:
         full_feedback=[]
         pending = []
-    pagination = Pagination(page=page, per_page=per_page, offset=offset, total=len(full_feedback), search=search, record_name='feedback')
+    pagination = Pagination(page=page, per_page=per_page, offset=offset, total=len(full_feedback), search=search, record_name='partial_feedback')
     pagination_2 = Pagination(page=page, per_page=per_page, offset=offset, total=len(pending), search=search_2, record_name='pending')
-    return render_template('all_feedback.html', partial_feedback = partial_feedback, purchase_name = purchase_name, pagination = pagination, pending = pending, partial_pending = partial_pending, pagination_2 = pagination_2)
+    return render_template('all_feedback.html', partial_feedback = partial_feedback, purchase_name_pending = purchase_name_pending, pagination = pagination, pending = pending, partial_pending = partial_pending, pagination_2 = pagination_2)
 
 class FeedbackForm(FlaskForm):
     rating = SelectField('Rating', choices=[('1', '1'), ('2', '2'), ('3', '3'),
@@ -79,3 +79,22 @@ def post_feedback(pid):
             return redirect(url_for('feedback.all_feedback'))
     return render_template('post_feedback.html', title='Submit', form=form)
 
+
+class FeedbackEditForm(FlaskForm):
+    rating = SelectField('New Rating', choices=[('1', '1'), ('2', '2'), ('3', '3'),
+                                             ('4', '4'), ('5', '5')],
+                                              coerce = int, validators = [DataRequired()])
+    comment = TextAreaField('New Review', validators= [DataRequired()])
+    submit = SubmitField('Submit Edits')
+
+@bp.route('/edit_feedback<int:id>', methods=['GET', 'POST'])
+def edit_feedback(id):
+    if current_user.is_authenticated is False:
+        return redirect(url_for('users.login'))
+    form = FeedbackEditForm()
+    if form.is_submitted():
+        if Feedback.edit_feedback(id, form.rating.data, form.comment.data, datetime.datetime.now()):
+            flash('Feedback successfully edited!')
+            return redirect(url_for('feedback.all_feedback'))
+    return render_template('edit_feedback.html', title='Submit', form=form)
+    

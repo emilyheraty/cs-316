@@ -9,17 +9,21 @@
 <table class="table">
     <thead class="thead-dark">
         <tr>
+            <th scope="col">Product Name</th>
             <th scope="col">Rating</th>
             <th scope="col">Comment</th>
             <th scope="col">Date</th>
+            <th scope="col">Edit Review</th>
         </tr>
     </thead>
     <tbody>
         {% for feedback in partial_feedback %}
         <tr>
+            <td>{{ feedback.name }}</td>
             <td>{{ feedback.rating }}</td>
             <td>{{ feedback.comment }}</td>
             <td>{{ feedback.time_posted }}</td>
+            <td> <a class="btn btn-secondary" href="{{ url_for('feedback.edit_feedback', id = feedback.id) }}" role="button">Edit</a> </td>
         </tr>
         {% endfor %}
     </tbody>
@@ -32,18 +36,17 @@
 <table class="table">
 <thead class="thead-dark">
     <tr>
-        <th scope="col">Purchase Id</th>
+       
         <th scope="col">Product Name</th>
     </tr>
 </thead>
 <tbody>
-    {% for p in purchase_name %}
+    {% for p in purchase_name_pending %}
         <tr>
             
             
-           <td> <a href="{{ url_for('feedback.post_feedback', pid = p.pid) }}"> {{ p.pid }}</a> </td>
+           <td> <a href="{{ url_for('feedback.post_feedback', pid = p.pid) }}"> {{ p.name }}</a> </td>
            
-           <td> {{p.name}}</td>
            
            
         

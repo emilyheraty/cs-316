@@ -3,13 +3,16 @@ from flask import current_app as app
 
 
 class Feedback():
-    def __init__(self, id, user_id, pid, rating, comment, time_posted):
+    def __init__(self, id, user_id, pid, seller_id, review_type, rating, comment, time_posted):
         self.id = id
         self.user_id = user_id
         self.pid = pid
+        self.seller_id = seller_id
+        self.review_type = review_type
         self.rating = rating
         self.comment = comment
         self.time_posted = time_posted
+
 
     @staticmethod
     def get_recent_feedback(user_id, limit):
@@ -28,17 +31,21 @@ class Feedback():
             id = result[0],
             user_id = result[1],
             pid = result[2],
-            rating = result[3],
-            comment = result[4],
-            time_posted = result[5])
+            seller_id = result[3],
+            review_type = result[4],
+            rating = result[5],
+            comment = result[6],
+            time_posted = result[7])
             feedbacks.append(feedback)
         
         return feedbacks
 
+
     @staticmethod
     def get_all_feedback(user_id):
         rows = app.db.execute("""
-        SELECT * FROM Feedback
+        SELECT * 
+        FROM Feedback
         WHERE user_id = :user_id
         ORDER BY time_posted DESC
         """,
@@ -46,6 +53,7 @@ class Feedback():
         
         return [Feedback(*row) for row in rows]
     
+    @staticmethod
     def add_product_feedback(user_id, pid, seller_id, review_type, rating, comment, time_posted):
         feedbackCount = app.db.execute("""
         SELECT
@@ -63,17 +71,31 @@ class Feedback():
         return 1
 
     @staticmethod
+    def edit_feedback(id, rating, comment, time_posted):
+        new = app.db.execute("""
+            UPDATE Feedback
+            SET rating = :rating, comment = :comment, time_posted = :time_posted
+            WHERE id = :id""", id = id, rating = rating, comment = comment, time_posted = time_posted)
+        return new
+
+
+    @staticmethod
     def get_partial_feedback(user_id, per_page, off):
         rows = app.db.execute("""
-            SELECT * 
-            FROM Feedback
-            WHERE user_id = :user_id
+            SELECT p.rating, p.comment, p.time_posted, p.name, p.pid, p.id 
+            FROM (
+                              SELECT Feedback.id, Feedback.rating, Feedback.comment, Feedback.time_posted, Products.name, Feedback.pid
+                              FROM Feedback 
+                                    INNER JOIN Products ON Feedback.pid = Products.id
+                              WHERE user_id = :user_id
+                              ) as p
             ORDER BY time_posted DESC
             LIMIT :per_page
             OFFSET :off
                               """,
                               user_id = user_id, per_page = per_page, off = off)
-        return [Feedback(*row) for row in rows]
+        return rows
+    
    # @staticmethod
    # def get(id):
    #     rows = app.db.execute("""
@@ -97,15 +119,17 @@ class Feedback():
         """, uid = uid)
         return rows
     
+
+    @staticmethod
     def get_seller(pid):
         rows = app.db.execute("""
         SELECT DISTINCT Sellers.id 
-        FROM Sellers, Purchases, Inventory, Products
-        WHERE Purchases.id = :pid
-        AND Purchases.pid = Products.id
+        FROM Sellers, Inventory, Products
+        WHERE Products.id = :pid
         AND Products.name = Inventory.product_name
         AND Inventory.id = Sellers.id""", pid = pid)
-        return rows
+
+        return int(rows[0][0])
 
 
     @staticmethod
@@ -124,24 +148,21 @@ class Feedback():
         """, uid = uid, per_page = per_page, off = off)
         return rows
     
+
     @staticmethod
     def get_purchase_name_pending(uid):
-        
         rows = app.db.execute("""
-                SELECT DISTINCT p.pid, p.name
-                FROM (SELECT name, p2.id, pid, uid 
-                    FROM Products as p1
-                    INNER JOIN Purchases as p2 ON p2.pid = p1.id 
-                    WHERE uid = :uid) as p
-                WHERE NOT EXISTS(
-                              SELECT *
-                              FROM Feedback, Purchases
-                              WHERE Feedback.pid = Purchases.pid
-                )""", uid = uid)
+        SELECT DISTINCT Purchases.pid, Products.name
+        FROM Purchases, Products
+        WHERE Purchases.uid = :uid AND
+        Products.id = Purchases.pid
+        
+        
+                """, uid = uid)
         return rows
     
+    @staticmethod
     def get_purchase_name_posted(uid):
-        
         rows = app.db.execute("""
                 SELECT DISTINCT p.pid, p.name
                 FROM (SELECT name, p2.id, pid, uid 
