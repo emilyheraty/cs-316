@@ -40,3 +40,22 @@ LIMIT :k;
                               k=k)
     
         return rows
+    
+    @staticmethod
+    def get_by_name(name):
+        rows = app.db.execute('''
+SELECT id, seller_id, name, price, available
+FROM Products                             
+WHERE name = :name
+''',
+                              name=name)
+        return Product(*(rows[0])) if rows is not None else None                          
+    
+        
+
+        
+        
+    
+
+
+
