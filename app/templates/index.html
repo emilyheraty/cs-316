@@ -8,8 +8,9 @@
 <table class='table table-hover table-bordered container'>
   <thead class="thead-dark">
     <tr>
-      <th scope="col">Product ID</th>
+      <th scope="col">Image</th>
       <th scope="col">Product Name</th>
+      <th scope="col">Average Rating</th>
       <th scope="col">Price</th>
       <th scope="col"></th>
     </tr>
@@ -17,8 +18,11 @@
   <tbody>
     {% for product in avail_products%}
       <tr>
-        <th scope="row">{{product.id}}</th>
+        <td width=100px>
+          <img src="static/clover.jpg"></img>
+        </td>        
         <td>{{product.name}}</td>
+        <td>{{product.get_rating(product.id)}}</td>
         <td>{{product.price}}</td>
         <td width=100px>
           <a href="/cart/add/{{product.id}}" type="button" class="btn btn-light">Add to Cart</a>
