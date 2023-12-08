@@ -21,12 +21,3 @@ def top_k_products(k):
                            items=products
                         )
 
-@bp.route('/product/<str:name>')
-def products_list(name):
-    products = Product.get_by_name(name)
-    # get all available products by name:
-
-    # render the page by adding information to the index.html file
-    return render_template('temp_products.html',
-                           items=products
-                        )

@@ -41,6 +41,7 @@ WHERE available = :available
 ''',
                               available=available)
         return [Product(*row) for row in rows]
+    
     @staticmethod
     def get_k_products(k):
         rows = app.db.execute('''
