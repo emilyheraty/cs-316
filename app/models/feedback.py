@@ -159,6 +159,18 @@ class Feedback():
         return rows
     
     @staticmethod
+    def get_partial_customer_feedback_seller(seller_id, per_page, off):
+        rows = app.db.execute("""
+            SELECT *
+            FROM Feedback
+            WHERE seller_id = :seller_id AND
+            review_type = 'seller'
+            LIMIT :per_page
+            OFFSET :off
+                              """, seller_id = seller_id, per_page = per_page, off = off)
+        return rows
+    
+    @staticmethod
     def get_customer_feedback_product(seller_id):
         rows = app.db.execute("""
             SELECT *
@@ -166,6 +178,18 @@ class Feedback():
             WHERE seller_id = :seller_id AND
             review_type = 'product' 
                               """, seller_id=seller_id)
+        return rows
+    
+    @staticmethod
+    def get_partial_customer_feedback_product(seller_id, per_page, off):
+        rows = app.db.execute("""
+            SELECT *
+            FROM Feedback
+            WHERE seller_id = :seller_id AND
+            review_type = 'product'
+            LIMIT :per_page
+            OFFSET :off
+                              """, seller_id = seller_id, per_page = per_page, off = off)
         return rows
 
 

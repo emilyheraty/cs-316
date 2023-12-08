@@ -90,7 +90,6 @@
             {% if isseller == 1 %}
               <a href="{{ url_for('inventory.inventory', seller_id = current_user.id) }}">Inventory</a>
             {% endif %}
-            <a href="{{ url_for('feedback.all_feedback') }}">Feedback</a>
             <a href="{{ url_for('users.logout') }}">Log out</a>
           </div>
         </div>

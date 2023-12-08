@@ -3,17 +3,23 @@
 {% block content %}
 
 {% if current_user.is_authenticated %}
+<p style="margin-top: 10px;">
+    <a href="{{ url_for('index.index') }}">Home</a>
+    / <a href="{{ url_for('users.account') }}">Account</a>
+    / Reviews
+</p>
+
 <br>
-<h2>Your submitted feedback:</h2>
+<h2>Your posted reviews</h2>
 
 <table class="table">
     <thead class="thead-dark">
         <tr>
-            <th scope="col">Product Name</th>
+            <th scope="col">Product name</th>
             <th scope="col">Rating</th>
             <th scope="col">Comment</th>
-            <th scope="col">Date</th>
-            <th scope="col">Edit Review</th>
+            <th scope="col">Date posted</th>
+            <th scope="col">Edit review</th>
         </tr>
     </thead>
     <tbody>
@@ -32,12 +38,13 @@
 {{ pagination.links }}
 <br><br>
 
-<h2>Leave a review!</h2>
+<h2>Completed purchases pending review</h2>
 <table class="table">
 <thead class="thead-dark">
     <tr>
        
-        <th scope="col">Product Name</th>
+        <th scope="col">Product name</th>
+        <th scope="col">Leave review?</th>
     </tr>
 </thead>
 <tbody>
@@ -45,8 +52,8 @@
         <tr>
             
             
-           <td> <a href="{{ url_for('feedback.post_feedback', pid = p.pid) }}"> {{ p.name }}</a> </td>
-           
+           <td>  {{ p.name }} </td>
+           <td> <a class="btn btn-secondary" href="{{ url_for('feedback.post_feedback', pid = p.pid) }}" role="button">Review</a> </td>
            
            
         
