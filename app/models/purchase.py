@@ -44,6 +44,17 @@ ORDER BY time_purchased DESC
 ''',
                               uid=uid)
         return [Purchase(*row) for row in rows]
+    
+    @staticmethod
+    def get_chart_data(uid):
+        rows = app.db.execute('''
+SELECT time_purchased, total_amount, number_of_items
+FROM Purchases
+WHERE uid = :uid
+ORDER BY time_purchased DESC
+''',
+                              uid=uid)
+        return rows
 
     @staticmethod
     def submitPurchase(uid, pid, time, amount, quantity, status):
