@@ -10,11 +10,17 @@
   / Purchases
 </p>
 <h2>Your recent purchases:</h2>
-{{ pagination.info }}
+  {{ pagination.info }}
+  {{ pagination.links }}
+  <p>
+    {{ searchForm.keyword.label }}: {{ searchForm.keyword(size=32) }} {{ searchForm.submit() }}</p>
+  </p>
+  
 <table class='table table-hover table-bordered container'>
   <thead class="thead-dark">
     <tr>
       <th scope="col">Purchase ID</th>
+      <th scope="col">Product Name</th>
       <th scope="col">Time Purchased</th>
       <th scope="col">Total Amount</th>
       <th scope="col">Number of Items</th>
@@ -25,6 +31,7 @@
     {% for purchase in purchase_history%}
       <tr>
         <th scope="row">{{purchase.id}}</th>
+        <td>{{products[purchase_history.index(purchase)].name}}</td>
         <td>{{purchase.time_purchased}}</td>
         <td>{{purchase.total_amount}}</td>
         <td>{{purchase.number_of_items}}</td>
