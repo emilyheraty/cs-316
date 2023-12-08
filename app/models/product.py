@@ -44,7 +44,7 @@ LIMIT :k;
     @staticmethod
     def get_by_name(name):
         rows = app.db.execute('''
-SELECT *
+SELECT id, seller_id, name, price, available
 FROM Products                             
 WHERE name = :name
 ''',
