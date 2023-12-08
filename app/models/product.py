@@ -2,12 +2,18 @@ from flask import current_app as app
 
 
 class Product:
-    def __init__(self, id, name, price, available):
+    def __init__(self, id, name, description, category, price, review, rating, available, image):
         self.id = id
         self.name = name
+        self.description = description
+        self.category = category
         self.price = price
+        self.review = review
+        self.rating = rating
         self.available = available
+        self.image = image
 
+        
     @staticmethod
     def get(id):
         rows = app.db.execute('''
@@ -38,6 +44,19 @@ LIMIT :k;
                               k=k)
     
         return rows
+    
+    @staticmethod
+    def get_by_name(name):
+        rows = app.db.execute('''
+SELECT id, name, price, available
+FROM Products
+WHERE name = :name
+''',
+                              name=name)
+        return Product(*(rows[0])) if rows is not None else None
+    
+
+
                           
     
         
