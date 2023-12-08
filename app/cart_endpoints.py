@@ -5,7 +5,9 @@ from wtforms import StringField, PasswordField, BooleanField, SubmitField, Decim
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Regexp
 from .models.cart import Cart
 from .models.product import Product
+from .models.purchase import Purchase
 from flask_paginate import Pagination, get_page_parameter
+from datetime import datetime
 
 bp = Blueprint('cart_bp', __name__)
 
@@ -31,7 +33,36 @@ def showCart():
 def addItemToCart(product_id):
     product = Product.get(product_id)
     quantity=1
+    if current_user.is_authenticated:
+        Cart.addToCart(current_user.id, 0, product.id, quantity, product.price)
+    else:
+        redirect('/login')
     # Should take you to order page to determine quantity, and maybe other options?
-    Cart.addToCart(current_user.id, 0, product.id, quantity, product.price)
+
+    
     #bid, sid, pid, quant, price
     return redirect('/')
+
+@bp.route('/cart/submit', methods=['GET', 'POST'])
+def submitCart():
+    if current_user.is_authenticated:
+        lineitems = Cart.getCartByBuyerId(current_user.id)
+    else:
+        redirect('/login')
+
+    time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+
+    for purch in lineitems:
+        # if user can afford it
+        amount = round(purch.quantity * purch.price, 2)
+        Purchase.submitPurchase(purch.buyer_id, 
+                                purch.product_id, 
+                                str(time),
+                                amount, 
+                                purch.quantity, 
+                                0
+        )
+    #uid, pid, time, sid, amount, quant, status
+    
+    return redirect('/purchases')

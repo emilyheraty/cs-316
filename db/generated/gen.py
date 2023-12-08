@@ -7,7 +7,7 @@ num_products = 2000
 num_purchases = 2500
 num_carts = 1000
 num_feedback = 1000
-num_inventory = 1000
+num_inventory = 300
 
 Faker.seed(0)
 fake = Faker()
@@ -54,7 +54,7 @@ def gen_sellers(sellers):
                 seller_ids.append(sid)
     return seller_ids
 
-def gen_products(num_products):
+def gen_products(seller_ids):
     available_pids = []
     product_names = []
     with open('Products.csv', 'w') as f:
@@ -63,13 +63,14 @@ def gen_products(num_products):
         for pid in range(num_products):
             if pid % 100 == 0:
                 print(f'{pid}', end=' ', flush=True)
+            sid = fake.random_element(elements=seller_ids)
             name = fake.sentence(nb_words=4)[:-1]
             price = f'{str(fake.random_int(max=500))}.{fake.random_int(max=99):02}'
             available = fake.random_element(elements=('true', 'false'))
             if available == 'true':
                 available_pids.append(pid)
                 product_names.append(name)
-            writer.writerow([pid, name, price, available])
+            writer.writerow([pid, int(sid), name, float(price), available=='true'])
         print(f'{num_products} generated; {len(available_pids)} available')
     return available_pids, product_names
 
@@ -154,7 +155,7 @@ def gen_feedback(num_feedback, available_pids):
 
 sellers = gen_users(num_users)
 seller_ids = gen_sellers(sellers)
-available_pids, product_names = gen_products(num_products)
+available_pids, product_names = gen_products(seller_ids)
 gen_purchases(num_purchases, available_pids)
 gen_carts(num_carts, seller_ids)
 gen_inventory(num_inventory, seller_ids, product_names)

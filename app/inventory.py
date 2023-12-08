@@ -69,6 +69,7 @@ def add_products(seller_id):
             if result == 0:
                 return render_template('inventory-addproduct.html', form=form,isseller=1, error=1)
             return redirect(url_for('inventory.inventory', seller_id=current_user.id))
+    
     return render_template('inventory-addproduct.html', form=form, isseller=1, error=0)
 
 @bp.route('/inventory/<int:seller_id>/delete', methods = ['GET', 'POST'])
