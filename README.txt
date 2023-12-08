@@ -28,8 +28,12 @@ cart_page.html - the html for the cart front end
 Judy Rhee - Products Guru
 - will finish endpoint, has an extension until Saturday
 
-link to gitlab: https://gitlab.oit.duke.edu/cyl13/cs-316-project
-
 link to milestone 3 video: https://clipchamp.com/watch/JHlCiQ56KZb
+link to gitlab: https://gitlab.oit.duke.edu/cyl13/cs-316-project
+-----------------------------------------------------------------------------------
 
+The code for creating and populating a much larger database is in db/generated/gen.py
+
+link to milestone 4 video: https://clipchamp.com/watch/xnyGFLod2ZS
+link to gitlab: https://gitlab.oit.duke.edu/cyl13/cs-316-project
 

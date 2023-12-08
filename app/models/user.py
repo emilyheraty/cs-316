@@ -6,16 +6,19 @@ from .. import login
 
 
 class User(UserMixin):
-    def __init__(self, id, email, firstname, lastname):
+    def __init__(self, id, email, firstname, lastname, address, balance, is_seller):
         self.id = id
         self.email = email
         self.firstname = firstname
         self.lastname = lastname
+        self.address = address
+        self.balance = balance
+        self.is_seller = is_seller
 
     @staticmethod
     def get_by_auth(email, password):
         rows = app.db.execute("""
-SELECT password, id, email, firstname, lastname
+SELECT password, id, email, firstname, lastname, address, balance, is_seller
 FROM Users
 WHERE email = :email
 """,
@@ -62,9 +65,56 @@ RETURNING id
     @login.user_loader
     def get(id):
         rows = app.db.execute("""
-SELECT id, email, firstname, lastname
+SELECT id, email, firstname, lastname, address, balance, is_seller
 FROM Users
 WHERE id = :id
 """,
                               id=id)
         return User(*(rows[0])) if rows else None
+    
+    @staticmethod
+    def get_profile_info(id):
+        rows = app.db.execute("""
+SELECT id, email, firstname, lastname, address, balance, is_seller
+FROM Users
+WHERE id = :id                    
+""", 
+                             id=id)
+        return User(*(rows[0])) if rows else None
+    
+    @staticmethod
+    def update_info(id, email, firstname, lastname, address, balance, is_seller):
+        try:
+            rows = app.db.execute("""
+UPDATE Users
+SET email = :email, firstname = :firstname, lastname = :lastname, address = :address, balance = :balance, is_seller = :is_seller
+WHERE id = :id
+""",
+                            id=id,
+                            email=email,
+                            firstname=firstname,
+                            lastname=lastname,
+                            address=address,
+                            balance=balance,
+                            is_seller=int(is_seller))
+            return 1
+        except Exception as e:
+            print(str(e))
+            return None
+            
+
+    @staticmethod
+    def update_password(id, password):
+        try:
+            rows = app.db.execute("""
+UPDATE Users
+SET password = :password
+WHERE id = :id
+""",
+                            id=id,
+                            password=generate_password_hash(password))
+            return 1
+        except Exception as e:
+            print (str(e))
+        return None
+

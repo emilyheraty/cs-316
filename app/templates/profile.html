@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style> 
+    .card {
+        width: 700px;
+        height: 650px;
+        border: 2px solid #ddddddd2;
+        border-radius: 10px;
+        margin: 20px;
+        background-color: #fff;
+        padding: 20px;
+    }
+    .container {
+        padding: 2px 16px;
+    }
+</style>
+<p style="margin-top: 10px;">
+    <a href="{{ url_for('index.index') }}">Home</a>
+    /  
+    <a href="{{ url_for('users.account') }}">Account</a>
+    / Profile
+</p>
+<h1 style="margin-left: 20px;">Profile</h1>
+<div class="card">
+    <h6>Name</h6> 
+    <p>{{user.firstname}} {{user.lastname}}</p>
+    <hr>
+    <h6>Email</h6>
+    <p>
+        {{user.email}}
+    </p>
+    <hr>
+    <h6>Password</h6>
+    <p >
+        *******
+        <a style="vertical-align: text-bottom; margin-left: 5px;" href="{{ url_for('users.changepassword') }}">Change Password</a>
+
+    </p>
+    <hr>
+    <h6>Address</h6>
+    <p>{{user.address}}</p>
+    <hr>
+    <h6>Balance</h6>
+    <p>${{user.balance}}</p>
+    <hr>
+    <h6>Seller Status</h6>
+    {% if user.is_seller %}
+    <p>You are a seller</p>
+    {% else %}
+    <p>You are not a seller</p>
+    {% endif %}
+    <a style="text-align: right;" href="{{ url_for('users.edit') }}">Edit</a>
+</div>
+<p>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul>
+      {% for message in messages %}
+      <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+</p>
+
+
+{% endblock %}

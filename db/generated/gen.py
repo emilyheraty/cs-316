@@ -54,7 +54,7 @@ def gen_sellers(sellers):
                 seller_ids.append(sid)
     return seller_ids
 
-def gen_products(num_products):
+def gen_products(num_products, seller_ids):
     available_pids = []
     product_names = []
     with open('Products.csv', 'w') as f:
@@ -63,6 +63,7 @@ def gen_products(num_products):
         for pid in range(num_products):
             if pid % 100 == 0:
                 print(f'{pid}', end=' ', flush=True)
+            sid = fake.random_element(elements=seller_ids)
             name = fake.sentence(nb_words=4)[:-1]
             price = f'{str(fake.random_int(max=500))}.{fake.random_int(max=99):02}'
             available = fake.random_element(elements=('true', 'false'))
@@ -74,7 +75,7 @@ def gen_products(num_products):
             if available == 'true':
                 available_pids.append(pid)
                 product_names.append(name)
-            writer.writerow([pid, name, price, available])
+            writer.writerow([pid, sid, name, price, available])
         print(f'{num_products} generated; {len(available_pids)} available')
     return available_pids, product_names
 
@@ -89,7 +90,10 @@ def gen_purchases(num_purchases, available_pids):
             uid = fake.random_int(min=0, max=num_users-1)
             pid = fake.random_element(elements=available_pids)
             time_purchased = fake.date_time()
-            writer.writerow([id, uid, pid, time_purchased])
+            total_amount = fake.pyfloat(right_digits=2, positive=True, min_value = 0.01, max_value = 999999999.99)
+            number_of_items = fake.random_int(min=0, max=100)
+            fulfillment_status = fake.random_int(min=0, max=1)
+            writer.writerow([id, uid, pid, time_purchased, total_amount, number_of_items, fulfillment_status])
         print(f'{num_purchases} generated')
     return
 
@@ -156,7 +160,7 @@ def gen_feedback(num_feedback, available_pids):
 
 sellers = gen_users(num_users)
 seller_ids = gen_sellers(sellers)
-available_pids, product_names = gen_products(num_products)
+available_pids, product_names = gen_products(num_products, seller_ids)
 gen_purchases(num_purchases, available_pids)
 gen_carts(num_carts, seller_ids)
 gen_inventory(num_inventory, seller_ids, product_names)
