@@ -17,15 +17,17 @@ class Product:
 SELECT AVG(rating)
 FROM Feedback
 WHERE pid = :id
-''',
-                              id=id)
-        return result[0][0] if result is not None else None
+''', id=id)
+        if result is not None:
+            return "No Reviews"
+        else:
+            return round(result[0][0], 3)
 
 
     @staticmethod
     def get(id):
         rows = app.db.execute('''
-SELECT id, name, price, available
+SELECT *
 FROM Products
 WHERE id = :id
 ''',
@@ -35,11 +37,12 @@ WHERE id = :id
     @staticmethod
     def get_all(available=True):
         rows = app.db.execute('''
-SELECT id, name, price, available
+SELECT *
 FROM Products
 WHERE available = :available
 ''',
                               available=available)
+        
         return [Product(*row) for row in rows]
     
     @staticmethod
@@ -57,7 +60,7 @@ LIMIT :k;
     @staticmethod
     def get_by_name(name):
         rows = app.db.execute('''
-SELECT id, name, price, available
+SELECT *
 FROM Products
 WHERE name = :name
 ''',
