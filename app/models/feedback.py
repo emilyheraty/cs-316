@@ -89,9 +89,9 @@ class Feedback():
     
     def get_feedback_info(id):
         rows = app.db.execute("""
-                 SELECT *
-                 FROM Feedback
-                 WHERE id = :id  """, id = id)
+                 SELECT Feedback.rating, Feedback.comment, Feedback.id, Products.name, Feedback.pid
+                 FROM Feedback, Products
+                 WHERE Feedback.id = :id AND Feedback.pid = Products.id""", id = id)
         return rows
 
     @staticmethod
@@ -144,7 +144,50 @@ class Feedback():
         AND Products.name = Inventory.product_name
         AND Inventory.id = Sellers.id""", pid = pid)
 
-        return int(rows[0][0])
+        return rows
+    
+
+    @staticmethod
+    def avg_rating_product(pid):
+        avg = app.db.execute("""
+                SELECT AVG(Feedback.rating)
+                FROM Feedback
+                WHERE pid = :pid
+                AND review_type = 'product'
+                             """, pid = pid)
+        return avg
+
+
+    @staticmethod
+    def avg_rating_seller(seller_id):
+        avg = app.db.execute("""
+                SELECT AVG(Feedback.rating)
+                FROM Feedback
+                WHERE seller_id = :seller_id
+                AND review_type = 'seller'
+                             """, seller_id = seller_id)
+        return avg
+
+
+    @staticmethod
+    def num_rating_seller(seller_id):
+        num = app.db.execute("""
+                SELECT COUNT(*)
+                FROM Feedback
+                WHERE seller_id = :seller_id
+                AND review_type = 'seller'
+                             """, seller_id = seller_id)
+        return num
+    
+    @staticmethod
+    def num_rating_product(pid):
+        num = app.db.execute("""
+                SELECT COUNT(*)
+                FROM Feedback
+                WHERE pid = :pid
+                AND review_type = 'product'
+                             """, pid = pid)
+        return num
 
 
     @staticmethod
@@ -241,5 +284,14 @@ class Feedback():
                     WHERE uid = :uid) as p
                 """, uid = uid)
         return rows
+    
+    @staticmethod
+    def seller_review_check(seller_id):
+        
+        rows = app.db.execute("""
+                        SELECT *
+                        FROM Feedback
+                        WHERE seller_id = :seller_id AND review_type = 'seller'""", seller_id = seller_id)
+        return len(rows)>0
  
 

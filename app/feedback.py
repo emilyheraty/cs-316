@@ -79,11 +79,11 @@ def all_feedback():
             
             
         search = False
-        search_2 = False
+        
         q = request.args.get('q')
         if q:
             search = True
-        
+        search_2 = False
         
         q2 = request.args.get('q2')
         if q2:
@@ -97,6 +97,7 @@ def all_feedback():
     pagination_2 = Pagination(page=page2, per_page=per_page, offset=offset2, total=len(purchase_name_pending), search=search_2, record_name='purchases pending review')
     return render_template('all_feedback.html', partial_feedback = partial_feedback, purchase_name_pending = purchase_name_pending, pagination = pagination, pending = pending, partial_pending = partial_pending, pagination_2 = pagination_2)
 
+
 class FeedbackForm(FlaskForm):
     rating = SelectField('Rating', choices=[('1', '1'), ('2', '2'), ('3', '3'),
                                              ('4', '4'), ('5', '5')],
@@ -104,6 +105,8 @@ class FeedbackForm(FlaskForm):
     review_type = SelectField('Review product or seller?', choices = [('product', 'product'), ('seller', 'seller')], validators = [DataRequired()])
     comment = TextAreaField('Review', validators= [DataRequired()])
     submit = SubmitField('Submit')
+   
+
 
 @bp.route('/post_feedback<int:pid>', methods=['GET', 'POST'])
 def post_feedback(pid):
@@ -113,8 +116,12 @@ def post_feedback(pid):
     seller_id = Feedback.get_seller(pid)
     form = FeedbackForm()
     if form.is_submitted():
+       # if(form.review_type.data == 'seller'):
+         #   if(Feedback.seller_review_check(seller_id)):
+         #       flash('Already reviewed seller')
+          #      return redirect(url_for('feedback.all_feedback'))
         if Feedback.add_product_feedback(user_id, pid, seller_id, form.review_type.data, form.rating.data, form.comment.data, datetime.datetime.now()):
-            flash('Feedback successfully submitted!')
+            #flash('Feedback successfully submitted!')
             return redirect(url_for('feedback.all_feedback'))
     return render_template('post_feedback.html', title='Submit', form=form)
 
@@ -133,7 +140,7 @@ def edit_feedback(id):
     form = FeedbackEditForm()
     if form.is_submitted():
         if Feedback.edit_feedback(id, form.rating.data, form.comment.data, datetime.datetime.now()):
-            flash('Feedback successfully edited!')
+            #flash('Feedback successfully edited!')
             return redirect(url_for('feedback.all_feedback'))
     return render_template('edit_feedback.html', title='Submit', form=form)
 
@@ -149,7 +156,7 @@ def delete_feedback(id):
     form = FeedbackDeleteForm()
     if form.is_submitted():
         if Feedback.delete_feedback(id):
-            flash('Feedback successfully deleted.')
+            #flash('Feedback successfully deleted.')
             return redirect(url_for('feedback.all_feedback'))
     return render_template('delete_feedback.html', review = review, title = 'Delete', form = form)
     

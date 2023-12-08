@@ -3,6 +3,8 @@
 {% block content %}
 
 <style>
+
+
     .btn-secondary-2 {
         background-color: red;
         color: white
@@ -35,7 +37,9 @@
         {% for feedback in partial_feedback %}
         <tr>
             <td>{{ feedback.name }}</td>
-            <td>{{ feedback.rating }}</td>
+            <td>
+                {{ feedback.rating }}
+            </td>
             <td>{{ feedback.comment }}</td>
             <td>{{ feedback.time_posted }}</td>
             <td> <a class="btn btn-secondary" href="{{ url_for('feedback.edit_feedback', id = feedback.id) }}" role="button">Edit</a> </td>
