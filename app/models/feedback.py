@@ -148,14 +148,35 @@ class Feedback():
         """, uid = uid, per_page = per_page, off = off)
         return rows
     
+    @staticmethod
+    def get_customer_feedback_seller(seller_id):
+        rows = app.db.execute("""
+            SELECT *
+            FROM Feedback
+            WHERE seller_id = :seller_id AND
+            review_type = 'seller'
+                              """, seller_id=seller_id)
+        return rows
+    
+    @staticmethod
+    def get_customer_feedback_product(seller_id):
+        rows = app.db.execute("""
+            SELECT *
+            FROM Feedback
+            WHERE seller_id = :seller_id AND
+            review_type = 'product' 
+                              """, seller_id=seller_id)
+        return rows
+
 
     @staticmethod
     def get_purchase_name_pending(uid):
         rows = app.db.execute("""
         SELECT DISTINCT Purchases.pid, Products.name
-        FROM Purchases, Products
+        FROM Purchases, Products, Feedback
         WHERE Purchases.uid = :uid AND
-        Products.id = Purchases.pid
+        Products.id = Purchases.pid AND
+        Purchases.fulfillment_status = 1 
         
         
                 """, uid = uid)

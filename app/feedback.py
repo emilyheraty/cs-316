@@ -11,6 +11,7 @@ from flask_paginate import Pagination, get_page_parameter
 from .models.feedback import Feedback
 from .models.purchase import Purchase
 from .models.product import Product
+from .models.inventory import Inventory
 
 from flask import Blueprint
 bp = Blueprint('feedback', __name__)
@@ -23,6 +24,17 @@ def recent_feedback():
     else:
         feedbacks=[]
     return render_template('recent_feedback.html', feedbacks=feedbacks)
+
+
+@bp.route('/customer_feedback<int:seller_id>')
+def customer_feedback(seller_id):
+    if current_user.is_authenticated:
+        user_id = current_user.id
+        if(Inventory.isSeller(seller_id)):
+            feedback_seller = Feedback.get_customer_feedback_seller(seller_id)
+            feedback_product = Feedback.get_customer_feedback_product(seller_id)
+    return render_template('customer_feedback.html',feedback_seller=feedback_seller, feedback_product=feedback_product)
+
 
 @bp.route('/all_feedback')
 def all_feedback():
