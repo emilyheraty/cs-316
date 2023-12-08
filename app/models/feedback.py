@@ -77,7 +77,22 @@ class Feedback():
             SET rating = :rating, comment = :comment, time_posted = :time_posted
             WHERE id = :id""", id = id, rating = rating, comment = comment, time_posted = time_posted)
         return new
-
+    
+    
+    def delete_feedback(id):
+        rows = app.db.execute("""
+            DELETE FROM Feedback
+            WHERE id = :id       
+                               """, id = id)
+        return 1
+    
+    
+    def get_feedback_info(id):
+        rows = app.db.execute("""
+                 SELECT *
+                 FROM Feedback
+                 WHERE id = :id  """, id = id)
+        return rows
 
     @staticmethod
     def get_partial_feedback(user_id, per_page, off):

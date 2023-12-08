@@ -136,4 +136,20 @@ def edit_feedback(id):
             flash('Feedback successfully edited!')
             return redirect(url_for('feedback.all_feedback'))
     return render_template('edit_feedback.html', title='Submit', form=form)
+
+
+class FeedbackDeleteForm(FlaskForm):
+    submit = SubmitField('Delete')
+
+@bp.route('/delete_feedback<int:id>', methods=['GET', 'POST'])
+def delete_feedback(id):
+    if current_user.is_authenticated is False:
+        return redirect(url_for('users.login'))
+    review = Feedback.get_feedback_info(id)
+    form = FeedbackDeleteForm()
+    if form.is_submitted():
+        if Feedback.delete_feedback(id):
+            flash('Feedback successfully deleted.')
+            return redirect(url_for('feedback.all_feedback'))
+    return render_template('delete_feedback.html', review = review, title = 'Delete', form = form)
     

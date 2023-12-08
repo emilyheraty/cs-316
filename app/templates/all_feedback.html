@@ -2,6 +2,14 @@
 
 {% block content %}
 
+<style>
+    .btn-secondary-2 {
+        background-color: red;
+        color: white
+    }
+
+</style>
+
 {% if current_user.is_authenticated %}
 <p style="margin-top: 10px;">
     <a href="{{ url_for('index.index') }}">Home</a>
@@ -20,6 +28,7 @@
             <th scope="col">Comment</th>
             <th scope="col">Date posted</th>
             <th scope="col">Edit review</th>
+            <th scope="col">Delete review</th>
         </tr>
     </thead>
     <tbody>
@@ -30,6 +39,7 @@
             <td>{{ feedback.comment }}</td>
             <td>{{ feedback.time_posted }}</td>
             <td> <a class="btn btn-secondary" href="{{ url_for('feedback.edit_feedback', id = feedback.id) }}" role="button">Edit</a> </td>
+            <td> <a class="btn btn-secondary-2" href="{{ url_for('feedback.delete_feedback', id = feedback.id) }}" role="button">Delete</a> </td>
         </tr>
         {% endfor %}
     </tbody>
@@ -53,7 +63,7 @@
             
             
            <td>  {{ p.name }} </td>
-           <td> <a class="btn btn-secondary" href="{{ url_for('feedback.post_feedback', pid = p.pid) }}" role="button">Review</a> </td>
+           <td> <a class="btn btn-secondary" href="{{ url_for('feedback.post_feedback', pid = p.pid) }}" role="button">Post</a> </td>
            
            
         
