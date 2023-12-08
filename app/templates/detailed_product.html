@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<br><br>
+
+<h1 style="color:rgb(53, 131, 199)">{{product_name}}</h1>
+<table class='table table-hover table-bordered container'>
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">Seller Name</th>
+      <th scope="col">Description</th>
+      <th scope="col">Quantity Available</th>
+      <th scope="col">AddtoCart</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for dp in items%}
+      <tr>
+        <th scope="row">{{dp.sid}}</th>
+        <td>{{dp.description}}</td>
+        <td>{{dp.quantity}}</td>
+        <td>addtocart</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
+

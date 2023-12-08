@@ -4,7 +4,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, DecimalField, IntegerField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Regexp
 from .models.cart import Cart
-from .models.product import Product
+from .models.product import Product, DetailedProduct
 from .models.purchase import Purchase
 from .models.inventory import Inventory
 from flask_paginate import Pagination, get_page_parameter
@@ -69,3 +69,10 @@ def submitCart():
     #uid, pid, time, sid, amount, quant, status
     
     return redirect('/purchases')
+
+@bp.route('/detailed_product/<string:product_name>', methods=['GET', 'POST'])
+def detailedOrder(product_name):
+    products = DetailedProduct.get_detailed_products_by_name(product_name)
+    for i in range(len(products)):
+        print(products[i].sid)
+    return render_template('detailed_product.html', items=products, product_name=product_name)
