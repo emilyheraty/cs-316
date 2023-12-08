@@ -17,5 +17,16 @@
     {{form.comment}} </br>
 </p>
 {{ form.submit(class_="btn btn-black") }}
+<p>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul>
+      {% for message in messages %}
+      <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+  </p>
 </form>
 {% endblock %}

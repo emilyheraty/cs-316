@@ -62,25 +62,29 @@ def customer_feedback(seller_id):
 @bp.route('/all_feedback')
 def all_feedback():
     per_page = 4
-    page = request.args.get(get_page_parameter(), type=int, default=1)
-    offset = (page - 1) * per_page
+    page1 = request.args.get(get_page_parameter(), type=int, default=1)
+    offset1 = (page1 - 1) * per_page
+    page2 = request.args.get(get_page_parameter(), type=int, default=1)
+    offset2 = (page2 - 1) * per_page
+
     if current_user.is_authenticated:
         user_id = current_user.id
         full_feedback = Feedback.get_all_feedback(user_id)
-        partial_feedback = Feedback.get_partial_feedback(user_id, per_page, offset)
+        partial_feedback = Feedback.get_partial_feedback(user_id, per_page, offset1)
         pending = Feedback.pending_products(user_id)
-        partial_pending = Feedback.get_partial_pending(user_id, per_page, offset)
+        partial_pending = Feedback.get_partial_pending(user_id, per_page, offset2)
         purchase_name_pending = Feedback.get_purchase_name_pending(user_id)
         num = 0
         
             
             
         search = False
+        search_2 = False
         q = request.args.get('q')
         if q:
             search = True
         
-        search_2 = False
+        
         q2 = request.args.get('q2')
         if q2:
             search_2 = True
@@ -89,8 +93,8 @@ def all_feedback():
     else:
         full_feedback=[]
         pending = []
-    pagination = Pagination(page=page, per_page=per_page, offset=offset, total=len(full_feedback), search=search, record_name='posted reviews')
-    pagination_2 = Pagination(page=page, per_page=per_page, offset=offset, total=len(pending), search=search_2, record_name='purchases pending review')
+    pagination = Pagination(page=page1, per_page=per_page, offset=offset1, total=len(full_feedback), search=search, record_name='posted reviews')
+    pagination_2 = Pagination(page=page2, per_page=per_page, offset=offset2, total=len(purchase_name_pending), search=search_2, record_name='purchases pending review')
     return render_template('all_feedback.html', partial_feedback = partial_feedback, purchase_name_pending = purchase_name_pending, pagination = pagination, pending = pending, partial_pending = partial_pending, pagination_2 = pagination_2)
 
 class FeedbackForm(FlaskForm):

@@ -135,14 +135,18 @@ class Feedback():
     @staticmethod
     def get_partial_pending(uid, per_page, off):
         rows = app.db.execute("""
-        SELECT DISTINCT Purchases.pid
-        FROM Purchases, Feedback
-        WHERE Purchases.uid = :uid
-        AND NOT EXISTS(
-                              SELECT *
-                              FROM Feedback, Purchases
-                              WHERE Feedback.user_id = :uid AND Feedback.pid = Purchases.pid
-        )
+        SELECT DISTINCT p2.pid, p2.name
+        FROM (
+                    SELECT DISTINCT p.pid, p.name, p.fulfillment_status
+                    FROM (SELECT name, p2.id, pid, uid, fulfillment_status 
+                    FROM Products as p1
+                    INNER JOIN Purchases as p2 ON p2.pid = p1.id 
+                    WHERE uid = :uid) AS p 
+        ) AS p2 
+                              WHERE NOT EXISTS(SELECT *
+                              FROM Feedback
+                              WHERE Feedback.pid = p2.pid
+                            ) AND p2.fulfillment_status = 1
         LIMIT :per_page
         OFFSET :off
         """, uid = uid, per_page = per_page, off = off)
@@ -196,12 +200,18 @@ class Feedback():
     @staticmethod
     def get_purchase_name_pending(uid):
         rows = app.db.execute("""
-        SELECT DISTINCT Purchases.pid, Products.name
-        FROM Purchases, Products, Feedback
-        WHERE Purchases.uid = :uid AND
-        Products.id = Purchases.pid AND
-        Purchases.fulfillment_status = 1 
-        
+        SELECT DISTINCT p2.pid, p2.name
+        FROM (
+                    SELECT DISTINCT p.pid, p.name, p.fulfillment_status
+                    FROM (SELECT name, p2.id, pid, uid, fulfillment_status 
+                    FROM Products as p1
+                    INNER JOIN Purchases as p2 ON p2.pid = p1.id 
+                    WHERE uid = :uid) AS p 
+        ) AS p2 
+                              WHERE NOT EXISTS(SELECT *
+                              FROM Feedback
+                              WHERE Feedback.pid = p2.pid
+                            ) AND p2.fulfillment_status = 1
         
                 """, uid = uid)
         return rows
