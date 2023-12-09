@@ -42,5 +42,29 @@
         <p style="color:rgb(120, 119, 119)">View customer feedback</p>
     </a>
 {% endif %}
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<body>
+
+    <div id="spending" style="width:100%;max-width:700px"></div>
+    <script>
+        var available_years =  JSON.parse('{{ available_years | safe }}');
+        var total_amount =  JSON.parse('{{ total_amount | safe }}');
+        var number_of_items =  JSON.parse('{{ number_of_items | safe }}');
+        const data = [{
+            x: available_years,
+            y: total_amount,
+            mode: "line"
+    
+        }];
+    
+        const layout = {
+            xaxis: {title: "Years"},
+            yaxis: {title: "Total Amount"},
+            title: "Spending Over Time"
+    
+        };
+        Plotly.newPlot('spending', data, layout);
+    </script>
+</body>
 
 {% endblock %}

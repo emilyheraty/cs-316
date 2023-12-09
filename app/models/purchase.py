@@ -97,12 +97,23 @@ WHERE fulfillment_status = :status AND uid = :uid
         return [Purchase(*row) for row in rows]
         
     @staticmethod
-    def get_chart_data(uid):
+    def get_by_year(uid):
         rows = app.db.execute('''
-SELECT time_purchased, total_amount, number_of_items
+SELECT EXTRACT(Year FROM Purchases.time_purchased) AS Year, SUM(total_amount) as total_amount
 FROM Purchases
 WHERE uid = :uid
-ORDER BY time_purchased DESC
+GROUP BY Year
+''',
+                              uid=uid)
+        return rows
+    
+    @staticmethod
+    def get_by_year_month(uid):
+        rows = app.db.execute('''
+SELECT EXTRACT(Year FROM Purchases.time_purchased) AS Year, EXTRACT(Month FROM Purchases.time_purchased) AS Month, SUM(total_amount) as total_amount, SUM(number_of_items) as number_of_items
+FROM Purchases
+WHERE uid = :uid
+GROUP BY Year, Month
 ''',
                               uid=uid)
         return rows

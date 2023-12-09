@@ -106,8 +106,6 @@ def purchases():
                             searchForm=searchForm, sortForm=sortForm, filterForm=filterForm)
     
 
-    
-
     return render_template('purchases.html',
                             purchase_history=purchases[offset: offset + per_page], pagination=pagination, isseller=isseller,
                             products=products[offset: offset + per_page],

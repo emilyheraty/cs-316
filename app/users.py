@@ -3,8 +3,10 @@ from flask_paginate import Pagination, get_page_args
 from werkzeug.urls import url_parse
 from flask_login import login_user, logout_user, current_user
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, DecimalField
+from wtforms import SelectField, StringField, PasswordField, BooleanField, SubmitField, DecimalField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Regexp
+
+from app.models.purchase import Purchase
 
 from .models.user import User
 from .models.inventory import Inventory
@@ -83,15 +85,27 @@ def logout():
     logout_user()
     return redirect(url_for('index.index'))
 
+class SpendingForm(FlaskForm):
+    years = SelectField("Year", coerce=int)
 
 @bp.route('/account', methods=['GET'])
 def account():
+    grouped_data = Purchase.get_by_year(current_user.id)
+    available_years = []
+    total_amount = []
+    for purchase in grouped_data:
+        available_years.append(int(purchase[0]))
+        total_amount.append(int(purchase[1]))
+
+    yearsForm = SpendingForm()
+    yearsForm.years.choices = [(a, a) for a in available_years]
+
     if current_user.is_authenticated is False:
         isseller = 0
         return redirect(url_for('users.login'))
     else:
         isseller = Inventory.isSeller(current_user.id)[0][0]
-    return render_template('account.html', isseller=isseller)
+    return render_template('account.html', isseller=isseller, available_years=available_years, total_amount=total_amount)
 
 
 @bp.route('/account/profile', methods=['GET'])
