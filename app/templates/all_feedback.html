@@ -58,7 +58,7 @@
     <tr>
        
         <th scope="col">Product name</th>
-        <th scope="col">Leave review?</th>
+        <th scope="col">Review?</th>
     </tr>
 </thead>
 <tbody>
@@ -67,7 +67,7 @@
             
             
            <td>  {{ p.name }} </td>
-           <td> <a class="btn btn-secondary" href="{{ url_for('feedback.post_feedback', pid = p.pid) }}" role="button">Post</a> </td>
+           <td> <a class="btn btn-secondary" href="{{ url_for('purchases.purchases.html') }}" role="button">Go to orders</a> </td>
            
            
         

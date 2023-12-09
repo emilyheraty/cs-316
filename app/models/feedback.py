@@ -138,14 +138,12 @@ class Feedback():
     @staticmethod
     def get_seller(pid):
         rows = app.db.execute("""
-        SELECT Sellers.id
-        FROM Sellers, Inventory, Products
+        SELECT DISTINCT Products.creator_id
+        FROM Products
         WHERE Products.id = :pid
-        AND Products.name = Inventory.product_name
-        AND Inventory.id = Sellers.id
                               """, pid = pid)
 
-        return rows[0]
+        return rows
     
 
     @staticmethod

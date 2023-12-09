@@ -13,7 +13,7 @@ class Order:
        rows = app.db.execute('''
                              SELECT Purchases.uid as buyer_id, Products.name, time_purchased, number_of_items, fulfillment_status                             
                              FROM Purchases, Products
-                             WHERE Products.seller_id = :id and Purchases.pid = Products.id
+                             WHERE Products.creator_id = :id and Purchases.pid = Products.id
                              ORDER BY time_purchased
                              LIMIT :per_page
                              OFFSET :off
@@ -28,7 +28,7 @@ class Order:
        rows = app.db.execute('''
                              SELECT Purchases.uid as buyer_id, Products.name, time_purchased, number_of_items, fulfillment_status                             
                              FROM Purchases, Products
-                             WHERE Products.seller_id = :id and Purchases.pid = Products.id
+                             WHERE Products.creator_id = :id and Purchases.pid = Products.id
                              ORDER BY time_purchased
                              ''',
                              id=sid)

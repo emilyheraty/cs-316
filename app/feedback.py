@@ -88,9 +88,9 @@ def all_feedback():
     else:
         full_feedback=[]
         pending = []
-    pagination = Pagination(page=page, per_page=per_page, offset=offset, total=len(full_feedback), search=search, record_name='feedback')
-    pagination_2 = Pagination(page=page, per_page=per_page, offset=offset, total=len(pending), search=search, record_name='pending')
-    return render_template('all_feedback.html', partial_feedback = partial_feedback, purchase_name = purchase_name, pagination = pagination, pending = pending, partial_pending = partial_pending, pagination_2 = pagination_2)
+    pagination = Pagination(page=page1, per_page=per_page, offset=offset1, total=len(full_feedback), search=search, record_name='feedback')
+    pagination_2 = Pagination(page=page2, per_page=per_page, offset=offset2, total=len(purchase_name_pending), search=search, record_name='pending')
+    return render_template('all_feedback.html', partial_feedback = partial_feedback, purchase_name_pending = purchase_name_pending, pagination = pagination, pending = pending, partial_pending = partial_pending, pagination_2 = pagination_2)
 
 class FeedbackForm(FlaskForm):
     rating = SelectField('Rating', choices=[('1', '1'), ('2', '2'), ('3', '3'),
@@ -109,14 +109,14 @@ def post_feedback(pid):
         return redirect(url_for('users.login'))
         
     user_id = current_user.id
-    seller_id = 0
+    seller_id = Feedback.get_seller(pid)[0][0]
     form = FeedbackForm()
     if form.is_submitted():
        # if(form.review_type.data == 'seller'):
          #   if(Feedback.seller_review_check(seller_id)):
          #       flash('Already reviewed seller')
           #      return redirect(url_for('feedback.all_feedback'))
-        if Feedback.add_product_feedback(user_id, pid, 0, form.review_type.data, form.rating.data, form.comment.data, datetime.datetime.now()):
+        if Feedback.add_product_feedback(user_id, pid, seller_id, form.review_type.data, form.rating.data, form.comment.data, datetime.datetime.now()):
             #flash('Feedback successfully submitted!')
             return redirect(url_for('feedback.all_feedback'))
     return render_template('post_feedback.html', title='Submit', form=form)
