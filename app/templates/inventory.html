@@ -16,7 +16,7 @@
 <h4 style="color: red;"> {{err_message}} </h4>
 {% endif %}
 <br><br>
-<a href="{{ url_for('inventory.inventory', seller_id =id) }}" type="button" class="btn btn-light">Show Full Inventory</a>
+<a href="{{ url_for('inventory.inventory', seller_id =id) }}" type="button" class="btn btn-light">View Full Inventory</a>
 
 {{ pagination.info }}
 {{ pagination.links }}
@@ -58,7 +58,7 @@
                 <input type="hidden" name="product_name" value="{{ item.product_name }}">
                 {{ form_dp.csrf_token }}
                 {{ form_dp.submit() }}
-            </form>
+              </form>
             </td>
           {% else %}
             <td>{{item.number_available}} </td>
