@@ -5,7 +5,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, DecimalField, SelectField, TextAreaField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 from flask import jsonify
-from flask_paginate import Pagination, get_page_parameter
+from flask_paginate import Pagination, get_page_parameter, get_page_args
 
 from .models.inventory import Inventory
 from .models.feedback import Feedback
@@ -62,11 +62,17 @@ def customer_feedback(seller_id):
                            partial_feedback_product=partial_feedback_product, pagination = pagination, pagination2 = pagination2)
 
 
-@bp.route('/all_feedback')
+@bp.route('/all_feedback', methods=['GET'])
 def all_feedback():
+    search = False
+    q = request.args.get('q')
+    if q:
+        search = True
+
     per_page = 4
     page1 = request.args.get(get_page_parameter(), type=int, default=1)
     offset1 = (page1 - 1) * per_page
+
     page2 = request.args.get(get_page_parameter(), type=int, default=1)
     offset2 = (page2 - 1) * per_page
 
@@ -79,18 +85,17 @@ def all_feedback():
         purchase_name_pending = Feedback.get_purchase_name_pending(user_id)
         num = 0
         isseller = Inventory.isSeller(current_user.id)[0][0]
-        search = False
         
-        q = request.args.get('q')
-        if q:
-            search = True
+
+        
+       
     
 
     else:
         full_feedback=[]
         pending = []
-    pagination = Pagination(page=page1, per_page=per_page, offset=offset1, total=len(full_feedback), search=search, record_name='feedback')
-    pagination_2 = Pagination(page=page2, per_page=per_page, offset=offset2, total=len(purchase_name_pending), search=search, record_name='pending')
+    pagination = Pagination(page=page1, per_page=per_page, total=len(full_feedback), search = search, offset1 = offset1, record_name = 'reviews')
+    pagination_2 = Pagination(page=page2, per_page=per_page, total=len(purchase_name_pending), search = search, offset2 = offset2, record_name = 'purchases to review')
     return render_template('all_feedback.html', partial_feedback = partial_feedback, purchase_name_pending = purchase_name_pending, pagination = pagination, pending = pending, partial_pending = partial_pending, pagination_2 = pagination_2)
 
 class FeedbackForm(FlaskForm):

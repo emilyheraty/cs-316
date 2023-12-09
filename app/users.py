@@ -179,7 +179,7 @@ def seller_public_profile(seller_id):
         seller_inventory = Inventory.getInventory(seller_id)
         seller_products = []
         for item in seller_inventory:
-            product = Product.get_by_name(item.product_name)
+            product = Product.get_product_by_name(item.product_name)
             seller_products.append(product)
             
         seller_feedback = Feedback.get_recent_feedback(seller_id, 10)

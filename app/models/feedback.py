@@ -77,6 +77,17 @@ class Feedback():
         return len(rows)>0
     
     @staticmethod
+    def get_prod_recent_feedback(pid, limit):
+        rows = app.db.execute( """
+        SELECT * FROM Feedback
+        WHERE pid = :pid
+        ORDER BY time_posted DESC
+        LIMIT :limit
+        """, pid = pid, limit = limit)
+        return rows
+    
+    
+    @staticmethod
     def check_past_seller(seller_id, user_id):
         rows = app.db.execute("""
             SELECT *
@@ -348,7 +359,7 @@ class Feedback():
             LIMIT :per_page
             OFFSET :off
         """, user_id = user_id, per_page = per_page, off = off)
-        
+
         return rows
     
 
