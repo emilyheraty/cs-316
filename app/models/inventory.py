@@ -136,7 +136,7 @@ class Listing:
     @staticmethod
     def get_listings_by_product_name(name):
         rows = app.db.execute('''
-SELECT Users.id, Users.firstname, Users.lastname, Inventory.number_available
+SELECT Inventory.id, Users.firstname, Users.lastname, Inventory.number_available
 FROM Inventory, Users
 WHERE Inventory.product_name = :name and Inventory.id = Users.id
 ''',

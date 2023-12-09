@@ -61,12 +61,13 @@ def showCart():
     print("Got to end of Function")
     return render_template('cart_page.html', items=lineitems_partial, pagination=pagination, isseller=isseller, form_uq=form_uq)
 
-@bp.route('/cart/add/<int:product_id>', methods=['GET', 'POST'])
-def addItemToCart(product_id):
-    product = Product.get(product_id)
+@bp.route('/cart/add/<int:seller_id>/<string:product_name>', methods=['GET', 'POST'])
+def addItemToCart(seller_id, product_name):
+    product = Product.get_product_by_name(product_name)
+    print(product)
     quantity=1
     if current_user.is_authenticated:
-        Cart.addToCart(current_user.id, 0, product.id, quantity, product.price)
+        Cart.addToCart(current_user.id, seller_id, product.id, quantity)
     else:
         redirect('/login')
     # Should take you to order page to determine quantity, and maybe other options?

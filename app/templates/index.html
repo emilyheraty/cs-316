@@ -12,7 +12,6 @@
       <th scope="col">Product Name</th>
       <th scope="col">Average Rating</th>
       <th scope="col">Price</th>
-      <th scope="col"></th>
     </tr>
   </thead>
   <tbody>
@@ -24,9 +23,6 @@
         <td><a href="/detailed_product/{{product.name}}">{{product.name}}</a></td>
         <td>{{product.get_rating(product.id)}}</td>
         <td>{{product.price}}</td>
-        <td width=100px>
-          <a href="/cart/add/{{product.id}}" type="button" class="btn btn-light">Add to Cart</a>
-        </td>
       </tr>
     {% endfor %}
   </tbody>

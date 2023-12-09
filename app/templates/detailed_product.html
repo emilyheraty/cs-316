@@ -22,7 +22,9 @@
       <tr>
         <th scope="row">{{dp.sfirstname}} {{dp.slastname}}</th>
         <td>{{dp.qty}}</td>
-        <td>addtocart</td>
+        <td width=100px>
+          <a href="{{url_for('cart_bp.addItemToCart', seller_id = dp.sid, product_name = product_name) }}" type="button" class="btn btn-light">Add to Cart</a>
+        </td>
       </tr>
     {% endfor %}
   </tbody>

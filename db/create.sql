@@ -41,9 +41,9 @@ CREATE TABLE Carts (
     seller_id INT NOT NULL REFERENCES Users(id), -- TODO: check seller-d != buyer_id
     product_id INT NOT NULL REFERENCES Products(id),
     quantity INT NOT NULL,
-    price DECIMAL(12,2) NOT NULL,
     PRIMARY KEY (buyer_id, product_id)
 );
+
 CREATE TABLE Inventory (
     id INT NOT NULL REFERENCES Users(id),
     product_name VARCHAR(255) REFERENCES Products(name),

@@ -57,14 +57,19 @@ def gen_sellers(sellers):
 def gen_products(num_products, seller_ids):
     available_pids = []
     product_names = []
+    nameset = set()
     with open('Products.csv', 'w') as f:
         writer = get_csv_writer(f)
         print('Products...', end=' ', flush=True)
         for pid in range(num_products):
             if pid % 100 == 0:
                 print(f'{pid}', end=' ', flush=True)
-            cid = fake.random_element(elements=seller_ids)
             name = fake.sentence(nb_words=4)[:-1]
+            if name in nameset:
+                pid-=1
+                continue
+            nameset.add(name)    
+            cid = fake.random_element(elements=seller_ids)
             price = f'{str(fake.random_int(max=500))}.{fake.random_int(max=99):02}'
             available = fake.random_element(elements=('true', 'false'))
             description = fake.sentence(nb_words=50)[:-1]
@@ -112,8 +117,7 @@ def gen_carts(num_carts, seller_ids):
                 continue
             keyset.add((bid, pid))
             quantity = fake.random_int(min=1, max=1000)
-            price = f'{str(fake.random_int(max=500))}.{fake.random_int(max=99):02}'
-            writer.writerow([bid, sid, pid, quantity, price])
+            writer.writerow([bid, sid, pid, quantity])
         print(f'{num} generated')
     return
 

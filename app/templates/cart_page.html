@@ -10,14 +10,17 @@
   <thead class="thead-dark">
     <tr>
       <th scope="col">Product Name</th>
+      <th scope="col">Seller ID</th>
       <th scope="col">Item Price</th>
       <th scope="col">Quantity</th>
+      <th scope="col">Total Item Price</th>
     </tr>
   </thead>
   <tbody>
     {% for product in items%}
       <tr>
         <th scope="row">{{product.prod_name}}</th>
+        <td>{{product.seller_id}}</td>
         <td>{{product.price}}</td>
         <td>
           <form action="{{ url_for('cart_bp.showCart') }}" method="POST">
@@ -37,6 +40,7 @@
             {{ form_uq.submit() }}
         </form>
         </td>
+        <td>{{product.total_price}}</td>
       </tr>
     {% endfor %}
   </tbody>
