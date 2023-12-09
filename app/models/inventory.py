@@ -114,7 +114,18 @@ WHERE Inventory.id = :id AND Inventory.product_name = :product_name
                                 id=id)
         print("updating")
         return res
-
+    
+    @staticmethod
+    def decreaseQuantity(id, product_name, quantity):
+        res = app.db.execute('''
+UPDATE Inventory
+SET number_available = number_available - :quantity
+WHERE Inventory.id = :id and Inventory.product_name = :product_name;
+''',
+                                product_name=product_name,
+                                quantity=quantity,
+                                id=id)
+        return res
 
 #     @staticmethod
 #     def addProductToInventory(id, product_name, number_available):
@@ -127,7 +138,8 @@ WHERE Inventory.id = :id AND Inventory.product_name = :product_name
 # ''',
 #                                 id=id)
 class Listing:
-    def __init__(self, sfirstname, slastname, qty):
+    def __init__(self, sid, sfirstname, slastname, qty):
+        self.sid = sid
         self.sfirstname = sfirstname
         self.slastname = slastname
         self.qty = qty
@@ -135,7 +147,7 @@ class Listing:
     @staticmethod
     def get_listings_by_product_name(name):
         rows = app.db.execute('''
-SELECT Users.firstname, Users.lastname, Inventory.number_available
+SELECT Inventory.id, Users.firstname, Users.lastname, Inventory.number_available
 FROM Inventory, Users
 WHERE Inventory.product_name = :name and Inventory.id = Users.id
 ''',

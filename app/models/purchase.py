@@ -46,57 +46,6 @@ ORDER BY time_purchased DESC
         return [Purchase(*row) for row in rows]
     
     @staticmethod
-    def get_by_natural_time(uid):
-        rows = app.db.execute('''
-SELECT id, uid, pid, time_purchased, total_amount, number_of_items, fulfillment_status
-FROM Purchases
-WHERE uid = :uid
-ORDER BY time_purchased ASC
-''',
-                              uid=uid)
-        return [Purchase(*row) for row in rows]
-    
-    @staticmethod
-    def get_by_product_name(name, uid):
-        rows = app.db.execute('''
-SELECT Purchases.id, uid, pid, time_purchased, total_amount, number_of_items, fulfillment_status
-FROM (Purchases JOIN Products ON Purchases.pid = Products.id)
-WHERE name = :name AND uid = :uid
-                              ''',
-                              name=name, uid=uid)
-        return [Purchase(*row) for row in rows]
-    
-    @staticmethod
-    def get_by_ascending_amount(uid):
-        rows = app.db.execute('''
-SELECT id, uid, pid, time_purchased, total_amount, number_of_items, fulfillment_status
-FROM Purchases
-WHERE uid = :uid
-ORDER BY total_amount ASC
-                              ''', uid=uid)
-        return [Purchase(*row) for row in rows]
-    
-    @staticmethod
-    def get_by_descending_amount(uid):
-        rows = app.db.execute('''
-SELECT id, uid, pid, time_purchased, total_amount, number_of_items, fulfillment_status
-FROM Purchases
-WHERE uid = :uid
-ORDER BY total_amount DESC
-                              ''', uid=uid)
-        return [Purchase(*row) for row in rows]
-
-    @staticmethod
-    def get_by_status(status, uid):
-        rows = app.db.execute('''
-SELECT id, uid, pid, time_purchased, total_amount, number_of_items, fulfillment_status
-FROM Purchases
-WHERE fulfillment_status = :status AND uid = :uid
-                              ''',
-                              status=status, uid=uid)
-        return [Purchase(*row) for row in rows]
-        
-    @staticmethod
     def get_chart_data(uid):
         rows = app.db.execute('''
 SELECT time_purchased, total_amount, number_of_items
@@ -108,7 +57,7 @@ ORDER BY time_purchased DESC
         return rows
 
     @staticmethod
-    def submitPurchase(uid, pid, time, amount, quantity, status):
+    def submitPurchase(uid, pid, time, amount, quantity):
         try:
             rows = app.db.execute("""
 INSERT INTO Purchases(uid, pid, time_purchased, total_amount, number_of_items, fulfillment_status)

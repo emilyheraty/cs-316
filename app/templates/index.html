@@ -12,7 +12,6 @@
       <th scope="col">Product Name</th>
       <th scope="col">Average Rating</th>
       <th scope="col">Price</th>
-      <th scope="col"></th>
     </tr>
   </thead>
   <tbody>
@@ -24,42 +23,9 @@
         <td><a href="/detailed_product/{{product.name}}">{{product.name}}</a></td>
         <td>{{product.get_rating(product.id)}}</td>
         <td>{{product.price}}</td>
-        <td width=100px>
-          <a href="/cart/add/{{product.id}}" type="button" class="btn btn-light">Add to Cart</a>
-        </td>
       </tr>
     {% endfor %}
   </tbody>
 </table>
-
-<br><br>
-{% if current_user.is_authenticated %}
-<h2>Your recent purchases:</h2>
-<table class='table table-hover table-bordered container'>
-  <thead class="thead-dark">
-    <tr>
-      <th scope="col">Purchase ID</th>
-      <th scope="col">Product Name</th>
-      <th scope="col">Price</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for purchase in purchase_history%}
-      <tr>
-        <th scope="row">{{purchase.id}}</th>
-        <td>{{purchase.pid}}</td>
-        <td>{{purchase.time_purchased}}</td>
-      </tr>
-    {% endfor %}
-  </tbody>
-</table>
-
-
-
-
-
-{% else %}
-<p><a href="{{ url_for('users.login') }}">Log in</a> to see your purchase history!</p>
-{% endif %}
-
 {% endblock %}
+

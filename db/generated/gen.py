@@ -3,11 +3,11 @@ import csv
 from faker import Faker
 
 num_users = 100
-num_products = 2000
+num_products = 1000
 num_purchases = 2500
-num_carts = 1000
-num_feedback = 1000
-num_inventory = 1000
+num_carts = 200
+num_feedback = 800
+num_inventory = 2000
 
 Faker.seed(0)
 fake = Faker()
@@ -57,30 +57,27 @@ def gen_sellers(sellers):
 def gen_products(num_products, seller_ids):
     available_pids = []
     product_names = []
-    num = num_products
-    keyset = set()
+    nameset = set()
     with open('Products.csv', 'w') as f:
         writer = get_csv_writer(f)
         print('Products...', end=' ', flush=True)
         for pid in range(num_products):
             if pid % 100 == 0:
                 print(f'{pid}', end=' ', flush=True)
-            cid = fake.random_element(elements=seller_ids)
             name = fake.sentence(nb_words=4)[:-1]
-            if name in keyset:
-                num -= 1
+            if name in nameset:
+                pid-=1
                 continue
-            keyset.add(name)
+            nameset.add(name)    
+            cid = fake.random_element(elements=seller_ids)
             price = f'{str(fake.random_int(max=500))}.{fake.random_int(max=99):02}'
-            available = fake.random_element(elements=('true', 'false'))
             description = fake.sentence(nb_words=50)[:-1]
             category = fake.random_element(elements=('food', 'household products', 'clothing', 'books'))
           #rating = f'{str(fake.random_int(max=4))}.{fake.random_int(max=.9):02}'
-            if available == 'true':
-                available_pids.append(pid)
-                product_names.append(name)
-            writer.writerow([pid, description, category, cid, name, price, available])
-        print(f'{num} generated; {len(available_pids)} available')
+            available_pids.append(pid)
+            product_names.append(name)
+            writer.writerow([pid, description, category, cid, name, price])
+        print(f'{num_products} generated; {len(available_pids)} available')
     return available_pids, product_names
 
 
@@ -118,8 +115,7 @@ def gen_carts(num_carts, seller_ids):
                 continue
             keyset.add((bid, pid))
             quantity = fake.random_int(min=1, max=1000)
-            price = f'{str(fake.random_int(max=500))}.{fake.random_int(max=99):02}'
-            writer.writerow([bid, sid, pid, quantity, price])
+            writer.writerow([bid, sid, pid, quantity])
         print(f'{num} generated')
     return
 
