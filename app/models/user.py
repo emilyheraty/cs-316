@@ -117,4 +117,18 @@ WHERE id = :id
         except Exception as e:
             print (str(e))
         return None
+    
+    @staticmethod
+    def changeBalance(id, quantity):
+        try:
+            rows = app.db.execute("""
+UPDATE Users
+SET balance = balance + :quantity
+WHERE id = :id
+""",
+                            id=id, quantity=quantity)
+            return 1
+        except Exception as e:
+            print (str(e))
+            return 0
 
