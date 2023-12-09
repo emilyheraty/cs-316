@@ -42,9 +42,9 @@
     </tr>
   </thead>
   <tbody>
-    {% for purchase in purchase_history%}
+    {% for purchase in purchases%}
       <tr>
-        <th scope = "row">{{products[purchase_history.index(purchase)].name}}</th>
+        <th scope = "row">{{purchase.prod_name}}</th>
         <td>{{purchase.time_purchased}}</td>
         <td>${{purchase.total_amount}}</td>
         <td>{{purchase.number_of_items}}</td>

@@ -32,22 +32,16 @@ class FilterForm(FlaskForm):
 @bp.route('/purchases', methods = ['GET', 'POST'])
 def purchases():
     if current_user.is_authenticated:
-        purchases = Purchase.get_all_by_uid(
-            current_user.id)
-        products = []
-        for purchase in purchases:
-            products.append(Product.get(purchase.pid)) 
-
+        purchases = Purchase.get_all_by_uid(current_user.id)
         isseller = Inventory.isSeller(current_user.id)[0][0]
     else:
         purchases = []
-        products = None
         isseller = 0
 
     page, per_page, offset = get_page_args(page_parameter='page', per_page_parameter='per_page')
     pagination = Pagination(page=page, per_page=per_page, total=len(purchases))
 
-  
+
     sortForm = SortForm()
     searchForm = SearchForm()
     filterForm = FilterForm()
@@ -60,53 +54,33 @@ def purchases():
         else:
             return redirect(url_for('purchases.purchases'))
         purchases = Purchase.get_by_status(status, current_user.id)
-        products = []
-        for purchase in purchases:
-            products.append(Product.get(purchase.pid))
         pagination = Pagination(page=page, per_page=per_page, total=len(purchases))
         return render_template('purchases.html',
-                            purchase_history=purchases[offset: offset + per_page], pagination=pagination, isseller=isseller,
-                            products=products[offset: offset + per_page],
+                            purchases=purchases[offset: offset + per_page], pagination=pagination, isseller=isseller,
                             searchForm=searchForm, sortForm=sortForm, filterForm=filterForm)
-    
     if sortForm.is_submitted():
         if sortForm.sort.data == 'amount_asce':
             purchases = Purchase.get_by_ascending_amount(current_user.id)
-            products = []
-            for purchase in purchases:
-                products.append(Product.get(purchase.pid))
             pagination = Pagination(page=page, per_page=per_page, total=len(purchases))
         elif sortForm.sort.data == 'amount_desc':
             purchases = Purchase.get_by_descending_amount(current_user.id)
-            products = []
-            for purchase in purchases:
-                products.append(Product.get(purchase.pid))
             pagination = Pagination(page=page, per_page=per_page, total=len(purchases))
         elif sortForm.sort.data == 'time_natural':
             purchases = Purchase.get_by_natural_time(current_user.id)
-            products = []
-            for purchase in purchases:
-                products.append(Product.get(purchase.pid))
             pagination = Pagination(page=page, per_page=per_page, total=len(purchases))
-        
         return render_template('purchases.html',
-                            purchase_history=purchases[offset: offset + per_page], pagination=pagination, isseller=isseller,
-                            products=products[offset: offset + per_page],
+                            purchases=purchases[offset: offset + per_page], pagination=pagination, isseller=isseller,
                             searchForm=searchForm, sortForm=sortForm, filterForm=filterForm)
+    
     if searchForm.is_submitted():
         purchases = Purchase.get_by_product_name(searchForm.keyword.data, current_user.id)
-        products = []
-        for purchase in purchases:
-            products.append(Product.get(purchase.pid))
         pagination = Pagination(page=page, per_page=per_page, total=len(purchases))
         return render_template('purchases.html',
-                            purchase_history=purchases[offset: offset + per_page], pagination=pagination, isseller=isseller,
-                            products=products[offset: offset + per_page],
+                            purchases=purchases[offset: offset + per_page], pagination=pagination, isseller=isseller,
                             searchForm=searchForm, sortForm=sortForm, filterForm=filterForm)
     return render_template('purchases.html',
-                            purchase_history=purchases[offset: offset + per_page], pagination=pagination, isseller=isseller,
-                            products=products[offset: offset + per_page],
-                            searchForm=searchForm, sortForm=sortForm, filterForm=filterForm)
+                        purchases=purchases[offset: offset + per_page], pagination=pagination, isseller=isseller,
+                        searchForm=searchForm, sortForm=sortForm, filterForm=filterForm)
 
 # sellers perspective
 @bp.route('/orders/', methods = ['GET'])
