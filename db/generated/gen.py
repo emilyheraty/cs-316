@@ -93,8 +93,8 @@ def gen_purchases(num_purchases, available_pids):
             time_purchased = fake.date_time()
             total_amount = fake.pyfloat(right_digits=2, positive=True, min_value = 0.01, max_value = 999999999.99)
             number_of_items = fake.random_int(min=0, max=100)
-            fulfillment_status = fake.random_int(min=0, max=1)
-            writer.writerow([id, uid, pid, time_purchased, total_amount, number_of_items, fulfillment_status])
+            fulfillment_status = fake.date_time()
+            writer.writerow([id, uid, pid, time_purchased, total_amount, number_of_items, fulfillment_status, 0])
         print(f'{num_purchases} generated')
     return
 
