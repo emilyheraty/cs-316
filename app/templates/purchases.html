@@ -39,6 +39,7 @@
       <th scope="col">Total Amount</th>
       <th scope="col">Number of Items</th>
       <th scope="col">Entire Order Fulfillment Status</th>
+      <th scope="col">Review?</th>
     </tr>
   </thead>
   <tbody>
@@ -53,6 +54,11 @@
         <td>Fulfilled</td>
         {% else %}
         <td>Not Fulfilled</td>
+        {% endif %}
+        {% if purchase.fulfillment_status%}
+        <td><a class="btn btn-secondary" href="{{ url_for('feedback.post_feedback', pid = purchase.id) }}" role="button">Post review</a> </td>
+        {% else %}
+        <td>Not yet available for review</td>
         {% endif %}
       </tr>
     {% endfor %}

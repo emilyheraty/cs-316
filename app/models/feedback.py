@@ -54,6 +54,36 @@ class Feedback():
         return [Feedback(*row) for row in rows]
     
     @staticmethod
+    def check_past(pid, user_id):
+        rows = app.db.execute("""
+            SELECT *
+            FROM Feedback
+            WHERE user_id = :user_id
+            AND pid = :pid
+            AND review_type = 'product'""", user_id = user_id, pid = pid)
+        return len(rows)>0
+    
+    @staticmethod
+    def check_past_seller(seller_id, user_id):
+        rows = app.db.execute("""
+            SELECT *
+            FROM Feedback
+            WHERE user_id = :user_id
+            AND seller_id = :seller_id
+            AND review_type = 'seller'""", user_id = user_id, seller_id = seller_id)
+        return len(rows)>0
+    
+    @staticmethod
+    def check_purchased(seller_id, user_id):
+        rows = app.db.execute("""
+            SELECT *
+            FROM Purchases, Products
+            WHERE Purchases.uid = :user_id
+            AND Products.id = Purchases.pid
+            AND Products.creaor_id = :seller_id""", seller_id = seller_id, user_id = user_id)
+        return len(rows)>0
+
+    @staticmethod
     def add_product_feedback(user_id, pid, seller_id, review_type, rating, comment, time_posted):
         feedbackCount = app.db.execute("""
         SELECT

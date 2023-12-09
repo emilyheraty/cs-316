@@ -96,7 +96,7 @@ class FeedbackForm(FlaskForm):
     rating = SelectField('Rating', choices=[('1', '1'), ('2', '2'), ('3', '3'),
                                              ('4', '4'), ('5', '5')],
                                               coerce = int, validators = [DataRequired()])
-    review_type = SelectField('Review product or seller?', choices = [('product', 'product'), ('seller', 'seller')], validators = [DataRequired()])
+    #review_type = SelectField('Review product or seller?', choices = [('product', 'product'), ('seller', 'seller')], validators = [DataRequired()])
     comment = TextAreaField('Review', validators= [DataRequired()])
     submit = SubmitField('Submit')
    
@@ -106,9 +106,9 @@ class FeedbackForm(FlaskForm):
 @bp.route('/post_feedback<int:pid>', methods=['GET', 'POST'])
 def post_feedback(pid):
     if current_user.is_authenticated is False:
-        return redirect(url_for('users.login'))
-        
+        return redirect(url_for('users.login'))    
     user_id = current_user.id
+    already_reviewed = (not(Feedback.check_past(pid, user_id)))
     seller_id = Feedback.get_seller(pid)[0][0]
     form = FeedbackForm()
     if form.is_submitted():
@@ -116,10 +116,30 @@ def post_feedback(pid):
          #   if(Feedback.seller_review_check(seller_id)):
          #       flash('Already reviewed seller')
           #      return redirect(url_for('feedback.all_feedback'))
-        if Feedback.add_product_feedback(user_id, pid, seller_id, form.review_type.data, form.rating.data, form.comment.data, datetime.datetime.now()):
+        if Feedback.add_product_feedback(user_id, pid, seller_id, 'product', form.rating.data, form.comment.data, datetime.datetime.now()):
             #flash('Feedback successfully submitted!')
             return redirect(url_for('feedback.all_feedback'))
-    return render_template('post_feedback.html', title='Submit', form=form)
+    return render_template('post_feedback.html', title='Submit', form=form, already_reviewed = already_reviewed)
+
+
+@bp.route('/post_feedback_seller<int:seller_id>', methods=['GET', 'POST'])
+def post_feedback_seller(seller_id):
+    if current_user.is_authenticated is False:
+        return redirect(url_for('users.login'))    
+    user_id = current_user.id
+    already_reviewed=(not( Feedback.check_past_seller(seller_id, user_id)))
+    if(not( Feedback.check_purchased(seller_id, user_id))):
+        return redirect(url_for('index.index'))
+    form = FeedbackForm()
+    if form.is_submitted():
+       # if(form.review_type.data == 'seller'):
+         #   if(Feedback.seller_review_check(seller_id)):
+         #       flash('Already reviewed seller')
+          #      return redirect(url_for('feedback.all_feedback'))
+        if Feedback.add_product_feedback(user_id, None, seller_id, 'seller', form.rating.data, form.comment.data, datetime.datetime.now()):
+            #flash('Feedback successfully submitted!')
+            return redirect(url_for('feedback.all_feedback'))
+    return render_template('post_feedback_seller.html', title='Submit', form=form, already_reviewed = already_reviewed)
 
 
 class FeedbackEditForm(FlaskForm):
