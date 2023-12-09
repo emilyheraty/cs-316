@@ -6,7 +6,7 @@ from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Re
 from .models.cart import Cart
 from .models.product import Product
 from .models.purchase import Purchase
-from .models.inventory import Inventory
+from .models.inventory import Inventory, Listing
 from flask_paginate import Pagination, get_page_parameter
 from datetime import datetime
 
@@ -69,3 +69,13 @@ def submitCart():
     #uid, pid, time, sid, amount, quant, status
     
     return redirect('/purchases')
+
+@bp.route('/detailed_product/<string:product_name>', methods=['GET', 'POST'])
+def detailedOrder(product_name):
+    listings = Listing.get_listings_by_product_name(product_name)
+    for listing in listings:
+        print(listing.sfirstname)
+    prod = Product.get_product_by_name(product_name)
+    desc = prod.description
+    p = prod.price
+    return render_template('detailed_product.html', items=listings, description = desc, price = p, product_name=product_name)

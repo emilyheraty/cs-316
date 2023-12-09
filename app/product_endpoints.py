@@ -20,3 +20,4 @@ def top_k_products(k):
     return render_template('temp_products.html',
                            items=products
                         )
+

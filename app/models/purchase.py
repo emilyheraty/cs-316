@@ -119,7 +119,7 @@ VALUES(:uid, :pid, :time, :amount, :qty, :status)
                                   time=time,
                                   amount=amount,
                                   qty=quantity,
-                                  status=status)
+                                  status=0)
         except Exception as e:
             print(str(e))
 
