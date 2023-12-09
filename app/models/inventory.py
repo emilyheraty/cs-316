@@ -126,3 +126,18 @@ WHERE Inventory.id = :id AND Inventory.product_name = :product_name
 # AND Sellers.id = :id)
 # ''',
 #                                 id=id)
+class Listing:
+    def __init__(self, sfirstname, slastname, qty):
+        self.sfirstname = sfirstname
+        self.slastname = slastname
+        self.qty = qty
+    
+    @staticmethod
+    def get_listings_by_product_name(name):
+        rows = app.db.execute('''
+SELECT Users.firstname, Users.lastname, Inventory.number_available
+FROM Inventory, Users
+WHERE Inventory.product_name = :name and Inventory.id = Users.id
+''',
+                              name=name)
+        return [Listing(*row) for row in rows] if rows is not None else None
