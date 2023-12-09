@@ -168,17 +168,15 @@ class Feedback():
     def get_partial_feedback(user_id, per_page, off):
         rows = app.db.execute("""
             
-            SELECT DISTINCT Feedback.id, Feedback.rating, Feedback.comment, Feedback.time_posted, Products.name, Feedback.pid, Feedback.review_type, Feedback.seller_id
-            FROM Feedback, Purchases, Products, Inventory
-            WHERE Feedback.user_id = :user_id AND
-            Feedback.pid = Products.id AND
-            Products.creator_id = Inventory.id                       
+            SELECT *
+            FROM Feedback
+            WHERE Feedback.user_id = :user_id                       
             ORDER BY time_posted DESC
             LIMIT :per_page
             OFFSET :off
                               """,
                               user_id = user_id, per_page = per_page, off = off)
-        return rows
+        return [Feedback(*row) for row in rows]
     
 
     @staticmethod
@@ -213,7 +211,7 @@ class Feedback():
 
                               """,
                               user_id = user_id, per_page = per_page, off = off)
-        return rows
+        return [Feedback(*row) for row in rows]
     
    # @staticmethod
    # def get(id):

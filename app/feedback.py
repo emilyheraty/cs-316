@@ -12,6 +12,7 @@ from .models.feedback import Feedback
 from .models.purchase import Purchase
 from .models.product import Product
 from .models.inventory import Inventory
+from .models.user import User
 
 from flask import Blueprint
 bp = Blueprint('feedback', __name__)
@@ -76,8 +77,7 @@ def all_feedback():
     page2 = request.args.get(get_page_parameter(), type=int, default=1)
     offset2 = (page2 - 1) * per_page
 
-    page3 = request.args.get(get_page_parameter(), type=int, default=1)
-    offset3 = (page3 - 1) * per_page
+    
 
     if current_user.is_authenticated:
         user_id = current_user.id
@@ -86,13 +86,22 @@ def all_feedback():
         pending = Feedback.pending_products(user_id)
         partial_pending = Feedback.get_partial_pending(user_id, per_page, offset2)
         purchase_name_pending = Feedback.get_purchase_name_pending(user_id)
-        full_feedback_s = Feedback.get_all_feedback_s(user_id)
-        partial_feedback = Feedback.get_partial_feedback_s(user_id, per_page, offset3)
+        
 
         num = 0
         isseller = Inventory.isSeller(current_user.id)[0][0]
-        
-
+        names = []
+        for feedback in full_feedback:
+            if (feedback.review_type == 'seller'):
+                seller_id = feedback.seller_id
+                s1 = User.get_profile_info(seller_id).firstname
+                s2 = User.get_profile_info(seller_id).lastname
+                name = " ".join([s1, s2])
+                names.append(name)
+            if (feedback.review_type == 'product'):
+                product_id = feedback.pid
+                name = Product.get(product_id).name
+                names.append(name)
         
        
     
@@ -102,8 +111,8 @@ def all_feedback():
         pending = []
     pagination = Pagination(page=page1, per_page=per_page, total=len(full_feedback), search = search, offset1 = offset1, record_name = 'product reviews')
     pagination_2 = Pagination(page=page2, per_page=per_page, total=len(purchase_name_pending), search = search, offset2 = offset2, record_name = 'purchases to review')
-    pagination_3 = Pagination(page=page3, per_page=per_page, total=len(full_feedback_s), search = search, offset3 = offset3, record_name = 'seller reviews')
-    return render_template('all_feedback.html', partial_feedback = partial_feedback, purchase_name_pending = purchase_name_pending, pagination = pagination, pending = pending, partial_pending = partial_pending, pagination_2 = pagination_2)
+    
+    return render_template('all_feedback.html', partial_feedback = partial_feedback, purchase_name_pending = purchase_name_pending, pagination = pagination, pending = pending, partial_pending = partial_pending, pagination_2 = pagination_2, names = names)
 
 class FeedbackForm(FlaskForm):
     rating = SelectField('Rating', choices=[('1', '1'), ('2', '2'), ('3', '3'),
