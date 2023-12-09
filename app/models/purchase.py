@@ -115,7 +115,6 @@ FROM (Purchases JOIN Products ON Purchases.pid = Products.id)
 WHERE uid = :uid
 GROUP BY name
 LIMIT 10
-                              
                               ''',
                             uid=uid)
         return rows
@@ -129,6 +128,30 @@ WHERE uid = :uid AND EXTRACT(Year FROM Purchases.time_purchased) = :year
 GROUP BY Month
 ''',
                               uid=uid, year=year)
+        return rows
+    
+    @staticmethod
+    def get_all_by_state(uid):
+        rows = app.db.execute('''
+SELECT Users.state, SUM(Purchases.total_amount) as total_amount
+FROM Purchases
+JOIN Users ON Purchases.uid = Users.id
+JOIN (SELECT * FROM Products WHERE Products.creator_id = :uid) as d1 ON Purchases.pid = d1.id                  
+GROUP BY Users.state
+''',
+                              uid=uid)
+        return rows
+    
+    @staticmethod
+    def get_all_by_state_product(uid, name):
+        rows = app.db.execute('''
+SELECT Users.state, SUM(Purchases.total_amount) as total_amount
+FROM Purchases
+JOIN Users ON Purchases.uid = Users.id
+JOIN (SELECT * FROM Products WHERE Products.creator_id = :uid AND Products.name = :name) as d1 ON Purchases.pid = d1.id                  
+GROUP BY Users.state
+''',
+                              uid=uid, name=name)
         return rows
 
     @staticmethod

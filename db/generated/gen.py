@@ -1,6 +1,7 @@
 from werkzeug.security import generate_password_hash
 import csv
 from faker import Faker
+import re
 
 num_users = 100
 num_products = 2000
@@ -12,6 +13,13 @@ num_inventory = 1000
 Faker.seed(0)
 fake = Faker()
 
+def getState(address):
+    regex = r',\s*([A-Za-z]{2})\s+\d{5}'
+    state = re.search(regex, address)
+    if state:
+        return state.group(1)
+    else:
+        return
 
 def get_csv_writer(f):
     return csv.writer(f, dialect='unix')
@@ -19,6 +27,7 @@ def get_csv_writer(f):
 
 def gen_users(num_users):
     sellers = []
+
     with open('Users.csv', 'w') as f:
         writer = get_csv_writer(f)
         print('Users...', end=' ', flush=True)
@@ -34,9 +43,10 @@ def gen_users(num_users):
             firstname = name_components[0]
             lastname = name_components[-1]
             address = profile['residence']
+            state = getState(address)
             balance = fake.pyfloat(right_digits=2, positive=True, min_value = 0.01, max_value = 999999999.99)
             is_seller = fake.random_int(min=0,max=1)  # need to edit this!!!
-            writer.writerow([uid, email, password, firstname, lastname, address, balance, is_seller])
+            writer.writerow([uid, email, password, firstname, lastname, address, state, balance, is_seller])
             sellers.append(is_seller)
         print(f'{num_users} generated')
     return sellers

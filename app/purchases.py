@@ -132,12 +132,26 @@ class SpendingForm(FlaskForm):
     years = SelectField("Year")
     submit = SubmitField("View")
 
+class ProductForm(FlaskForm):
+    product = SelectField("Product")
+    submit = SubmitField("View")
+
 @bp.route('/purchases/statistics', methods = ['GET', 'POST'])
 def statistics():
     if current_user.is_authenticated:
         isseller = Inventory.isSeller(current_user.id)[0][0]
     else:
         isseller = 0
+
+    states = []
+    product_count = []
+    if isseller == 1:
+        seller_by_state = Purchase.get_all_by_state(current_user.id)
+        for state in seller_by_state:
+            states.append(state[0])
+            product_count.append(state[1])
+
+    
 
     grouped_products = Purchase.get_by_product_count(current_user.id)
     top_products = []
@@ -159,6 +173,22 @@ def statistics():
     spendingForm = SpendingForm()
     spendingForm.years.choices = [(str(a), str(a)) for a in selectedYears]
 
+    productForm = ProductForm()
+    productForm.product.choices = ["All Products"] + [(a[1], a[1]) for a in Inventory.getInventory(current_user.id)]
+
+    if productForm.product.data != ("None" or "All Products"):
+        product_by_state = Purchase.get_all_by_state_product(current_user.id, productForm.product.data)
+        states = []
+        product_count = []
+        for product in product_by_state:
+            states.append(product[0])
+            product_count.append(int(product[1]))
+        return render_template('statistics.html', isseller=isseller, top_products=top_products, count=count, 
+                                available_years=availableYears, total_amount=total_amount, spendingForm=spendingForm, productForm=productForm,
+                                states=states, product_count=product_count, product=productForm.product.data)
+
+        
+
     if spendingForm.years.data != ("All Years" or "None"):
         grouped_data_m = Purchase.get_by_year(current_user.id, spendingForm.years.data)
         months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
@@ -167,6 +197,11 @@ def statistics():
         for purchase in grouped_data_m:
             months_data.append(months[int(purchase[0]) - 1])
             total_amount.append(int(purchase[1]))
-        return render_template('statistics.html', isseller=isseller, top_products=top_products, count=count, available_years=availableYears, year=spendingForm.years.data, total_amount=total_amount, spendingForm=spendingForm, months=months_data)
+        return render_template('statistics.html', isseller=isseller, top_products=top_products, count=count, 
+                                available_years=availableYears, year=spendingForm.years.data, total_amount=total_amount,
+                                spendingForm=spendingForm, productForm=productForm, months=months_data, states=states,
+                                product_count=product_count, product=productForm.product.data)
     
-    return render_template('statistics.html', isseller=isseller, top_products=top_products, count=count, available_years=availableYears, total_amount=total_amount, spendingForm=spendingForm)
+    return render_template('statistics.html', isseller=isseller, top_products=top_products, count=count, 
+                            available_years=availableYears, total_amount=total_amount, spendingForm=spendingForm,
+                              states=states, product_count=product_count, product=productForm.product.data)

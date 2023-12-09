@@ -77,17 +77,78 @@
             const layout = {
                 xaxis: {label: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"], title: "Month"},
                 yaxis: {title: "Total Amount"},
-                title: "Spending Over the Year "+selectedYear
+                title: "Spending Over the Year "+ selectedYear
                 
             };
             Plotly.newPlot('spending', data, layout);
-        }    
-
+        } 
 
     </script>
 </body>
 {% if isseller %}
-<h5>Selling Statistics</h5>
+<h4>Selling Statistics</h4>
+<p>Visualize which states are most popular with your products</p>
+<form method="post" style="text-align: left;">
+    {{ productForm.hidden_tag() }}
+      {{ productForm.product() }}
+      {{ productForm.submit() }}
+</form>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<body>
+    <div class = "row">
+        <div id="sales" style="width:100%;max-width:700px"></div>
+    </div>
+    <script>
+        var states = JSON.parse('{{ states | safe }}');
+        var product_count =  JSON.parse('{{ product_count | safe }}');
+
+        const data2= [{
+                type: 'choropleth',
+                locationmode: 'USA-states',
+                locations: states,
+                z: product_count,
+                text: states,
+                colorscale: "Viridis"
+        }];
+
+                
+        const layout2 = {
+                title: "Total Items Purchased Per State",
+                geo:{
+                    scope: 'usa'
+                }
+        };
+
+        Plotly.newPlot('sales', data2, layout2);
+          
+        var product = JSON.parse('{{ product | safe }}');
+        if (product != ("None" || "All Products")){
+
+            var states = JSON.parse('{{ states | safe }}');
+            var product_count =  JSON.parse('{{ product_count | safe }}');
+
+            const data2= [{
+            type: 'choropleth',
+            locationmode: 'USA-states',
+            locations: states,
+            z: product_count,
+            colorscale: "Viridis"
+        }];
+
+                
+        const layout2 = {
+            title: "Total Number of " + product + " Purchased Per State",
+            geo:{
+                scope: 'usa'
+            }
+        };
+
+        Plotly.newPlot('sales', data2, layout2);
+        }  
+        
+
+    </script>
+</body>
 {%endif%}
 
 {%endif%}
