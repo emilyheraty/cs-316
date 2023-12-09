@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if current_user.is_authenticated %}
+<p style="margin-top: 10px;">
+  <a href="{{ url_for('index.index') }}">Home</a>
+  /
+  <a href="{{ url_for('users.account') }}">Account</a>
+  / Statistics
+</p>
+<h2>Statistics</h2>
+{% if isseller %}
+<p>Visualize your spending and selling patterns</p>
+{% else %}
+<p>Visualize your spending patterns</p>
+{% endif %}
+<h5>Spending Statistics</h5>
+<form method="post" style="text-align: left;">
+    {{ spendingForm.hidden_tag() }}
+      {{ spendingForm.years() }}
+      {{ spendingForm.submit() }}
+  </form>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<body>
+    <div class = "row">
+        <div id="spending" style="width:50%;max-width:700px"></div>
+        <div id="items" style="width:50%;max-width:700px"></div>
+    </div>
+    <script>
+        var available_years = JSON.parse('{{ available_years | safe }}');
+        var total_amount =  JSON.parse('{{ total_amount | safe }}');
+        var top_products = JSON.parse('{{ top_products | safe }}');
+        var count =  JSON.parse('{{ count | safe }}');
+
+        const data = [{
+            x: available_years,
+            y: total_amount,
+            mode: "line"
+                
+        }];
+                
+        const layout = {
+            xaxis: {title: "Years"},
+            yaxis: {title: "Total Amount"},
+            title: "Spending Over Time"
+                
+            };
+        Plotly.newPlot('spending', data, layout);
+
+        const items = [{
+            x: top_products,
+            y: count,
+            type: "bar"
+                
+        }];
+                
+        const layout1 = {
+            xaxis: {title: "Products"},
+            yaxis: {title: "Count"},
+            title: "Top 10 Most Purchased Products of All Time"
+                
+            };
+        Plotly.newPlot('items', items, layout1);
+
+        var selectedYear = JSON.parse('{{ year | safe }}');
+        if(selectedYear != "All Years" || "None"){
+            var months =  JSON.parse('{{ months | safe }}');
+            var total_amounts =  JSON.parse('{{ total_amount | safe }}');
+            const data = [{
+                x: months,
+                y: total_amounts,
+                mode: "line"
+            
+            }];
+                
+            const layout = {
+                xaxis: {label: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"], title: "Month"},
+                yaxis: {title: "Total Amount"},
+                title: "Spending Over the Year "+selectedYear
+                
+            };
+            Plotly.newPlot('spending', data, layout);
+        }    
+
+
+    </script>
+</body>
+{% if isseller %}
+<h5>Selling Statistics</h5>
+{%endif%}
+
+{%endif%}
+{% endblock %}

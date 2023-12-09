@@ -85,27 +85,16 @@ def logout():
     logout_user()
     return redirect(url_for('index.index'))
 
-class SpendingForm(FlaskForm):
-    years = SelectField("Year", coerce=int)
 
-@bp.route('/account', methods=['GET'])
+@bp.route('/account', methods=['GET', 'POST'])
 def account():
-    grouped_data = Purchase.get_by_year(current_user.id)
-    available_years = []
-    total_amount = []
-    for purchase in grouped_data:
-        available_years.append(int(purchase[0]))
-        total_amount.append(int(purchase[1]))
-
-    yearsForm = SpendingForm()
-    yearsForm.years.choices = [(a, a) for a in available_years]
-
     if current_user.is_authenticated is False:
         isseller = 0
         return redirect(url_for('users.login'))
     else:
         isseller = Inventory.isSeller(current_user.id)[0][0]
-    return render_template('account.html', isseller=isseller, available_years=available_years, total_amount=total_amount)
+    
+    return render_template('account.html', isseller=isseller)
 
 
 @bp.route('/account/profile', methods=['GET'])

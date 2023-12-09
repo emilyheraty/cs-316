@@ -97,7 +97,7 @@ WHERE fulfillment_status = :status AND uid = :uid
         return [Purchase(*row) for row in rows]
         
     @staticmethod
-    def get_by_year(uid):
+    def get_all_years(uid):
         rows = app.db.execute('''
 SELECT EXTRACT(Year FROM Purchases.time_purchased) AS Year, SUM(total_amount) as total_amount
 FROM Purchases
@@ -108,14 +108,27 @@ GROUP BY Year
         return rows
     
     @staticmethod
-    def get_by_year_month(uid):
+    def get_by_product_count(uid):
         rows = app.db.execute('''
-SELECT EXTRACT(Year FROM Purchases.time_purchased) AS Year, EXTRACT(Month FROM Purchases.time_purchased) AS Month, SUM(total_amount) as total_amount, SUM(number_of_items) as number_of_items
-FROM Purchases
+SELECT Products.name AS name, SUM(number_of_items) as Count
+FROM (Purchases JOIN Products ON Purchases.pid = Products.id)
 WHERE uid = :uid
-GROUP BY Year, Month
+GROUP BY name
+LIMIT 10
+                              
+                              ''',
+                            uid=uid)
+        return rows
+    
+    @staticmethod
+    def get_by_year(uid, year):
+        rows = app.db.execute('''
+SELECT EXTRACT(Month FROM Purchases.time_purchased) AS Month, SUM(total_amount) as total_amount
+FROM Purchases
+WHERE uid = :uid AND EXTRACT(Year FROM Purchases.time_purchased) = :year
+GROUP BY Month
 ''',
-                              uid=uid)
+                              uid=uid, year=year)
         return rows
 
     @staticmethod

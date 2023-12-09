@@ -127,3 +127,46 @@ def orders():
     search = request.args.get('q')
     pagination = Pagination(page=page, per_page=per_page, offset=offset, total=len(lineitems), search=search, record_name='lineitems')
     return render_template('orders.html', items=lineitems_partial, pagination=pagination, isseller=isseller)
+
+class SpendingForm(FlaskForm):
+    years = SelectField("Year")
+    submit = SubmitField("View")
+
+@bp.route('/purchases/statistics', methods = ['GET', 'POST'])
+def statistics():
+    if current_user.is_authenticated:
+        isseller = Inventory.isSeller(current_user.id)[0][0]
+    else:
+        isseller = 0
+
+    grouped_products = Purchase.get_by_product_count(current_user.id)
+    top_products = []
+    count = []
+    for product in grouped_products:
+        top_products.append(str(product[0]))
+        count.append(int(product[1]))
+
+    
+    grouped_data = Purchase.get_all_years(current_user.id)
+    selectedYears = ["All Years"]
+    availableYears = []
+    total_amount = []
+    for purchase in grouped_data:
+        selectedYears.append(int(purchase[0]))
+        availableYears.append(int(purchase[0]))
+        total_amount.append(int(purchase[1]))
+
+    spendingForm = SpendingForm()
+    spendingForm.years.choices = [(str(a), str(a)) for a in selectedYears]
+
+    if spendingForm.years.data != ("All Years" or "None"):
+        grouped_data_m = Purchase.get_by_year(current_user.id, spendingForm.years.data)
+        months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+        months_data = []
+        total_amount = []
+        for purchase in grouped_data_m:
+            months_data.append(months[int(purchase[0]) - 1])
+            total_amount.append(int(purchase[1]))
+        return render_template('statistics.html', isseller=isseller, top_products=top_products, count=count, available_years=availableYears, year=spendingForm.years.data, total_amount=total_amount, spendingForm=spendingForm, months=months_data)
+    
+    return render_template('statistics.html', isseller=isseller, top_products=top_products, count=count, available_years=availableYears, total_amount=total_amount, spendingForm=spendingForm)
