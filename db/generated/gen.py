@@ -71,14 +71,12 @@ def gen_products(num_products, seller_ids):
             nameset.add(name)    
             cid = fake.random_element(elements=seller_ids)
             price = f'{str(fake.random_int(max=500))}.{fake.random_int(max=99):02}'
-            available = fake.random_element(elements=('true', 'false'))
             description = fake.sentence(nb_words=50)[:-1]
             category = fake.random_element(elements=('food', 'household products', 'clothing', 'books'))
           #rating = f'{str(fake.random_int(max=4))}.{fake.random_int(max=.9):02}'
-            if available == 'true':
-                available_pids.append(pid)
-                product_names.append(name)
-            writer.writerow([pid, description, category, cid, name, price, available])
+            available_pids.append(pid)
+            product_names.append(name)
+            writer.writerow([pid, description, category, cid, name, price])
         print(f'{num_products} generated; {len(available_pids)} available')
     return available_pids, product_names
 

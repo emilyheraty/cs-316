@@ -2,14 +2,13 @@ from flask import current_app as app
 
 
 class Product:
-    def __init__(self, id, description, category, cid, name, price, available):
+    def __init__(self, id, description, category, cid, name, price):
         self.id = id
         self.cid = cid
         self.name = name
         self.description = description
         self.category = category
         self.price = price
-        self.available = available
 
     @staticmethod
     def get_rating(id):

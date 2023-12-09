@@ -72,8 +72,6 @@ def addItemToCart(seller_id, product_name):
     else:
         redirect('/login')
     # Should take you to order page to determine quantity, and maybe other options?
-
-    
     #bid, sid, pid, quant, price
     return redirect('/')
 
@@ -85,8 +83,6 @@ def submitCart():
         redirect('/login')
 
     time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
-
     for purch in lineitems:
         # if user can afford it
         amount = round(purch.quantity * purch.price, 2)
@@ -94,18 +90,15 @@ def submitCart():
                                 purch.product_id, 
                                 str(time),
                                 amount, 
-                                purch.quantity, 
-                                0
+                                purch.quantity
         )
-    #uid, pid, time, sid, amount, quant, status
-    
+    # CLEAR CART
+    # INCREMENT BALANCES
     return redirect('/purchases')
 
 @bp.route('/detailed_product/<string:product_name>', methods=['GET', 'POST'])
 def detailedOrder(product_name):
     listings = Listing.get_listings_by_product_name(product_name)
-    for listing in listings:
-        print(listing.sfirstname)
     prod = Product.get_product_by_name(product_name)
     desc = prod.description
     p = prod.price
