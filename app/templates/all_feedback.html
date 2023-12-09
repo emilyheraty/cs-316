@@ -2,24 +2,48 @@
 
 {% block content %}
 
+<style>
+
+
+    .btn-secondary-2 {
+        background-color: red;
+        color: white
+    }
+
+</style>
+
 {% if current_user.is_authenticated %}
+<p style="margin-top: 10px;">
+    <a href="{{ url_for('index.index') }}">Home</a>
+    / <a href="{{ url_for('users.account') }}">Account</a>
+    / Reviews
+</p>
+
 <br>
-<h2>Your submitted feedback:</h2>
+<h2>Your posted reviews</h2>
 
 <table class="table">
     <thead class="thead-dark">
         <tr>
+            <th scope="col">Product name</th>
             <th scope="col">Rating</th>
             <th scope="col">Comment</th>
-            <th scope="col">Date</th>
+            <th scope="col">Date posted</th>
+            <th scope="col">Edit review</th>
+            <th scope="col">Delete review</th>
         </tr>
     </thead>
     <tbody>
         {% for feedback in partial_feedback %}
         <tr>
-            <td>{{ feedback.rating }}</td>
+            <td>{{ feedback.name }}</td>
+            <td>
+                {{ feedback.rating }}
+            </td>
             <td>{{ feedback.comment }}</td>
             <td>{{ feedback.time_posted }}</td>
+            <td> <a class="btn btn-secondary" href="{{ url_for('feedback.edit_feedback', id = feedback.id) }}" role="button">Edit</a> </td>
+            <td> <a class="btn btn-secondary-2" href="{{ url_for('feedback.delete_feedback', id = feedback.id) }}" role="button">Delete</a> </td>
         </tr>
         {% endfor %}
     </tbody>
@@ -28,22 +52,22 @@
 {{ pagination.links }}
 <br><br>
 
-<h2>Leave a review!</h2>
+<h2>Completed purchases pending review</h2>
 <table class="table">
 <thead class="thead-dark">
     <tr>
-        <th scope="col">Purchase Id</th>
-        <th scope="col">Product Name</th>
+       
+        <th scope="col">Product name</th>
+        <th scope="col">Leave review?</th>
     </tr>
 </thead>
 <tbody>
-    {% for p in purchase_name %}
+    {% for p in partial_pending %}
         <tr>
             
             
-           <td> <a href="{{ url_for('feedback.post_feedback', pid = p.pid) }}"> {{ p.pid }}</a> </td>
-           
-           <td> {{p.name}}</td>
+           <td>  {{ p.name }} </td>
+           <td> <a class="btn btn-secondary" href="{{ url_for('feedback.post_feedback', pid = p.pid) }}" role="button">Post</a> </td>
            
            
         
