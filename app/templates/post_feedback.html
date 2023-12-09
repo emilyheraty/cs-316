@@ -2,8 +2,19 @@
 
 {% block content %}
 
+<p style="margin-top: 10px;">
+    <a href="{{ url_for('index.index') }}">Home</a>
+    / <a href="{{ url_for('users.account') }}">Account</a>
+    / <a href="{{ url_for('feedback.all_feedback') }}">Reviews</a>
+    / Post review
+</p>
+
 <h1>Post Review</h1>
 <form action="" method="post">
+    <p>
+        {{form.review_type.label}} </br>
+        {{form.review_type}} </br>
+    </p>
 <p>
     {{form.rating.label}} </br>
     {{form.rating}} </br>
@@ -12,6 +23,18 @@
     {{form.comment.label}} </br>
     {{form.comment}} </br>
 </p>
-{{ form.submit(class_ ="btn btn-black") }}
+<p>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul>
+      {% for message in messages %}
+      <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+  </p>
+{{ form.submit(class_="btn btn-black") }}
+
 </form>
 {% endblock %}
