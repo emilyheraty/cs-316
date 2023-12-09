@@ -65,19 +65,3 @@ WHERE name = :name
 ''',
                               name=name)
         return Product(*(rows[0])) if rows is not None else None
-
-
-
-
-                          
-
-    
-    
-        
-
-        
-        
-    
-
-
-
