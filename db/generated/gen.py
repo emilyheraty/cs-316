@@ -67,14 +67,19 @@ def gen_sellers(sellers):
 def gen_products(num_products, seller_ids):
     available_pids = []
     product_names = []
+    nameset = set()
     with open('Products.csv', 'w') as f:
         writer = get_csv_writer(f)
         print('Products...', end=' ', flush=True)
         for pid in range(num_products):
             if pid % 100 == 0:
                 print(f'{pid}', end=' ', flush=True)
-            cid = fake.random_element(elements=seller_ids)
             name = fake.sentence(nb_words=4)[:-1]
+            if name in nameset:
+                pid-=1
+                continue
+            nameset.add(name)    
+            cid = fake.random_element(elements=seller_ids)
             price = f'{str(fake.random_int(max=500))}.{fake.random_int(max=99):02}'
             available = fake.random_element(elements=('true', 'false'))
             description = fake.sentence(nb_words=50)[:-1]
@@ -122,8 +127,7 @@ def gen_carts(num_carts, seller_ids):
                 continue
             keyset.add((bid, pid))
             quantity = fake.random_int(min=1, max=1000)
-            price = f'{str(fake.random_int(max=500))}.{fake.random_int(max=99):02}'
-            writer.writerow([bid, sid, pid, quantity, price])
+            writer.writerow([bid, sid, pid, quantity])
         print(f'{num} generated')
     return
 
@@ -149,7 +153,7 @@ def gen_inventory(num_inventory, seller_ids, product_names):
     return
 
 
-def gen_feedback(num_feedback, available_pids):
+def gen_feedback(num_feedback, available_pids, seller_ids):
     with open('Feedback.csv', 'w') as f:
         writer = get_csv_writer(f)
         print('Feedback...', end=' ', flush=True)
@@ -159,10 +163,12 @@ def gen_feedback(num_feedback, available_pids):
             id = i
             uid = fake.random_int(min=0, max=num_users-1)
             pid = fake.random_element(elements=available_pids)
+            seller_id = fake.random_element(elements=seller_ids)
+            review_type = fake.random_element(elements=('product','seller'))
             rating = fake.random_int(min=1, max=5)
             comment = fake.sentence(nb_words=5)[:-1]
             time_posted = fake.date_time()
-            writer.writerow([id, uid, pid, rating, comment, time_posted])
+            writer.writerow([id, uid, pid, seller_id, review_type, rating, comment, time_posted])
         print(f'{num_feedback} generated')
     return
 
@@ -172,4 +178,4 @@ available_pids, product_names = gen_products(num_products, seller_ids)
 gen_purchases(num_purchases, available_pids)
 gen_carts(num_carts, seller_ids)
 gen_inventory(num_inventory, seller_ids, product_names)
-gen_feedback(num_feedback, available_pids)
+gen_feedback(num_feedback, available_pids, seller_ids)

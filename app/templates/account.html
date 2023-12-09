@@ -37,8 +37,8 @@
         <h4>Inventory</h4>
         <p style="color:rgb(120, 119, 119)">View and edit inventory</p>
     </a>
-    <a class="card" style="text-decoration:none; color:inherit;" href="{{ url_for('feedback.all_feedback') }}">
-        <h4>Feedback</h4>
+    <a class="card" style="text-decoration:none; color:inherit;" href="{{ url_for('feedback.customer_feedback', seller_id = current_user.id) }}">
+        <h4>Customer Feedback</h4>
         <p style="color:rgb(120, 119, 119)">View customer feedback</p>
     </a>
     <a class="card" style="text-decoration:none; color:inherit;" href="{{ url_for('purchases.statistics') }}">
@@ -51,5 +51,10 @@
         <p style="color:rgb(120, 119, 119)">Visualize spending patterns over time</p>
     </a>
 {% endif %}
+
+<a class="card" style="text-decoration:none; color:inherit;" href="{{ url_for('feedback.all_feedback') }}">
+    <h4>Your Feedback</h4>
+    <p style="color:rgb(120, 119, 119)">View and edit your feedback</p>
+</a>
 
 {% endblock %}

@@ -10,16 +10,38 @@
   <thead class="thead-dark">
     <tr>
       <th scope="col">Product Name</th>
+      <th scope="col">Seller ID</th>
       <th scope="col">Item Price</th>
       <th scope="col">Quantity</th>
+      <th scope="col">Total Item Price</th>
     </tr>
   </thead>
   <tbody>
     {% for product in items%}
       <tr>
         <th scope="row">{{product.prod_name}}</th>
+        <td>{{product.seller_id}}</td>
         <td>{{product.price}}</td>
-        <td>{{product.quantity}} <a href="/"> Edit (does nothing for now)</a></td>
+        <td>
+          <form action="{{ url_for('cart_bp.showCart') }}" method="POST">
+            <input type="hidden" name="bid" value="{{ current_user.id }}">
+            <input type="hidden" name="sid" value="{{ product.seller_id }}">
+            <input type="hidden" name="pid" value="{{ product.product_id }}">
+            {{ form_uq.csrf_token }}
+            <input type="number" name="new_quantity" value="{{ product.quantity }}">
+            {% if form_uq.errors %}
+            <ul>
+                {% for field, errors in form_uq.errors.items() %}
+                    {% for error in errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+            {% endif %}
+            {{ form_uq.submit() }}
+        </form>
+        </td>
+        <td>{{product.quantity * product.price}}</td>
       </tr>
     {% endfor %}
   </tbody>
@@ -27,4 +49,5 @@
 {{ pagination.links }}
 <a href="/cart/submit" type="button" class="btn btn-dark">Submit Cart as Order</a>
 {% endblock %}
+
 
