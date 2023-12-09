@@ -101,12 +101,13 @@ def submitCart():
     for purch in lineitems:
         # if user can afford it
         amount = round(purch.quantity * purch.price, 2)
+        newOId = Purchase.maxOId() + 1
         Purchase.submitPurchase(purch.buyer_id, 
                                 purch.product_id, 
                                 str(time),
                                 amount, 
-                                purch.quantity
-        )
+                                purch.quantity,
+                                newOId)
         User.changeBalance(purch.seller_id, amount)
         User.changeBalance(current_user.id, -1 * amount)
         Inventory.decreaseQuantity(purch.seller_id, purch.prod_name, purch.quantity)

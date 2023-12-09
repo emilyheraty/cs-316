@@ -46,7 +46,7 @@
       <tr>
         <th scope = "row">{{products[purchase_history.index(purchase)].name}}</th>
         <td>{{purchase.time_purchased}}</td>
-        <td>{{purchase.total_amount}}</td>
+        <td>${{purchase.total_amount}}</td>
         <td>{{purchase.number_of_items}}</td>
         {% if purchase.fulfillment_status%}
         <td>Fulfilled</td>

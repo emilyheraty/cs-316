@@ -28,6 +28,7 @@ class FilterForm(FlaskForm):
     status = SelectField('Filter', choices=[('all', 'All'), ('fulfilled', 'Fulfilled'), ('not_fulfilled', 'Not Fulfilled')])
     submit = SubmitField('Filter')
 
+# buyers perspective
 @bp.route('/purchases', methods = ['GET', 'POST'])
 def purchases():
     if current_user.is_authenticated:
@@ -39,7 +40,7 @@ def purchases():
 
         isseller = Inventory.isSeller(current_user.id)[0][0]
     else:
-        purchases = None
+        purchases = []
         products = None
         isseller = 0
 
@@ -92,8 +93,6 @@ def purchases():
                             purchase_history=purchases[offset: offset + per_page], pagination=pagination, isseller=isseller,
                             products=products[offset: offset + per_page],
                             searchForm=searchForm, sortForm=sortForm, filterForm=filterForm)
-    
-
     if searchForm.is_submitted():
         purchases = Purchase.get_by_product_name(searchForm.keyword.data, current_user.id)
         products = []
@@ -104,16 +103,12 @@ def purchases():
                             purchase_history=purchases[offset: offset + per_page], pagination=pagination, isseller=isseller,
                             products=products[offset: offset + per_page],
                             searchForm=searchForm, sortForm=sortForm, filterForm=filterForm)
-    
-
-    
-
     return render_template('purchases.html',
                             purchase_history=purchases[offset: offset + per_page], pagination=pagination, isseller=isseller,
                             products=products[offset: offset + per_page],
                             searchForm=searchForm, sortForm=sortForm, filterForm=filterForm)
 
-
+# sellers perspective
 @bp.route('/orders/', methods = ['GET'])
 def orders():
     if current_user.is_authenticated and Inventory.isSeller(current_user.id)[0][0]: # isSeller
