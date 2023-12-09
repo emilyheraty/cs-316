@@ -10,7 +10,6 @@ class Purchase:
         self.total_amount = total_amount
         self.number_of_items = number_of_items
         self.fulfillment_status = fulfillment_status
-
     @staticmethod
     def get(id):
         rows = app.db.execute('''
