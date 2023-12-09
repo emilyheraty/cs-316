@@ -54,6 +54,19 @@ class Feedback():
         return [Feedback(*row) for row in rows]
     
     @staticmethod
+    def get_all_feedback_p(user_id):
+        rows = app.db.execute("""
+        SELECT * 
+        FROM Feedback
+        WHERE user_id = :user_id
+        AND review_type = 'product'
+        ORDER BY time_posted DESC
+        """,
+        user_id=user_id)
+        
+        return [Feedback(*row) for row in rows]
+    
+    @staticmethod
     def check_past(pid, user_id):
         rows = app.db.execute("""
             SELECT *
@@ -129,10 +142,45 @@ class Feedback():
         rows = app.db.execute("""
             SELECT p.rating, p.comment, p.time_posted, p.name, p.pid, p.id 
             FROM (
-                              SELECT Feedback.id, Feedback.rating, Feedback.comment, Feedback.time_posted, Products.name, Feedback.pid
+                              SELECT Feedback.id, Feedback.rating, Feedback.comment, Feedback.time_posted, Products.name, Feedback.pid, Feedback.review_type
                               FROM Feedback 
                                     INNER JOIN Products ON Feedback.pid = Products.id
-                              WHERE user_id = :user_id
+                              WHERE user_id = :user_id 
+                              ) as p
+            ORDER BY time_posted DESC
+            LIMIT :per_page
+            OFFSET :off
+                              """,
+                              user_id = user_id, per_page = per_page, off = off)
+        return rows
+    
+
+    @staticmethod
+    def get_partial_feedback_s(user_id, per_page, off):
+        rows = app.db.execute("""
+            SELECT p.rating, p.comment, p.time_posted, p.name, p.pid, p.id 
+            FROM (
+                              SELECT Feedback.id, Feedback.rating, Feedback.comment, Feedback.time_posted, Products.name, Feedback.pid, Feedback.review_type
+                              FROM Feedback 
+                                    INNER JOIN Products ON Feedback.pid = Products.id
+                              WHERE user_id = :user_id AND Feedback.review_type = 'seller'
+                              ) as p
+            ORDER BY time_posted DESC
+            LIMIT :per_page
+            OFFSET :off
+                              """,
+                              user_id = user_id, per_page = per_page, off = off)
+        return rows
+    
+    @staticmethod
+    def get_partial_feedback_p(user_id, per_page, off):
+        rows = app.db.execute("""
+            SELECT p.rating, p.comment, p.time_posted, p.name, p.pid, p.id 
+            FROM (
+                              SELECT Feedback.id, Feedback.rating, Feedback.comment, Feedback.time_posted, Products.name, Feedback.pid, Feedback.review_type
+                              FROM Feedback 
+                                    INNER JOIN Products ON Feedback.pid = Products.id
+                              WHERE user_id = :user_id AND Feedback.review_type = 'product'
                               ) as p
             ORDER BY time_posted DESC
             LIMIT :per_page
