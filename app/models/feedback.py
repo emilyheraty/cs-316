@@ -305,7 +305,7 @@ class Feedback():
                               WHERE NOT EXISTS(SELECT *
                               FROM Feedback
                               WHERE Feedback.pid = p2.pid
-                            ) AND p2.fulfillment_status = 1
+                            ) AND p2.fulfillment_status IS NOT NULL
         LIMIT :per_page
         OFFSET :off
         """, uid = uid, per_page = per_page, off = off)
@@ -414,7 +414,7 @@ class Feedback():
                               WHERE NOT EXISTS(SELECT *
                               FROM Feedback
                               WHERE Feedback.pid = p2.pid
-                            ) AND p2.fulfillment_status = 1
+                            ) AND p2.fulfillment_status IS NOT NULL
         
                 """, uid = uid)
         return rows
