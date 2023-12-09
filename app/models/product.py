@@ -2,9 +2,9 @@ from flask import current_app as app
 
 
 class Product:
-    def __init__(self, id, description, category, sid, name, price, available):
+    def __init__(self, id, description, category, cid, name, price, available):
         self.id = id
-        self.sid = sid
+        self.cid = cid
         self.name = name
         self.description = description
         self.category = category
@@ -18,11 +18,10 @@ SELECT AVG(rating)
 FROM Feedback
 WHERE pid = :id
 ''', id=id)
-        if result is not None:
+        if result[0][0] is None:
             return "No Reviews"
         else:
-            return round(result[0][0], 3)
-
+            return round(result[0][0], 1)
 
     @staticmethod
     def get(id):
@@ -58,7 +57,7 @@ LIMIT :k;
         return rows
     
     @staticmethod
-    def get_by_name(name):
+    def get_product_by_name(name):
         rows = app.db.execute('''
 SELECT *
 FROM Products
@@ -66,7 +65,8 @@ WHERE name = :name
 ''',
                               name=name)
         return Product(*(rows[0])) if rows is not None else None
-    
+
+
 
 
                           
