@@ -15,11 +15,9 @@ bp = Blueprint('cart_bp', __name__)
 class UpdateQuantity(FlaskForm):
     bid = IntegerField('Bid')
     sid = IntegerField('Sid')
-    new_quantity = IntegerField('New Quantity', validators=[DataRequired(), validators.NumberRange(min=1, message='Quantity must be between 1 and 100')])
+    pid = IntegerField('Pid')
+    new_quantity = IntegerField('New Quantity', validators=[validators.NumberRange(min=0, max=999, message='Quantity must be between 0 and 1000')])
     submit = SubmitField('Update')
-class DeleteProduct(FlaskForm):
-    product_name = StringField('Product Name', validators=[DataRequired()])
-    submit = SubmitField('Delete')
 
 @bp.route('/cart', methods=['GET', 'POST'])
 def showCart():
@@ -30,8 +28,6 @@ def showCart():
         lineitems = []
         isseller=0
     form_uq = UpdateQuantity()
-    form_dp = DeleteProduct()
-
     per_page = 8
     page = request.args.get(get_page_parameter(), type=int, default=1)
     offset = (page - 1) * per_page
@@ -44,7 +40,11 @@ def showCart():
         amt = form_uq.new_quantity.data
         bid = form_uq.bid.data
         sid = form_uq.sid.data
-        res = Cart.updateQuantity2(bid, sid, amt)
+        pid = form_uq.pid.data
+        if amt == 0:
+            res = Cart.removeProductFromInventory(bid, sid, pid)
+        else:
+            res = Cart.updateQuantity(bid, sid, pid, amt)
         if res == 0:
             return render_template('cart_page.html',
                 current_user=current_user,
@@ -67,6 +67,7 @@ def addItemToCart(seller_id, product_name):
     print(product)
     quantity=1
     if current_user.is_authenticated:
+        print("adding to cart")
         Cart.addToCart(current_user.id, seller_id, product.id, quantity)
     else:
         redirect('/login')
