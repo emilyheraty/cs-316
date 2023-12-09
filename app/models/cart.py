@@ -76,7 +76,7 @@ WHERE Carts.buyer_id = :bid and Carts.seller_id = :sid and Carts.product_id=:pid
             return None
         
     @staticmethod
-    def removeProductFromInventory(bid, sid, pid):
+    def removeProductFromCart(bid, sid, pid):
         try:
             res = app.db.execute(
 """
@@ -90,3 +90,19 @@ WHERE Carts.buyer_id = :bid and Carts.seller_id = :sid and Carts.product_id=:pid
         except Exception as e:
             print(str(e))
             return None
+
+    @staticmethod
+    def clearCartByUserId(bid):
+        try:
+            res = app.db.execute(
+"""
+DELETE FROM Carts
+WHERE Carts.buyer_id = :bid;
+""",
+                                  bid=bid)
+            return res
+        except Exception as e:
+            print(str(e))
+            return None
+        
+        

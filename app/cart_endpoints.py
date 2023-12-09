@@ -42,7 +42,7 @@ def showCart():
         sid = form_uq.sid.data
         pid = form_uq.pid.data
         if amt == 0:
-            res = Cart.removeProductFromInventory(bid, sid, pid)
+            res = Cart.removeProductFromCart(bid, sid, pid)
         else:
             res = Cart.updateQuantity(bid, sid, pid, amt)
         if res == 0:
@@ -81,7 +81,11 @@ def submitCart():
         lineitems = Cart.getCartByBuyerId(current_user.id)
     else:
         redirect('/login')
-
+        return
+    if len(lineitems) == 0:
+        redirect('/')
+        return
+    
     time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     for purch in lineitems:
         # if user can afford it
@@ -92,8 +96,9 @@ def submitCart():
                                 amount, 
                                 purch.quantity
         )
-    # CLEAR CART
+    Cart.clearCartByUserId(purch[0].buyer_id)
     # INCREMENT BALANCES
+    # Increment quantity
     return redirect('/purchases')
 
 @bp.route('/detailed_product/<string:product_name>', methods=['GET', 'POST'])
