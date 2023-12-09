@@ -173,13 +173,14 @@ def seller_public_profile(seller_id):
     q = request.args.get('q')
     if q:
         search = True
-
+    user_id = current_user.id
+    can_review = Feedback.check_purchased(seller_id, user_id)
     seller = User.get_profile_info(seller_id)
     if(seller.is_seller):
         seller_inventory = Inventory.getInventory(seller_id)
         seller_products = []
         for item in seller_inventory:
-            product = Product.get_by_name(item.product_name)
+            product = Product.get_product_by_name(item.product_name)
             seller_products.append(product)
             
         seller_feedback = Feedback.get_recent_feedback(seller_id, 10)
@@ -193,7 +194,7 @@ def seller_public_profile(seller_id):
         pagination_feedback = Pagination(page=page2, per_page=per_page2, total=len(seller_feedback), href='/seller/0?page2={0}')
 
         return render_template('seller_profile.html', seller=seller, seller_products=products, seller_feedback=feedback,
-                                pagination_products=pagination_products, pagination_feedback=pagination_feedback)
+                                pagination_products=pagination_products, pagination_feedback=pagination_feedback, can_review = can_review)
     else:
         return render_template('seller_profile.html', seller=seller)
 

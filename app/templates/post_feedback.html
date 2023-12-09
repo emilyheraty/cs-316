@@ -5,16 +5,13 @@
 <p style="margin-top: 10px;">
     <a href="{{ url_for('index.index') }}">Home</a>
     / <a href="{{ url_for('users.account') }}">Account</a>
-    / <a href="{{ url_for('feedback.all_feedback') }}">Reviews</a>
+    / <a href="{{ url_for('purchases.purchases') }}">Purchases</a>
     / Post review
 </p>
+{% if already_reviewed%}
 
-<h1>Post Review</h1>
+<h1>Post Product Review</h1>
 <form action="" method="post">
-    <p>
-        {{form.review_type.label}} </br>
-        {{form.review_type}} </br>
-    </p>
 <p>
     {{form.rating.label}} </br>
     {{form.rating}} </br>
@@ -37,4 +34,13 @@
 {{ form.submit(class_="btn btn-black") }}
 
 </form>
+
+{% else %}
+You already reviewed this product.
+<br>
+<p>
+    <a class="btn btn-secondary" href="{{ url_for('index.index') }}" role="button">Go back to home</a>
+</p>
+{% endif %}
+
 {% endblock %}
