@@ -8,6 +8,7 @@
 <div style="display: flex; justify-content: space-between;">
     <div style="text-align: left; max-width: 600px;">{{description}}</div>
     <h2 style="text-align: right;">{{price}}$ per Item</h2>
+   
 </div>
 <table class='table table-hover table-bordered container'>
   <thead class="thead-dark">
@@ -27,5 +28,11 @@
     {% endfor %}
   </tbody>
 </table>
+<br>
+  {% if has_rating%}
+  <h2 style="text-align: left;">Average rating: {{avg_rating}}</h2>
+  {% else %}
+  <h2 style="text-align: left;">No reviews yet</h2>
+  {% endif %}
 {% endblock %}
 

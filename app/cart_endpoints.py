@@ -10,6 +10,8 @@ from .models.inventory import Inventory, Listing
 from flask_paginate import Pagination, get_page_parameter
 from datetime import datetime
 
+from .models.feedback import Feedback
+
 bp = Blueprint('cart_bp', __name__)
 
 
@@ -78,4 +80,9 @@ def detailedOrder(product_name):
     prod = Product.get_product_by_name(product_name)
     desc = prod.description
     p = prod.price
-    return render_template('detailed_product.html', items=listings, description = desc, price = p, product_name=product_name)
+    prod_id = prod.id
+    avg_rating = Feedback.avg_rating_product(prod_id)[0][0]
+    has_rating = True
+    if avg_rating == None:
+        has_rating = False
+    return render_template('detailed_product.html', items=listings, description = desc, price = p, product_name=product_name, avg_rating = avg_rating, has_rating = has_rating)
