@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<p style="margin-top: 10px;">
+    <a href="{{ url_for('index.index') }}">Home</a>
+    / <a href="{{ url_for('users.account') }}">Reviews</a>
+    / Edit review
+</p>
+
+<h1>Edit Review</h1>
+<form action="" method="post">
+   
+<p>
+    {{form.rating.label}} </br>
+    {{form.rating}} </br>
+</p>
+<p>
+    {{form.comment.label}} </br>
+    {{form.comment}} </br>
+</p>
+{{ form.submit(class_="btn btn-black") }}
+</form>
+{% endblock %}

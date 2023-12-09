@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+
+<p style="margin-top: 10px;">
+    <a href="{{ url_for('index.index') }}">Home</a>
+    / <a href="{{ url_for('users.account') }}">Account</a>
+    / <a href="{{ url_for('feedback.all_feedback') }}">Reviews</a>
+    / Delete review
+</p>
+
+
+
+<h1>Delete review</h1>
+
+<br>
+{% for r in review%}
+<p>Are you sure you want to delete review for <u>{{r.name}}</u>?</p> <br>
+<h3><center>Your review for <u>{{r.name}}</u></center></h3> <br>
+<p>Rating: <b>{{r.rating}}</b></p> 
+<p>Comment: <b></b>{{r.comment}}</b></p>
+<br>
+{% endfor %}
+<form action="" method="post">
+{{ form.submit(class_="btn btn-black") }}
+</form>
+
+{% endblock %}

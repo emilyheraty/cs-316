@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+{% if current_user.is_authenticated %}
+<p style="margin-top: 10px;">
+    <a href="{{ url_for('index.index') }}">Home</a>
+    / <a href="{{ url_for('users.account') }}">Account</a>
+    / Customer reviews
+</p>
+<br>
+
+<h2>Customer feedback on products</h2>
+<table class="table">
+<thead class="thead-dark">
+    <tr>
+       
+        <th scope="col">Product ID</th>
+        <th scope="col">Customer User ID</th>
+        <th scope="col">Rating</th>
+        <th scope="col">Comment</th>
+    </tr>
+</thead>
+<tbody>
+    {% for p in partial_feedback_product %}
+        <tr>
+            
+            
+           <td> {{ p.pid }} </td>
+           <td> {{ p.user_id }} </td>
+           <td> {{ p.rating }} </td>
+           <td> {{ p.comment }} </td>
+           
+        </tr>
+        {% endfor %}
+    </tbody>
+  
+</table>
+{{ pagination.info }}
+{{ pagination.links }}
+<br><br>
+
+<h2>Customer feedback on seller:</h2>
+
+<table class="table">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">Customer User ID</th>
+            <th scope="col">Rating</th>
+            <th scope="col">Comment</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for feedback in partial_feedback_seller %}
+        <tr>
+            <td>{{ feedback.user_id }}</td>
+            <td>{{ feedback.rating }}</td>
+            <td>{{ feedback.comment }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{{ pagination2.info }}
+{{ pagination2.links }}
+<br><br>
+
+{% else %}
+<p><a href="{{ url_for('users.login') }}">Log in</a> to see your feedback history!</p>
+{% endif %}
+
+
+{% endblock %}
