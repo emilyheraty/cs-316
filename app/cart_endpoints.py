@@ -1,7 +1,7 @@
 from flask_login import current_user
 from flask import Blueprint, render_template, redirect, request
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, DecimalField, IntegerField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, DecimalField, IntegerField, validators
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Regexp
 from .models.cart import Cart
 from .models.product import Product
@@ -12,8 +12,16 @@ from datetime import datetime
 
 bp = Blueprint('cart_bp', __name__)
 
+class UpdateQuantity(FlaskForm):
+    bid = IntegerField('Bid')
+    sid = IntegerField('Sid')
+    new_quantity = IntegerField('New Quantity', validators=[DataRequired(), validators.NumberRange(min=1, message='Quantity must be between 1 and 100')])
+    submit = SubmitField('Update')
+class DeleteProduct(FlaskForm):
+    product_name = StringField('Product Name', validators=[DataRequired()])
+    submit = SubmitField('Delete')
 
-@bp.route('/cart')
+@bp.route('/cart', methods=['GET', 'POST'])
 def showCart():
     if current_user.is_authenticated:
         lineitems = Cart.getCartByBuyerId(current_user.id)
@@ -21,7 +29,8 @@ def showCart():
     else:
         lineitems = []
         isseller=0
-
+    form_uq = UpdateQuantity()
+    form_dp = DeleteProduct()
     per_page = 8
     # get all available products for sale:
     page = request.args.get(get_page_parameter(), type=int, default=1)
@@ -30,7 +39,17 @@ def showCart():
     search = request.args.get('q')
     pagination = Pagination(page=page, per_page=per_page, offset=offset, total=len(lineitems), search=search, record_name='lineitems')
     # render the cart_page template. 
-    return render_template('cart_page.html', items=lineitems_partial, pagination=pagination, isseller=isseller)
+    if form_uq.validate_on_submit():
+                print("AFEASE")
+                amt = form_uq.new_quantity.data
+                bid = form_uq.bid.data
+                sid = form_uq.sid.data
+                print(amt)
+                Cart.updateQuantity(bid, sid, amt)
+                return render_template('cart_page.html', user_id=current_user.id, items=lineitems_partial, pagination=pagination, isseller=isseller, form_uq=form_uq)
+    else:
+        print(":()")
+    return render_template('cart_page.html', items=lineitems_partial, pagination=pagination, isseller=isseller, form_uq=form_uq)
 
 @bp.route('/cart/add/<int:product_id>', methods=['GET', 'POST'])
 def addItemToCart(product_id):

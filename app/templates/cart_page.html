@@ -19,7 +19,24 @@
       <tr>
         <th scope="row">{{product.prod_name}}</th>
         <td>{{product.price}}</td>
-        <td>{{product.quantity}} <a href="/"> Edit (does nothing for now)</a></td>
+        <td>
+          <form action="{{ url_for('cart_bp.showCart') }}" method="POST">
+            <input type="hidden" name="bid" value="{{ current_user.id }}">
+            <input type="hidden" name="sid" value="{{ product.seller_id }}">
+            {{ form_uq.csrf_token }}
+            <input type="number" name="new_quantity" value="{{ product.quantity }}">
+            {% if form_uq.errors %}
+            <ul>
+                {% for field, errors in form_uq.errors.items() %}
+                    {% for error in errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+            {% endif %}
+            {{ form_uq.submit() }}
+        </form>
+        </td>
       </tr>
     {% endfor %}
   </tbody>

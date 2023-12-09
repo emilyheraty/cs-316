@@ -108,7 +108,7 @@ def inventory(seller_id):
                             err_message="error: could not update quantity")
                 return redirect(url_for('inventory.inventory', seller_id=current_user.id))
             else:
-                print("what the fuck")
+                print("what the f***")
                 print(form_uq.errors)
             
             if form_dp.validate_on_submit():
@@ -129,7 +129,7 @@ def inventory(seller_id):
                             err_message="error: could not remove product")
                 return redirect(url_for('inventory.inventory', seller_id=current_user.id))
             else:
-                print("what the fuck")
+                print("what the f***")
                 print(form_uq.errors)
     # return jsonify([item.__dict__ for item in items])
     return render_template('inventory.html',
