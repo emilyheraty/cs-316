@@ -1,8 +1,8 @@
-from flask import render_template, redirect, Blueprint, request
+from flask import render_template, redirect, Blueprint, request, session, url_for
 from flask_wtf import FlaskForm
 from flask_login import current_user
 from flask_paginate import Pagination, get_page_args
-from wtforms import SearchField, SubmitField
+from wtforms import StringField, SubmitField, SelectField
 from .models.order import Order
 from .models.purchase import Purchase
 from .models.inventory import Inventory
@@ -12,24 +12,30 @@ from flask import Blueprint
 
 bp = Blueprint('purchases', __name__)
 
-import pandas as pd
 
 class SearchForm(FlaskForm):
-    keyword = SearchField("Find a product")
-    submit = SubmitField("Search")
+    keyword = StringField('Find a product')
+    submit = SubmitField('Search')
 
-@bp.route('/purchases', methods = ['GET'])
+class SortForm(FlaskForm):
+    sort = SelectField('Sort', choices=[('time_reverse', 'Time Purchased: Newest to Oldest'),
+                                        ('time_natural', 'Time Purchased: Oldest to Newest'), 
+                                        ('amount_asce', 'Total Amount: Low to High'), 
+                                        ('amount_desc', 'Total Amount: High to Low')])
+    submit = SubmitField('Sort')
+
+class FilterForm(FlaskForm):
+    status = SelectField('Filter', choices=[('all', 'All'), ('fulfilled', 'Fulfilled'), ('not_fulfilled', 'Not Fulfilled')])
+    submit = SubmitField('Filter')
+
+@bp.route('/purchases', methods = ['GET', 'POST'])
 def purchases():
-    search = False
-    q = request.args.get('q')
-    if q:
-        search = True
     if current_user.is_authenticated:
         purchases = Purchase.get_all_by_uid(
             current_user.id)
         products = []
         for purchase in purchases:
-            products.append(Product.get(purchase.pid))
+            products.append(Product.get(purchase.pid)) 
 
         isseller = Inventory.isSeller(current_user.id)[0][0]
     else:
@@ -37,25 +43,75 @@ def purchases():
         products = None
         isseller = 0
 
-    searchForm = SearchForm()
-
-    chart_data = Purchase.get_chart_data(current_user.id)
-    chart_data = pd.DataFrame(chart_data, columns=['time_purchased', 'total_amount', 'number_of_items'])
-    chart_data['time_purchased'] = pd.to_datetime(chart_data['time_purchased'])
-    chart_data['Year'] = chart_data['time_purchased'].dt.year
-    chart_data['Month'] = chart_data['time_purchased'].dt.month
-    grouped_data = chart_data.groupby(['Year', 'Month'])['total_amount'].sum().reset_index()
-    years = sorted(chart_data['Year'].unique())
-
     page, per_page, offset = get_page_args(page_parameter='page', per_page_parameter='per_page')
-    total = len(purchases)
-    pagination_purchases = purchases[offset: offset + per_page]
-    pagination_products = products[offset: offset + per_page]
-    pagination = Pagination(page=page, per_page=per_page, total=total)
+    pagination = Pagination(page=page, per_page=per_page, total=len(purchases))
+
+  
+    sortForm = SortForm()
+    searchForm = SearchForm()
+    filterForm = FilterForm()
+    
+    if filterForm.is_submitted():
+        if filterForm.status.data == 'fulfilled':
+            status = 1
+        elif filterForm.status.data == 'not_fulfilled':
+            status = 0
+        else:
+            return redirect(url_for('purchases.purchases'))
+        purchases = Purchase.get_by_status(status, current_user.id)
+        products = []
+        for purchase in purchases:
+            products.append(Product.get(purchase.pid))
+        pagination = Pagination(page=page, per_page=per_page, total=len(purchases))
+        return render_template('purchases.html',
+                            purchase_history=purchases[offset: offset + per_page], pagination=pagination, isseller=isseller,
+                            products=products[offset: offset + per_page],
+                            searchForm=searchForm, sortForm=sortForm, filterForm=filterForm)
+    
+    if sortForm.is_submitted():
+        if sortForm.sort.data == 'amount_asce':
+            purchases = Purchase.get_by_ascending_amount(current_user.id)
+            products = []
+            for purchase in purchases:
+                products.append(Product.get(purchase.pid))
+            pagination = Pagination(page=page, per_page=per_page, total=len(purchases))
+        elif sortForm.sort.data == 'amount_desc':
+            purchases = Purchase.get_by_descending_amount(current_user.id)
+            products = []
+            for purchase in purchases:
+                products.append(Product.get(purchase.pid))
+            pagination = Pagination(page=page, per_page=per_page, total=len(purchases))
+        elif sortForm.sort.data == 'time_natural':
+            purchases = Purchase.get_by_natural_time(current_user.id)
+            products = []
+            for purchase in purchases:
+                products.append(Product.get(purchase.pid))
+            pagination = Pagination(page=page, per_page=per_page, total=len(purchases))
+        
+        return render_template('purchases.html',
+                            purchase_history=purchases[offset: offset + per_page], pagination=pagination, isseller=isseller,
+                            products=products[offset: offset + per_page],
+                            searchForm=searchForm, sortForm=sortForm, filterForm=filterForm)
+    
+
+    if searchForm.is_submitted():
+        purchases = Purchase.get_by_product_name(searchForm.keyword.data, current_user.id)
+        products = []
+        for purchase in purchases:
+            products.append(Product.get(purchase.pid))
+        pagination = Pagination(page=page, per_page=per_page, total=len(purchases))
+        return render_template('purchases.html',
+                            purchase_history=purchases[offset: offset + per_page], pagination=pagination, isseller=isseller,
+                            products=products[offset: offset + per_page],
+                            searchForm=searchForm, sortForm=sortForm, filterForm=filterForm)
+    
+
+    
+
     return render_template('purchases.html',
-                            purchase_history=pagination_purchases, pagination=pagination, isseller=isseller,
-                            years=years, grouped_data=grouped_data.head().to_dict(), search=search, products=pagination_products,
-                            search_msg="Find a product", searchForm=searchForm)
+                            purchase_history=purchases[offset: offset + per_page], pagination=pagination, isseller=isseller,
+                            products=products[offset: offset + per_page],
+                            searchForm=searchForm, sortForm=sortForm, filterForm=filterForm)
 
 
 @bp.route('/orders/', methods = ['GET'])
