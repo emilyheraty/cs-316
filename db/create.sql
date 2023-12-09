@@ -54,7 +54,7 @@ CREATE TABLE Inventory (
 CREATE TABLE Feedback (
     id INT NOT NULL,
     user_id INT NOT NULL REFERENCES Users(id),
-    pid INT NOT NULL REFERENCES Products(id),
+    pid INT REFERENCES Products(id),
     seller_id INT REFERENCES Sellers(id),
     review_type VARCHAR(255) NOT NULL,
     rating INT NOT NULL,

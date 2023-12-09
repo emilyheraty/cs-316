@@ -76,6 +76,9 @@ def all_feedback():
     page2 = request.args.get(get_page_parameter(), type=int, default=1)
     offset2 = (page2 - 1) * per_page
 
+    page3 = request.args.get(get_page_parameter(), type=int, default=1)
+    offset3 = (page3 - 1) * per_page
+
     if current_user.is_authenticated:
         user_id = current_user.id
         full_feedback = Feedback.get_all_feedback(user_id)
@@ -83,6 +86,9 @@ def all_feedback():
         pending = Feedback.pending_products(user_id)
         partial_pending = Feedback.get_partial_pending(user_id, per_page, offset2)
         purchase_name_pending = Feedback.get_purchase_name_pending(user_id)
+        full_feedback_s = Feedback.get_all_feedback_s(user_id)
+        partial_feedback = Feedback.get_partial_feedback_s(user_id, per_page, offset3)
+
         num = 0
         isseller = Inventory.isSeller(current_user.id)[0][0]
         
@@ -94,8 +100,9 @@ def all_feedback():
     else:
         full_feedback=[]
         pending = []
-    pagination = Pagination(page=page1, per_page=per_page, total=len(full_feedback), search = search, offset1 = offset1, record_name = 'reviews')
+    pagination = Pagination(page=page1, per_page=per_page, total=len(full_feedback), search = search, offset1 = offset1, record_name = 'product reviews')
     pagination_2 = Pagination(page=page2, per_page=per_page, total=len(purchase_name_pending), search = search, offset2 = offset2, record_name = 'purchases to review')
+    pagination_3 = Pagination(page=page3, per_page=per_page, total=len(full_feedback_s), search = search, offset3 = offset3, record_name = 'seller reviews')
     return render_template('all_feedback.html', partial_feedback = partial_feedback, purchase_name_pending = purchase_name_pending, pagination = pagination, pending = pending, partial_pending = partial_pending, pagination_2 = pagination_2)
 
 class FeedbackForm(FlaskForm):

@@ -64,7 +64,23 @@ class Feedback():
         """,
         user_id=user_id)
         
+        return rows
+    
+
+    @staticmethod
+    def get_all_feedback_s(user_id):
+        rows = app.db.execute("""
+        SELECT * 
+        FROM Feedback
+        WHERE user_id = :user_id
+        AND review_type = 'seller'
+        ORDER BY time_posted DESC
+        """,
+        user_id=user_id)
+        
         return [Feedback(*row) for row in rows]
+    
+
     
     @staticmethod
     def check_past(pid, user_id):
@@ -104,7 +120,7 @@ class Feedback():
             FROM Purchases, Products
             WHERE Purchases.uid = :user_id
             AND Products.id = Purchases.pid
-            AND Products.creaor_id = :seller_id""", seller_id = seller_id, user_id = user_id)
+            AND Products.creator_id = :seller_id""", seller_id = seller_id, user_id = user_id)
         return len(rows)>0
 
     @staticmethod
@@ -152,7 +168,7 @@ class Feedback():
     def get_partial_feedback(user_id, per_page, off):
         rows = app.db.execute("""
             
-            SELECT DISTINCT Feedback.id, Feedback.rating, Feedback.comment, Feedback.time_posted, Products.name, Feedback.pid, Feedback.review_type
+            SELECT DISTINCT Feedback.id, Feedback.rating, Feedback.comment, Feedback.time_posted, Products.name, Feedback.pid, Feedback.review_type, Feedback.seller_id
             FROM Feedback, Purchases, Products, Inventory
             WHERE Feedback.user_id = :user_id AND
             Feedback.pid = Products.id AND
@@ -168,13 +184,12 @@ class Feedback():
     @staticmethod
     def get_partial_feedback_s(user_id, per_page, off):
         rows = app.db.execute("""
-            SELECT p.rating, p.comment, p.time_posted, p.name, p.pid, p.id 
-            FROM (
-                              SELECT Feedback.id, Feedback.rating, Feedback.comment, Feedback.time_posted, Products.name, Feedback.pid, Feedback.review_type
-                              FROM Feedback 
-                                    INNER JOIN Products ON Feedback.pid = Products.id
-                              WHERE user_id = :user_id AND Feedback.review_type = 'seller'
-                              ) as p
+            SELECT DISTINCT Feedback.id, Feedback.rating, Feedback.comment, Feedback.time_posted, Products.name, Feedback.pid, Feedback.review_type, Feedback.seller_id
+            FROM Feedback, Purchases, Products, Inventory
+            WHERE Feedback.user_id = :user_id AND
+            Feedback.pid = Products.id AND
+            Products.creator_id = Inventory.id    
+            AND Feedback.review_type = 'seller'                   
             ORDER BY time_posted DESC
             LIMIT :per_page
             OFFSET :off
