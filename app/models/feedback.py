@@ -138,13 +138,14 @@ class Feedback():
     @staticmethod
     def get_seller(pid):
         rows = app.db.execute("""
-        SELECT DISTINCT Sellers.id 
+        SELECT Sellers.id
         FROM Sellers, Inventory, Products
         WHERE Products.id = :pid
         AND Products.name = Inventory.product_name
-        AND Inventory.id = Sellers.id""", pid = pid)
+        AND Inventory.id = Sellers.id
+                              """, pid = pid)
 
-        return rows
+        return rows[0]
     
 
     @staticmethod
@@ -220,6 +221,7 @@ class Feedback():
                               """, seller_id=seller_id)
         return rows
     
+
     @staticmethod
     def get_partial_customer_feedback_seller(seller_id, per_page, off):
         rows = app.db.execute("""
@@ -232,6 +234,7 @@ class Feedback():
                               """, seller_id = seller_id, per_page = per_page, off = off)
         return rows
     
+
     @staticmethod
     def get_customer_feedback_product(seller_id):
         rows = app.db.execute("""
@@ -242,6 +245,7 @@ class Feedback():
                               """, seller_id=seller_id)
         return rows
     
+
     @staticmethod
     def get_partial_customer_feedback_product(seller_id, per_page, off):
         rows = app.db.execute("""
@@ -274,6 +278,7 @@ class Feedback():
                 """, uid = uid)
         return rows
     
+
     @staticmethod
     def get_purchase_name_posted(uid):
         rows = app.db.execute("""
@@ -285,6 +290,7 @@ class Feedback():
                 """, uid = uid)
         return rows
     
+
     @staticmethod
     def seller_review_check(seller_id):
         

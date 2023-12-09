@@ -108,19 +108,20 @@ class FeedbackForm(FlaskForm):
    
 
 
+
 @bp.route('/post_feedback<int:pid>', methods=['GET', 'POST'])
 def post_feedback(pid):
     if current_user.is_authenticated is False:
         return redirect(url_for('users.login'))
     user_id = current_user.id
-    seller_id = Feedback.get_seller(pid)
+    seller_id = 0
     form = FeedbackForm()
     if form.is_submitted():
        # if(form.review_type.data == 'seller'):
          #   if(Feedback.seller_review_check(seller_id)):
          #       flash('Already reviewed seller')
           #      return redirect(url_for('feedback.all_feedback'))
-        if Feedback.add_product_feedback(user_id, pid, seller_id, form.review_type.data, form.rating.data, form.comment.data, datetime.datetime.now()):
+        if Feedback.add_product_feedback(user_id, pid, 0, form.review_type.data, form.rating.data, form.comment.data, datetime.datetime.now()):
             #flash('Feedback successfully submitted!')
             return redirect(url_for('feedback.all_feedback'))
     return render_template('post_feedback.html', title='Submit', form=form)
