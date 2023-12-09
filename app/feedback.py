@@ -7,7 +7,7 @@ from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 from flask import jsonify
 from flask_paginate import Pagination, get_page_parameter
 
-
+from .models.inventory import Inventory
 from .models.feedback import Feedback
 from .models.purchase import Purchase
 from .models.product import Product
@@ -21,9 +21,11 @@ def recent_feedback():
     if current_user.is_authenticated:
         user_id = current_user.id
         feedbacks = Feedback.get_recent_feedback(user_id, 5)
+        isseller = Inventory.isSeller(current_user.id)[0][0]
     else:
         feedbacks=[]
-    return render_template('recent_feedback.html', feedbacks=feedbacks)
+        isseller=0
+    return render_template('recent_feedback.html', feedbacks=feedbacks, isseller=isseller)
 
 
 @bp.route('/customer_feedback<int:seller_id>')
@@ -75,28 +77,20 @@ def all_feedback():
         partial_pending = Feedback.get_partial_pending(user_id, per_page, offset2)
         purchase_name_pending = Feedback.get_purchase_name_pending(user_id)
         num = 0
-        
-            
-            
+        isseller = Inventory.isSeller(current_user.id)[0][0]
         search = False
         
         q = request.args.get('q')
         if q:
             search = True
-        search_2 = False
-        
-        q2 = request.args.get('q2')
-        if q2:
-            search_2 = True
     
 
     else:
         full_feedback=[]
         pending = []
-    pagination = Pagination(page=page1, per_page=per_page, offset=offset1, total=len(full_feedback), search=search, record_name='posted reviews')
-    pagination_2 = Pagination(page=page2, per_page=per_page, offset=offset2, total=len(purchase_name_pending), search=search_2, record_name='purchases pending review')
-    return render_template('all_feedback.html', partial_feedback = partial_feedback, purchase_name_pending = purchase_name_pending, pagination = pagination, pending = pending, partial_pending = partial_pending, pagination_2 = pagination_2)
-
+    pagination = Pagination(page=page, per_page=per_page, offset=offset, total=len(full_feedback), search=search, record_name='feedback')
+    pagination_2 = Pagination(page=page, per_page=per_page, offset=offset, total=len(pending), search=search, record_name='pending')
+    return render_template('all_feedback.html', partial_feedback = partial_feedback, purchase_name = purchase_name, pagination = pagination, pending = pending, partial_pending = partial_pending, pagination_2 = pagination_2)
 
 class FeedbackForm(FlaskForm):
     rating = SelectField('Rating', choices=[('1', '1'), ('2', '2'), ('3', '3'),
@@ -113,6 +107,7 @@ class FeedbackForm(FlaskForm):
 def post_feedback(pid):
     if current_user.is_authenticated is False:
         return redirect(url_for('users.login'))
+        
     user_id = current_user.id
     seller_id = 0
     form = FeedbackForm()

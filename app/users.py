@@ -1,4 +1,5 @@
 from flask import render_template, redirect, url_for, flash, request
+from flask_paginate import Pagination, get_page_args
 from werkzeug.urls import url_parse
 from flask_login import login_user, logout_user, current_user
 from flask_wtf import FlaskForm
@@ -7,6 +8,8 @@ from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Re
 
 from .models.user import User
 from .models.inventory import Inventory
+from .models.feedback import Feedback
+from .models.product import Product
 
 
 from flask import Blueprint
@@ -40,8 +43,8 @@ def login():
 
 
 class RegistrationForm(FlaskForm):
-    firstname = StringField('First Name', validators=[DataRequired(), Regexp("^[a-zA-Z \-.]*$ ", message="Invalid characters")])
-    lastname = StringField('Last Name', validators=[DataRequired(), Regexp("^[a-zA-Z \-.]*$", message="Invalid characters")])
+    firstname = StringField('First Name', validators=[DataRequired()])
+    lastname = StringField('Last Name', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
     password2 = PasswordField(
@@ -84,8 +87,8 @@ def logout():
 @bp.route('/account', methods=['GET'])
 def account():
     if current_user.is_authenticated is False:
-        return redirect(url_for('users.login'))
         isseller = 0
+        return redirect(url_for('users.login'))
     else:
         isseller = Inventory.isSeller(current_user.id)[0][0]
     return render_template('account.html', isseller=isseller)
@@ -162,3 +165,35 @@ def changepassword():
             flash('Password successfully changed')
             return redirect(url_for('users.profile'))
     return render_template('changepassword.html', form=form)
+
+
+@bp.route('/seller/<int:seller_id>', methods=['GET'])
+def seller_public_profile(seller_id):
+    search = False
+    q = request.args.get('q')
+    if q:
+        search = True
+
+    seller = User.get_profile_info(seller_id)
+    if(seller.is_seller):
+        seller_inventory = Inventory.getInventory(seller_id)
+        seller_products = []
+        for item in seller_inventory:
+            product = Product.get_by_name(item.product_name)
+            seller_products.append(product)
+            
+        seller_feedback = Feedback.get_recent_feedback(seller_id, 10)
+
+        page1, per_page1, offset1 = get_page_args(page_parameter='page1', per_page_parameter='per_page1')
+        page2, per_page2, offset2 = get_page_args(page_parameter='page2', per_page_parameter='per_page2')
+
+        products = seller_products[offset1: offset1 + per_page1]
+        feedback = seller_feedback[offset2: offset2 + per_page2]
+        pagination_products = Pagination(page=page1, per_page=per_page1, search=search, total=len(seller_products), href='/seller/0?page1={0}')
+        pagination_feedback = Pagination(page=page2, per_page=per_page2, total=len(seller_feedback), href='/seller/0?page2={0}')
+
+        return render_template('seller_profile.html', seller=seller, seller_products=products, seller_feedback=feedback,
+                                pagination_products=pagination_products, pagination_feedback=pagination_feedback)
+    else:
+        return render_template('seller_profile.html', seller=seller)
+

@@ -36,6 +36,25 @@ OFFSET :off
 
 
     @staticmethod
+    def getInventoryProducts(str, per_page, off, id):
+        print("trying out this")
+        rows = app.db.execute('''
+SELECT id, product_name, number_available
+FROM Inventory
+WHERE product_name LIKE '%' || :str || '%'
+AND id=:id
+ORDER BY number_available DESC
+LIMIT :per_page
+OFFSET :off
+''',
+                                id=id,
+                                str=str,
+                                per_page=per_page,
+                                off=off)
+        print("still trying man")
+        return [Inventory(*row) for row in rows]
+
+    @staticmethod
     def getSellerInfo(id):
         sid = app.db.execute('''
 SELECT DISTINCT id, firstname
@@ -84,6 +103,7 @@ WHERE Inventory.id = :id AND Inventory.product_name = :product_name
 
     @staticmethod
     def updateProductQuantity(id, product_name, number_available):
+        print("hereeeee")
         res = app.db.execute('''
 UPDATE Inventory
 SET number_available = :number_available
@@ -92,6 +112,7 @@ WHERE Inventory.id = :id AND Inventory.product_name = :product_name
                                 product_name=product_name,
                                 number_available=number_available,
                                 id=id)
+        print("updating")
         return res
 
 
@@ -105,3 +126,18 @@ WHERE Inventory.id = :id AND Inventory.product_name = :product_name
 # AND Sellers.id = :id)
 # ''',
 #                                 id=id)
+class Listing:
+    def __init__(self, sfirstname, slastname, qty):
+        self.sfirstname = sfirstname
+        self.slastname = slastname
+        self.qty = qty
+    
+    @staticmethod
+    def get_listings_by_product_name(name):
+        rows = app.db.execute('''
+SELECT Users.firstname, Users.lastname, Inventory.number_available
+FROM Inventory, Users
+WHERE Inventory.product_name = :name and Inventory.id = Users.id
+''',
+                              name=name)
+        return [Listing(*row) for row in rows] if rows is not None else None

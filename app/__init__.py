@@ -36,5 +36,4 @@ def create_app():
     from .feedback import bp as feedback_bp
     app.register_blueprint(feedback_bp)
 
-
     return app

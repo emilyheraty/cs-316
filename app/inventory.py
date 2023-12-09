@@ -6,7 +6,7 @@ from flask import redirect, url_for, flash, request
 from werkzeug.urls import url_parse
 from flask_login import login_user, logout_user, current_user
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, DecimalField, IntegerField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, DecimalField, IntegerField, SearchField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 from flask_paginate import Pagination, get_page_parameter
 
@@ -30,11 +30,15 @@ class UpdateQuantity(FlaskForm):
     new_quantity = IntegerField('New Quantity', validators=[DataRequired()])
     submit = SubmitField('Update')
 
-@bp.route('/inventory/<int:seller_id>')
+class Search(FlaskForm):
+    search_input = SearchField('Product Name', validators=[DataRequired()])
+    submit = SubmitField('Search')
+
+@bp.route('/inventory/<int:seller_id>', methods = ['GET', 'POST'])
 def inventory(seller_id):
-    per_page = 4
     # get all available products for sale:
     items = Inventory.getInventory(seller_id)
+    per_page = 4
     page = request.args.get(get_page_parameter(), type=int, default=1)
     offset = (page - 1) * per_page
     items_partial = Inventory.getPartialInventory(seller_id, per_page, offset)
@@ -45,16 +49,99 @@ def inventory(seller_id):
     pagination = Pagination(page=page, per_page=per_page, offset=offset, total=len(items), search=search, record_name='items')
     seller_info = Inventory.getSellerInfo(seller_id)
     isseller = 0
+
+    # make search box
+    form_search = Search()
+    form_uq = UpdateQuantity()
+    form_dp = DeleteProduct()
+    if form_search.validate_on_submit():
+        print("Heyyyy")
+        search_str = form_search.search_input.data
+        print(search_str)
+        result = Inventory.getInventoryProducts(search_str, per_page, offset, seller_id)
+        print("got hereeee ")
+        if len(result) == 0:
+            print("no results lol")
+            return render_template('inventory.html',
+                            id=seller_info[0][0],
+                            name=seller_info[0][1],
+                            inv=items_partial,
+                            isseller=isseller,
+                            pagination=pagination,
+                            form_uq=form_uq,
+                            form_dp=form_dp,
+                            form_search=form_search,
+                            err_message="No search results found")
+        else:
+            print(result)
+            return render_template('inventory.html',
+                            id=seller_info[0][0],
+                            name=seller_info[0][1],
+                            inv=result,
+                            isseller=isseller,
+                            pagination=pagination,
+                            form_uq=form_uq,
+                            form_dp=form_dp,
+                            form_search=form_search,
+                            err_message=0)
     if current_user.is_authenticated:
         if current_user.id == seller_info[0][0]:
             isseller = 1
+            print("got here")
+            if form_uq.validate_on_submit():
+                print("HELLO?")
+                pname = form_uq.product_name.data
+                print("HELEPEOO")
+                amt = form_uq.new_quantity.data
+                print(amt)
+                result = Inventory.updateProductQuantity(seller_id, pname, amt)
+                if result == 0:
+                    return render_template('inventory.html',
+                            id=seller_info[0][0],
+                            name=seller_info[0][1],
+                            inv=items_partial,
+                            isseller=isseller,
+                            pagination=pagination,
+                            form_uq=form_uq,
+                            form_dp=form_dp,
+                            form_search=form_search,
+                            err_message="error: could not update quantity")
+                return redirect(url_for('inventory.inventory', seller_id=current_user.id))
+            else:
+                print("what the fuck")
+                print(form_uq.errors)
+            
+            if form_dp.validate_on_submit():
+                print("HELLO?")
+                pname = form_dp.product_name.data
+                print("HELEPEOO")
+                result = Inventory.removeProductFromInventory(seller_id, pname)
+                if result == 0:
+                    return render_template('inventory.html',
+                            id=seller_info[0][0],
+                            name=seller_info[0][1],
+                            inv=items_partial,
+                            isseller=isseller,
+                            pagination=pagination,
+                            form_uq=form_uq,
+                            form_dp=form_dp,
+                            form_search=form_search,
+                            err_message="error: could not remove product")
+                return redirect(url_for('inventory.inventory', seller_id=current_user.id))
+            else:
+                print("what the fuck")
+                print(form_uq.errors)
     # return jsonify([item.__dict__ for item in items])
     return render_template('inventory.html',
                            id=seller_info[0][0],
                            name=seller_info[0][1],
                            inv=items_partial,
                            isseller=isseller,
-                           pagination=pagination)
+                           pagination=pagination,
+                           form_uq=form_uq,
+                           form_dp=form_dp,
+                           form_search=form_search,
+                           err_message=0)
 
 @bp.route('/inventory/<int:seller_id>/add', methods = ['GET', 'POST'])
 def add_products(seller_id):
