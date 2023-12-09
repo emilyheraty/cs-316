@@ -59,17 +59,34 @@ VALUES(:buyer_id, :seller_id, :product_id, :quantity, :price)
     def updateQuantity(bid, sid, newQuantity):
         print("bid: " + str(bid) + " sid: " + str(sid) + "nq: " + str(newQuantity))
         try:
-            app.db.execute("""
+            res = app.db.execute("""
 UPDATE Carts
 SET quantity = :newQuantity
-WHERE buyer_id = :bid and seller_id = :sid;
+WHERE Carts.buyer_id = :bid and Carts.seller_id = :sid;
 """,
                                   bid=bid,
                                   sid=sid,
                                   newQuantity=newQuantity)
+            print("Result: " + str(res))
+            return res
         except Exception as e:
             print(str(e))
             return None
+        
+    @staticmethod
+    def updateQuantity2(bid, sid, newQuantity):
+        print("bid: " + str(bid) + " sid: " + str(sid) + "nq: " + str(newQuantity))
+        res = app.db.execute("""
+Select *
+FROM Carts
+WHERE Carts.buyer_id = :bid and Carts.seller_id = :sid;
+""",
+                                  bid=int(bid),
+                                  sid=int(sid),
+                                  newQuantity=int(newQuantity))
+        print("Result: " + str(res))
+        return res
+
 
         
 

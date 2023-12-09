@@ -1,5 +1,5 @@
 from flask_login import current_user
-from flask import Blueprint, render_template, redirect, request
+from flask import Blueprint, render_template, redirect, request, url_for
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, DecimalField, IntegerField, validators
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Regexp
@@ -31,24 +31,33 @@ def showCart():
         isseller=0
     form_uq = UpdateQuantity()
     form_dp = DeleteProduct()
+
     per_page = 8
-    # get all available products for sale:
     page = request.args.get(get_page_parameter(), type=int, default=1)
     offset = (page - 1) * per_page
     lineitems_partial = Cart.getPartialCartByBuyerId(current_user.id, per_page, offset)
     search = request.args.get('q')
     pagination = Pagination(page=page, per_page=per_page, offset=offset, total=len(lineitems), search=search, record_name='lineitems')
+
     # render the cart_page template. 
     if form_uq.validate_on_submit():
-                print("AFEASE")
-                amt = form_uq.new_quantity.data
-                bid = form_uq.bid.data
-                sid = form_uq.sid.data
-                print(amt)
-                Cart.updateQuantity(bid, sid, amt)
-                return render_template('cart_page.html', user_id=current_user.id, items=lineitems_partial, pagination=pagination, isseller=isseller, form_uq=form_uq)
+        amt = form_uq.new_quantity.data
+        bid = form_uq.bid.data
+        sid = form_uq.sid.data
+        res = Cart.updateQuantity2(bid, sid, amt)
+        if res == 0:
+            return render_template('cart_page.html',
+                current_user=current_user,
+                items=lineitems_partial,
+                isseller=isseller,
+                pagination=pagination,
+                form_uq=form_uq,
+                form_dp=form_dp,
+                err_message="error: could not update quantity")
+        return redirect(url_for('cart_bp.showCart'))
     else:
-        print(":()")
+        print(":(")
+    print("Got to end of Function")
     return render_template('cart_page.html', items=lineitems_partial, pagination=pagination, isseller=isseller, form_uq=form_uq)
 
 @bp.route('/cart/add/<int:product_id>', methods=['GET', 'POST'])

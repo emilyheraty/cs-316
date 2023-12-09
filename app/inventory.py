@@ -96,6 +96,7 @@ def inventory(seller_id):
                 print(amt)
                 result = Inventory.updateProductQuantity(seller_id, pname, amt)
                 if result == 0:
+                    print("__________________AEFAEF_____A____________")
                     return render_template('inventory.html',
                             id=seller_info[0][0],
                             name=seller_info[0][1],
@@ -106,6 +107,7 @@ def inventory(seller_id):
                             form_dp=form_dp,
                             form_search=form_search,
                             err_message="error: could not update quantity")
+                print("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB" + str(result))
                 return redirect(url_for('inventory.inventory', seller_id=current_user.id))
             else:
                 print("what the f***")
