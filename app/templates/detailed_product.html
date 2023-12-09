@@ -8,6 +8,7 @@
 <div style="display: flex; justify-content: space-between;">
     <div style="text-align: left; max-width: 600px;">{{description}}</div>
     <h2 style="text-align: right;">{{price}}$ per Item</h2>
+   
 </div>
 <table class='table table-hover table-bordered container'>
   <thead class="thead-dark">
@@ -29,4 +30,32 @@
     {% endfor %}
   </tbody>
 </table>
+<br>
+  {% if has_rating%}
+  <div style="display: flex; justify-content: space-between;">
+    <div style="text-align: left; max-width: 600px;">Recent reviews</div>
+    <h2 style="text-align: right;">Average rating: {{avg_rating}}</h2>
+   
+</div>
+<table class="table">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">Rating</th>
+            <th scope="col">Comment</th>
+            <th scope="col">Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for feedback in recent_revs %}
+        <tr>
+            <td>{{ feedback.rating }}</td>
+            <td>{{ feedback.comment }}</td>
+            <td>{{ feedback.time_posted }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+  {% else %}
+  <h2 style="text-align: left;">No reviews yet</h2>
+  {% endif %}
 {% endblock %}

@@ -39,6 +39,8 @@
       <th scope="col">Total Amount</th>
       <th scope="col">Number of Items</th>
       <th scope="col">Entire Order Fulfillment Status</th>
+      <th scope="col">Seller</th>
+      <th scope="col">Review?</th>
     </tr>
   </thead>
   <tbody>
@@ -53,6 +55,13 @@
         <td>Fulfilled</td>
         {% else %}
         <td>Not Fulfilled</td>
+        {% endif %}
+        <td><a class="btn btn-secondary" href="{{ url_for('users.seller_public_profile', seller_id = products[purchase_history.index(purchase)].cid) }}" role="button">Go to seller</a> </td>
+        
+        {% if purchase.fulfillment_status%}
+        <td> <a class="btn btn-secondary" href="{{ url_for('feedback.post_feedback', pid = purchase.pid) }}" role="button">Post review</a> </td>
+        {% else %}
+        <td>Not yet available for review</td>
         {% endif %}
       </tr>
     {% endfor %}

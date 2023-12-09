@@ -13,6 +13,9 @@ class Cart:
     @staticmethod
     def getCartByBuyerId(id):
         rows = app.db.execute('''
+SELECT buyer_id, name, Products.creator_id, product_id, quantity, Carts.price                             
+FROM Carts, Products
+WHERE Carts.buyer_id = :id and Carts.product_id = Products.id
 SELECT buyer_id, name, Inventory.id, product_id, quantity, Products.price                             
 FROM Carts, Products, Inventory
 WHERE Carts.buyer_id = :id and Carts.seller_id = Inventory.id and Carts.product_id = Products.id and Products.name=Inventory.product_name 
@@ -24,6 +27,9 @@ WHERE Carts.buyer_id = :id and Carts.seller_id = Inventory.id and Carts.product_
     @staticmethod
     def getPartialCartByBuyerId(id, per_page, off):
         rows = app.db.execute('''
+SELECT buyer_id, name, Products.creator_id, product_id, quantity, Carts.price                             
+FROM Carts, Products
+WHERE Carts.buyer_id = :id and Carts.product_id = Products.id
 SELECT buyer_id, name, Inventory.id, product_id, quantity, Products.price                             
 FROM Carts, Products, Inventory
 WHERE Carts.buyer_id = :id and Carts.seller_id = Inventory.id and Carts.product_id = Products.id and Products.name=Inventory.product_name 

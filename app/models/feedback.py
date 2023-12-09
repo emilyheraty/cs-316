@@ -54,10 +54,80 @@ class Feedback():
         return [Feedback(*row) for row in rows]
     
     @staticmethod
+    def get_all_feedback_p(user_id):
+        rows = app.db.execute("""
+        SELECT * 
+        FROM Feedback
+        WHERE user_id = :user_id
+        AND review_type = 'product'
+        ORDER BY time_posted DESC
+        """,
+        user_id=user_id)
+        
+        return rows
+    
+
+    @staticmethod
+    def get_all_feedback_s(user_id):
+        rows = app.db.execute("""
+        SELECT * 
+        FROM Feedback
+        WHERE user_id = :user_id
+        AND review_type = 'seller'
+        ORDER BY time_posted DESC
+        """,
+        user_id=user_id)
+        
+        return [Feedback(*row) for row in rows]
+    
+
+    
+    @staticmethod
+    def check_past(pid, user_id):
+        rows = app.db.execute("""
+            SELECT *
+            FROM Feedback
+            WHERE user_id = :user_id
+            AND pid = :pid
+            AND review_type = 'product'""", user_id = user_id, pid = pid)
+        return len(rows)>0
+    
+    @staticmethod
+    def get_prod_recent_feedback(pid, limit):
+        rows = app.db.execute( """
+        SELECT * FROM Feedback
+        WHERE pid = :pid
+        ORDER BY time_posted DESC
+        LIMIT :limit
+        """, pid = pid, limit = limit)
+        return rows
+    
+    
+    @staticmethod
+    def check_past_seller(seller_id, user_id):
+        rows = app.db.execute("""
+            SELECT *
+            FROM Feedback
+            WHERE user_id = :user_id
+            AND seller_id = :seller_id
+            AND review_type = 'seller'""", user_id = user_id, seller_id = seller_id)
+        return len(rows)>0
+    
+    @staticmethod
+    def check_purchased(seller_id, user_id):
+        rows = app.db.execute("""
+            SELECT *
+            FROM Purchases, Products
+            WHERE Purchases.uid = :user_id
+            AND Products.id = Purchases.pid
+            AND Products.creator_id = :seller_id""", seller_id = seller_id, user_id = user_id)
+        return len(rows)>0
+
+    @staticmethod
     def add_product_feedback(user_id, pid, seller_id, review_type, rating, comment, time_posted):
         feedbackCount = app.db.execute("""
         SELECT
-        COUNT(*)
+        COUNT(id)
         FROM Feedback                             
         """)
         rows = app.db.execute("""
@@ -65,7 +135,7 @@ class Feedback():
         VALUES(:id, :user_id, :pid, :seller_id, :review_type, :rating, :comment, :time_posted)
         RETURNING id
                               """,
-        id=feedbackCount[0][0], user_id = user_id, pid = pid, 
+            id=feedbackCount[0][0]+2, user_id = user_id, pid = pid, 
             seller_id = seller_id, review_type = review_type, rating = rating, comment = comment,
             time_posted = time_posted)
         return 1
@@ -97,19 +167,51 @@ class Feedback():
     @staticmethod
     def get_partial_feedback(user_id, per_page, off):
         rows = app.db.execute("""
-            SELECT p.rating, p.comment, p.time_posted, p.name, p.pid, p.id 
-            FROM (
-                              SELECT Feedback.id, Feedback.rating, Feedback.comment, Feedback.time_posted, Products.name, Feedback.pid
-                              FROM Feedback 
-                                    INNER JOIN Products ON Feedback.pid = Products.id
-                              WHERE user_id = :user_id
-                              ) as p
+            
+            SELECT *
+            FROM Feedback
+            WHERE Feedback.user_id = :user_id                       
+            ORDER BY time_posted DESC
+            LIMIT :per_page
+            OFFSET :off
+                              """,
+                              user_id = user_id, per_page = per_page, off = off)
+        return [Feedback(*row) for row in rows]
+    
+
+    @staticmethod
+    def get_partial_feedback_s(user_id, per_page, off):
+        rows = app.db.execute("""
+            SELECT DISTINCT Feedback.id, Feedback.rating, Feedback.comment, Feedback.time_posted, Products.name, Feedback.pid, Feedback.review_type, Feedback.seller_id
+            FROM Feedback, Purchases, Products, Inventory
+            WHERE Feedback.user_id = :user_id AND
+            Feedback.pid = Products.id AND
+            Products.creator_id = Inventory.id    
+            AND Feedback.review_type = 'seller'                   
             ORDER BY time_posted DESC
             LIMIT :per_page
             OFFSET :off
                               """,
                               user_id = user_id, per_page = per_page, off = off)
         return rows
+    
+    @staticmethod
+    def get_partial_feedback_p(user_id, per_page, off):
+        rows = app.db.execute("""
+            SELECT p.rating, p.comment, p.time_posted, p.name, p.pid, p.id 
+            FROM (
+                              SELECT Feedback.id, Feedback.rating, Feedback.comment, Feedback.time_posted, Products.name, Feedback.pid, Feedback.review_type
+                              FROM Feedback 
+                                    INNER JOIN Products ON Feedback.pid = Products.id
+                              WHERE user_id = :user_id AND Feedback.review_type = 'product'
+                              ) as p
+            ORDER BY time_posted DESC
+            LIMIT :per_page
+            OFFSET :off
+
+                              """,
+                              user_id = user_id, per_page = per_page, off = off)
+        return [Feedback(*row) for row in rows]
     
    # @staticmethod
    # def get(id):
@@ -138,14 +240,12 @@ class Feedback():
     @staticmethod
     def get_seller(pid):
         rows = app.db.execute("""
-        SELECT Sellers.id
-        FROM Sellers, Inventory, Products
+        SELECT DISTINCT Products.creator_id
+        FROM Products
         WHERE Products.id = :pid
-        AND Products.name = Inventory.product_name
-        AND Inventory.id = Sellers.id
                               """, pid = pid)
 
-        return rows[0]
+        return rows
     
 
     @staticmethod
@@ -232,6 +332,47 @@ class Feedback():
             LIMIT :per_page
             OFFSET :off
                               """, seller_id = seller_id, per_page = per_page, off = off)
+        return rows
+    
+
+    @staticmethod
+    def seller_to_review(user_id):
+        rows = app.db.execute(""" 
+        SELECT DISTINCT Sellers.id
+        FROM Feedback, Purchases, Products, Sellers
+        WHERE Purchases.uid = :user_id
+        AND Purchases.pid = Products.id
+        AND Products.creator_id = Sellers.id
+        AND NOT EXISTS (
+                              SELECT *
+                              FROM Feedback, Sellers
+                              WHERE Feedback.seller_id = Sellers.id
+                              AND Feedback.review_type = 'seller'
+
+        )
+        """, user_id = user_id)
+        return rows
+    
+
+    @staticmethod
+    def partial_seller_to_review(user_id, per_page, off):
+        rows = app.db.execute(""" 
+        SELECT DISTINCT Sellers.id
+        FROM Feedback, Purchases, Products, Sellers
+        WHERE Purchases.uid = :user_id
+        AND Purchases.pid = Products.id
+        AND Products.creator_id = Sellers.id
+        AND NOT EXISTS (
+                              SELECT *
+                              FROM Feedback, Sellers
+                              WHERE Feedback.seller_id = Sellers.id
+                              AND Feedback.review_type = 'seller'
+
+        )
+            LIMIT :per_page
+            OFFSET :off
+        """, user_id = user_id, per_page = per_page, off = off)
+
         return rows
     
 

@@ -25,7 +25,7 @@
 <table class="table">
     <thead class="thead-dark">
         <tr>
-            <th scope="col">Product name</th>
+            <th scope="col">Review subject</th>
             <th scope="col">Rating</th>
             <th scope="col">Comment</th>
             <th scope="col">Date posted</th>
@@ -36,10 +36,8 @@
     <tbody>
         {% for feedback in partial_feedback %}
         <tr>
-            <td>{{ feedback.name }}</td>
-            <td>
-                {{ feedback.rating }}
-            </td>
+            <td>{{ names[partial_feedback.index(feedback)] }} <i>({{feedback.review_type}}) </i></td>
+            <td>{{ feedback.rating }}</td>
             <td>{{ feedback.comment }}</td>
             <td>{{ feedback.time_posted }}</td>
             <td> <a class="btn btn-secondary" href="{{ url_for('feedback.edit_feedback', id = feedback.id) }}" role="button">Edit</a> </td>
@@ -58,7 +56,7 @@
     <tr>
        
         <th scope="col">Product name</th>
-        <th scope="col">Leave review?</th>
+        <th scope="col">Review?</th>
     </tr>
 </thead>
 <tbody>
@@ -67,7 +65,7 @@
             
             
            <td>  {{ p.name }} </td>
-           <td> <a class="btn btn-secondary" href="{{ url_for('feedback.post_feedback', pid = p.pid) }}" role="button">Post</a> </td>
+           <td> <a class="btn btn-secondary" href="{{ url_for('purchases.purchases') }}" role="button">Go to orders</a> </td>
            
            
         
