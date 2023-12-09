@@ -56,7 +56,7 @@
         <td>Not Fulfilled</td>
         {% endif %}
         {% if purchase.fulfillment_status%}
-        <td><a class="btn btn-secondary" href="{{ url_for('feedback.post_feedback', pid = purchase.id) }}" role="button">Post review</a> </td>
+        <td><a class="btn btn-secondary" href="{{ url_for('feedback.post_feedback', pid = purchase.pid) }}" role="button">Post review</a> </td>
         {% else %}
         <td>Not yet available for review</td>
         {% endif %}

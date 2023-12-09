@@ -33,14 +33,15 @@ def customer_feedback(seller_id):
     per_page = 4
     page = request.args.get(get_page_parameter(), type=int, default=1)
     offset = (page - 1) * per_page
+
     if current_user.is_authenticated:
         user_id = current_user.id
-        if(Inventory.isSeller(seller_id)):
-            full_feedback_seller = Feedback.get_customer_feedback_seller(seller_id)
-            partial_feedback_seller = Feedback.get_partial_customer_feedback_seller(seller_id, per_page, offset)
-            full_feedback_product = Feedback.get_customer_feedback_product(seller_id)
-            partial_feedback_product = Feedback.get_partial_customer_feedback_product(seller_id, per_page, offset)
-            search = False
+        #if(Inventory.isSeller(seller_id)[0][0]):
+        full_feedback_seller = Feedback.get_customer_feedback_seller(seller_id)
+        partial_feedback_seller = Feedback.get_partial_customer_feedback_seller(seller_id, per_page, offset)
+        full_feedback_product = Feedback.get_customer_feedback_product(seller_id)
+        partial_feedback_product = Feedback.get_partial_customer_feedback_product(seller_id, per_page, offset)
+        search = False
         q = request.args.get('q')
         if q:
             search = True
@@ -53,7 +54,7 @@ def customer_feedback(seller_id):
         partial_feedback_seller = []
         partial_feedback_product = []
     pagination = Pagination(page=page, per_page=per_page, offset=offset, total=len(full_feedback_seller), 
-                            search=search, record_name='seller revews')
+                            search=search, record_name='seller reviews')
     pagination2 = Pagination(page=page, per_page=per_page, offset=offset, total=len(full_feedback_product), 
                               search=search_2, record_name='product reviews')
     
@@ -106,7 +107,7 @@ class FeedbackForm(FlaskForm):
 @bp.route('/post_feedback<int:pid>', methods=['GET', 'POST'])
 def post_feedback(pid):
     if current_user.is_authenticated is False:
-        return redirect(url_for('users.login'))    
+        return redirect(url_for('users.login'))
     user_id = current_user.id
     already_reviewed = (not(Feedback.check_past(pid, user_id)))
     seller_id = Feedback.get_seller(pid)[0][0]
