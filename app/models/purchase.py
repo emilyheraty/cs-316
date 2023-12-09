@@ -57,7 +57,7 @@ ORDER BY time_purchased DESC
         return rows
 
     @staticmethod
-    def submitPurchase(uid, pid, time, amount, quantity, status):
+    def submitPurchase(uid, pid, time, amount, quantity):
         try:
             rows = app.db.execute("""
 INSERT INTO Purchases(uid, pid, time_purchased, total_amount, number_of_items, fulfillment_status)

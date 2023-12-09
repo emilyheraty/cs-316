@@ -29,21 +29,27 @@
             <input type="hidden" name="pid" value="{{ product.product_id }}">
             {{ form_uq.csrf_token }}
             <input type="number" name="new_quantity" value="{{ product.quantity }}">
-            {% if form_uq.errors %}
-            <ul>
-                {% for field, errors in form_uq.errors.items() %}
-                    {% for error in errors %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                {% endfor %}
-            </ul>
-            {% endif %}
             {{ form_uq.submit() }}
         </form>
         </td>
         <td>{{product.quantity * product.price}}</td>
       </tr>
     {% endfor %}
+    <tr>
+      <td></td><td></td><td></td>
+      <td>
+        {% if form_uq.errors %}
+        <ul>
+            {% for field, errors in form_uq.errors.items() %}
+                {% for error in errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            {% endfor %}
+        </ul>
+        {% endif %}
+      </td>
+      <td>Total Price of Order: ${{cart_total}}</td>
+    </tr>
   </tbody>
 </table>
 {{ pagination.links }}

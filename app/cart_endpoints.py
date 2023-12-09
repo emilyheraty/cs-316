@@ -6,6 +6,7 @@ from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Re
 from .models.cart import Cart
 from .models.product import Product
 from .models.purchase import Purchase
+from .models.user import User
 from .models.inventory import Inventory, Listing
 from flask_paginate import Pagination, get_page_parameter
 from datetime import datetime
@@ -18,6 +19,20 @@ class UpdateQuantity(FlaskForm):
     pid = IntegerField('Pid')
     new_quantity = IntegerField('New Quantity', validators=[validators.NumberRange(min=0, max=999, message='Quantity must be between 0 and 1000')])
     submit = SubmitField('Update')
+
+def getCartTotal():
+    if current_user.is_authenticated:
+        lineitems = Cart.getCartByBuyerId(current_user.id)
+    else:
+        return 0
+    if len(lineitems) == 0:
+        return 0
+    
+    total = 0
+    for purch in lineitems:
+        # if user can afford it
+        total += round(purch.quantity * purch.price, 2)
+    return total
 
 @bp.route('/cart', methods=['GET', 'POST'])
 def showCart():
@@ -42,7 +57,7 @@ def showCart():
         sid = form_uq.sid.data
         pid = form_uq.pid.data
         if amt == 0:
-            res = Cart.removeProductFromInventory(bid, sid, pid)
+            res = Cart.removeProductFromCart(bid, sid, pid)
         else:
             res = Cart.updateQuantity(bid, sid, pid, amt)
         if res == 0:
@@ -52,14 +67,10 @@ def showCart():
                 isseller=isseller,
                 pagination=pagination,
                 form_uq=form_uq,
-                form_dp=form_dp,
+                cart_total = getCartTotal(),
                 err_message="error: could not update quantity")
-        print("Result was not 0")
         return redirect(url_for('cart_bp.showCart'))
-    else:
-        print(":(")
-    print("Got to end of Function")
-    return render_template('cart_page.html', items=lineitems_partial, pagination=pagination, isseller=isseller, form_uq=form_uq)
+    return render_template('cart_page.html', items=lineitems_partial, pagination=pagination, isseller=isseller, form_uq=form_uq, cart_total = getCartTotal(),)
 
 @bp.route('/cart/add/<int:seller_id>/<string:product_name>', methods=['GET', 'POST'])
 def addItemToCart(seller_id, product_name):
@@ -81,7 +92,11 @@ def submitCart():
         lineitems = Cart.getCartByBuyerId(current_user.id)
     else:
         redirect('/login')
-
+        return
+    if len(lineitems) == 0:
+        redirect('/')
+        return
+    
     time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     for purch in lineitems:
         # if user can afford it
@@ -92,8 +107,13 @@ def submitCart():
                                 amount, 
                                 purch.quantity
         )
-    # CLEAR CART
+        User.changeBalance(purch.seller_id, amount)
+        User.changeBalance(current_user.id, -1 * amount)
+        Inventory.decreaseQuantity(purch.seller_id, purch.prod_name, purch.quantity)
+
+    Cart.clearCartByUserId(current_user.id)
     # INCREMENT BALANCES
+    # Increment quantity
     return redirect('/purchases')
 
 @bp.route('/detailed_product/<string:product_name>', methods=['GET', 'POST'])
