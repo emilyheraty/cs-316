@@ -187,8 +187,6 @@ def seller_public_profile(seller_id):
         page1, per_page1, offset1 = get_page_args(page_parameter='page1', per_page_parameter='per_page1')
         page2, per_page2, offset2 = get_page_args(page_parameter='page2', per_page_parameter='per_page2')
 
-
-
         products = seller_products[offset1: offset1 + per_page1]
         feedback = seller_feedback[offset2: offset2 + per_page2]
         pagination_products = Pagination(page=page1, per_page=per_page1, search=search, total=len(seller_products), href='/seller/0?page1={0}')

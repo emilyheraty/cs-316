@@ -9,12 +9,32 @@
   <a href="{{ url_for('users.account') }}">Account</a>
   / Purchases
 </p>
-<h2>Your recent purchases:</h2>
-{{ pagination.info }}
-<table class='table table-hover table-bordered container'>
+<h2>Purchases</h2>
+  {{ pagination.info }}
+  {{ pagination.links }}
+  <form action="" method="post">
+    {{ searchForm.hidden_tag() }}
+    <p>
+      {{ searchForm.keyword.label }}: {{ searchForm.keyword(size=32) }} {{ searchForm.submit() }}
+    </p>
+  </form>
+  <div>
+    <a href="{{ url_for('purchases.purchases') }}" type="button" class="btn btn-light">View All Purchases</a>
+    <form action="" method="post" style="text-align: right;">
+      {{ filterForm.hidden_tag() }}
+        {{ filterForm.status() }} {{ filterForm.submit() }}</p>
+    </form>
+    <form action="" method="post" style="text-align: right;">
+      {{ sortForm.hidden_tag() }}
+        {{ sortForm.sort() }} {{ sortForm.submit() }}</p>
+    </form>
+  </div>
+
+  <table class='table table-hover table-bordered container'>
   <thead class="thead-dark">
     <tr>
       <th scope="col">Purchase ID</th>
+      <th scope="col">Product Name</th>
       <th scope="col">Time Purchased</th>
       <th scope="col">Total Amount</th>
       <th scope="col">Number of Items</th>
@@ -25,6 +45,7 @@
     {% for purchase in purchase_history%}
       <tr>
         <th scope="row">{{purchase.id}}</th>
+        <td>{{products[purchase_history.index(purchase)].name}}</td>
         <td>{{purchase.time_purchased}}</td>
         <td>{{purchase.total_amount}}</td>
         <td>{{purchase.number_of_items}}</td>
