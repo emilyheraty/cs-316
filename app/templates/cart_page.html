@@ -26,6 +26,7 @@
           <form action="{{ url_for('cart_bp.showCart') }}" method="POST">
             <input type="hidden" name="bid" value="{{ current_user.id }}">
             <input type="hidden" name="sid" value="{{ product.seller_id }}">
+            <input type="hidden" name="pid" value="{{ product.product_id }}">
             {{ form_uq.csrf_token }}
             <input type="number" name="new_quantity" value="{{ product.quantity }}">
             {% if form_uq.errors %}

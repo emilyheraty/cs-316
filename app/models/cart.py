@@ -26,7 +26,7 @@ WHERE Carts.buyer_id = :id and Carts.product_id = Products.id and Products.name=
         rows = app.db.execute('''
 SELECT buyer_id, name, Inventory.id, product_id, quantity, Products.price                             
 FROM Carts, Products, Inventory
-WHERE Carts.buyer_id = :id and Carts.product_id = Products.id and Products.name=Inventory.product_name 
+WHERE Carts.buyer_id = :id and Carts.seller_id = Inventory.id and Carts.product_id = Products.id and Products.name=Inventory.product_name 
 ORDER BY product_id
 LIMIT :per_page
 OFFSET :off
@@ -55,17 +55,19 @@ VALUES(:buyer_id, :pname, :seller_id, :quantity)
         except Exception as e:
             print(str(e))
             return None
+        
     @staticmethod
-    def updateQuantity(bid, sid, newQuantity):
+    def updateQuantity(bid, sid, pid, newQuantity):
         print("bid: " + str(bid) + " sid: " + str(sid) + "nq: " + str(newQuantity))
         try:
             res = app.db.execute("""
 UPDATE Carts
 SET quantity = :newQuantity
-WHERE Carts.buyer_id = :bid and Carts.seller_id = :sid;
+WHERE Carts.buyer_id = :bid and Carts.seller_id = :sid and Carts.product_id=:pid;
 """,
                                   bid=bid,
                                   sid=sid,
+                                  pid=pid,
                                   newQuantity=newQuantity)
             print("Result: " + str(res))
             return res
@@ -74,15 +76,17 @@ WHERE Carts.buyer_id = :bid and Carts.seller_id = :sid;
             return None
         
     @staticmethod
-    def updateQuantity2(bid, sid, newQuantity):
-        print("bid: " + str(bid) + " sid: " + str(sid) + "nq: " + str(newQuantity))
-        res = app.db.execute("""
-Select *
-FROM Carts
-WHERE Carts.buyer_id = :bid and Carts.seller_id = :sid;
+    def removeProductFromInventory(bid, sid, pid):
+        try:
+            res = app.db.execute(
+"""
+DELETE FROM Carts
+WHERE Carts.buyer_id = :bid and Carts.seller_id = :sid and Carts.product_id=:pid;
 """,
-                                  bid=int(bid),
-                                  sid=int(sid),
-                                  newQuantity=int(newQuantity))
-        print("Result: " + str(res))
-        return res
+                                  bid=bid,
+                                  sid=sid,
+                                  pid=pid)
+            return res
+        except Exception as e:
+            print(str(e))
+            return None
