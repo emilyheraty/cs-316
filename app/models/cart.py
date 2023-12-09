@@ -13,9 +13,9 @@ class Cart:
     @staticmethod
     def getCartByBuyerId(id):
         rows = app.db.execute('''
-SELECT buyer_id, name, Products.seller_id, product_id, quantity, Carts.price                             
-FROM Carts, Products
-WHERE Carts.buyer_id = :id and Carts.product_id = Products.id
+SELECT buyer_id, name, Inventory.id, product_id, quantity, Carts.price                             
+FROM Carts, Products, Inventory
+WHERE Carts.buyer_id = :id and Carts.product_id = Products.id and Products.name=Inventory.product_name
 ''',
                               id=id)
         # perhaps shold make it so price updates from product table as well as name
@@ -24,9 +24,9 @@ WHERE Carts.buyer_id = :id and Carts.product_id = Products.id
     @staticmethod
     def getPartialCartByBuyerId(id, per_page, off):
         rows = app.db.execute('''
-SELECT buyer_id, name, Products.seller_id, product_id, quantity, Carts.price                             
-FROM Carts, Products
-WHERE Carts.buyer_id = :id and Carts.product_id = Products.id
+SELECT buyer_id, name, Inventory.id, product_id, quantity, Carts.price                             
+FROM Carts, Products, Inventory
+WHERE Carts.buyer_id = :id and Carts.product_id = Products.id and Products.name=Inventory.product_name 
 ORDER BY product_id
 LIMIT :per_page
 OFFSET :off

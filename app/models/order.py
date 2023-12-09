@@ -11,9 +11,13 @@ class Order:
     @staticmethod
     def getPartialOrdersBySellerId(sid, per_page, off):
        rows = app.db.execute('''
-                             SELECT Purchases.uid as buyer_id, Products.name, time_purchased, number_of_items, fulfillment_status                             
-                             FROM Purchases, Products
-                             WHERE Products.seller_id = :id and Purchases.pid = Products.id
+                             SELECT Purchases.uid as buyer_id, Products.name, number_of_items, time_purchased, fulfillment_status                             
+                             FROM Purchases, Products, Carts, Inventory
+                             WHERE Purchases.uid = Carts.buyer_id
+                             AND Purchases.pid = Carts.product_id
+                             AND Carts.seller_id = Inventory.id
+                             AND Carts.product_id = Products.id
+                             AND Products.name = Inventory.product_name
                              ORDER BY time_purchased
                              LIMIT :per_page
                              OFFSET :off
@@ -26,9 +30,13 @@ class Order:
     @staticmethod
     def getOrdersBySellerId(sid):
        rows = app.db.execute('''
-                             SELECT Purchases.uid as buyer_id, Products.name, time_purchased, number_of_items, fulfillment_status                             
-                             FROM Purchases, Products
-                             WHERE Products.seller_id = :id and Purchases.pid = Products.id
+                             SELECT Purchases.uid as buyer_id, Products.name, number_of_items, time_purchased, fulfillment_status                             
+                             FROM Purchases, Products, Carts, Inventory
+                             WHERE Purchases.uid = Carts.buyer_id
+                             AND Purchases.pid = Carts.product_id
+                             AND Carts.seller_id = Inventory.id
+                             AND Carts.product_id = Products.id
+                             AND Products.name = Inventory.product_name
                              ORDER BY time_purchased
                              ''',
                              id=sid)
