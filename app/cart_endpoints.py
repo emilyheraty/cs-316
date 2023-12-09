@@ -54,6 +54,7 @@ def showCart():
                 form_uq=form_uq,
                 form_dp=form_dp,
                 err_message="error: could not update quantity")
+        print("Result was not 0")
         return redirect(url_for('cart_bp.showCart'))
     else:
         print(":(")
