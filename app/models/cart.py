@@ -15,7 +15,7 @@ class Cart:
         rows = app.db.execute('''
 SELECT buyer_id, name, Inventory.id, product_id, quantity, Products.price                             
 FROM Carts, Products, Inventory
-WHERE Carts.buyer_id = :id and Carts.product_id = Products.id and Products.name=Inventory.product_name
+WHERE Carts.buyer_id = :id and Carts.seller_id = Inventory.id and Carts.product_id = Products.id and Products.name=Inventory.product_name 
 ''',
                               id=id)
         # perhaps shold make it so price updates from product table as well as name
