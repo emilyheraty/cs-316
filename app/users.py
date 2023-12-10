@@ -185,6 +185,13 @@ def seller_public_profile(seller_id):
             
         seller_feedback = Feedback.get_recent_customer_feedback_seller(seller_id, 5)
 
+        avg_rating = Feedback.avg_rating_seller(seller_id)[0][0]
+        if avg_rating is not None:
+            avg_rating = round(avg_rating, 2)
+        has_rating = avg_rating is not None
+        num_rating = Feedback.num_rating_seller(seller_id)[0][0]
+        
+
         page1, per_page1, offset1 = get_page_args(page_parameter='page1', per_page_parameter='per_page1')
         page2, per_page2, offset2 = get_page_args(page_parameter='page2', per_page_parameter='per_page2')
 
@@ -194,7 +201,8 @@ def seller_public_profile(seller_id):
         pagination_feedback = Pagination(page=page2, per_page=per_page2, total=len(seller_feedback), href='/seller/0?page2={0}')
 
         return render_template('seller_profile.html', seller=seller, seller_products=products, seller_feedback=feedback,
-                                pagination_products=pagination_products, pagination_feedback=pagination_feedback, can_review = can_review)
+                                pagination_products=pagination_products, pagination_feedback=pagination_feedback, can_review = can_review, 
+                                avg_rating = avg_rating, has_rating = has_rating, num_rating = num_rating)
     else:
         return render_template('seller_profile.html', seller=seller)
 
