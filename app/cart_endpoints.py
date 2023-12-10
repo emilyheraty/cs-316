@@ -145,4 +145,14 @@ def detailedOrder(product_name):
     prod = Product.get_product_by_name(product_name)
     desc = prod.description
     p = prod.price
-    return render_template('detailed_product.html', items=listings, description = desc, price = p, product_name=product_name)
+    prod_id = prod.id
+    avg_rating = Feedback.avg_rating_product(prod_id)
+    num_rating = Feedback.num_rating_product(prod_id)
+    has_rating = Feedback.prod_feedback_exists(prod.id)
+    if has_rating:
+        recent_revs = Feedback.get_prod_recent_feedback(prod_id, 5)
+   
+    else:
+        recent_revs = []
+    return render_template('detailed_product.html', items=listings, description = desc, price = p, product_name=product_name, 
+                           avg_rating = avg_rating, has_rating = has_rating, recent_revs = recent_revs, num_rating = num_rating)

@@ -18,9 +18,9 @@ FROM Feedback
 WHERE pid = :id
 ''', id=id)
         if result[0][0] is None:
-            return "No Reviews"
+            return "No reviews"
         else:
-            return round(result[0][0], 1)
+            return round(result[0][0], 2)
 
     @staticmethod
     def get(id):

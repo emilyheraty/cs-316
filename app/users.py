@@ -3,8 +3,10 @@ from flask_paginate import Pagination, get_page_args
 from werkzeug.urls import url_parse
 from flask_login import login_user, logout_user, current_user
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, DecimalField
+from wtforms import SelectField, StringField, PasswordField, BooleanField, SubmitField, DecimalField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Regexp
+
+from app.models.purchase import Purchase
 
 from .models.user import User
 from .models.inventory import Inventory
@@ -84,13 +86,14 @@ def logout():
     return redirect(url_for('index.index'))
 
 
-@bp.route('/account', methods=['GET'])
+@bp.route('/account', methods=['GET', 'POST'])
 def account():
     if current_user.is_authenticated is False:
         isseller = 0
         return redirect(url_for('users.login'))
     else:
         isseller = Inventory.isSeller(current_user.id)[0][0]
+    
     return render_template('account.html', isseller=isseller)
 
 
@@ -185,11 +188,9 @@ def seller_public_profile(seller_id):
             
         seller_feedback = Feedback.get_recent_customer_feedback_seller(seller_id, 5)
 
-        avg_rating = Feedback.avg_rating_seller(seller_id)[0][0]
-        if avg_rating is not None:
-            avg_rating = round(avg_rating, 2)
+        avg_rating = Feedback.avg_rating_seller(seller_id)
         has_rating = avg_rating is not None
-        num_rating = Feedback.num_rating_seller(seller_id)[0][0]
+        num_rating = Feedback.num_rating_seller(seller_id)
         
 
         page1, per_page1, offset1 = get_page_args(page_parameter='page1', per_page_parameter='per_page1')

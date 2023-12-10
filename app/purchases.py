@@ -79,6 +79,8 @@ def purchases():
         return render_template('purchases.html',
                             purchases=purchases[offset: offset + per_page], pagination=pagination, isseller=isseller,
                             searchForm=searchForm, sortForm=sortForm, filterForm=filterForm)
+    
+
     return render_template('purchases.html',
                         purchases=purchases[offset: offset + per_page], pagination=pagination, isseller=isseller,
                         searchForm=searchForm, sortForm=sortForm, filterForm=filterForm)
@@ -192,3 +194,84 @@ def orders():
         search = request.args.get('q')
         pagination = Pagination(page=page, per_page=per_page, offset=offset, total=len(lineitems), search=search, record_name='lineitems')
         return render_template('orders.html', items=lineitems, pagination=pagination, isseller=isseller, form_fulfilled=form_fulfilled,searchForm=searchForm, filterForm=filterForm)
+
+class SpendingForm(FlaskForm):
+    years = SelectField("Year")
+    submit = SubmitField("View")
+
+class ProductForm(FlaskForm):
+    product = SelectField("Product")
+    submit = SubmitField("View")
+
+@bp.route('/purchases/statistics', methods = ['GET', 'POST'])
+def statistics():
+    if current_user.is_authenticated:
+        isseller = Inventory.isSeller(current_user.id)[0][0]
+    else:
+        isseller = 0
+
+    states = []
+    product_count = []
+    if isseller == 1:
+        seller_by_state = Purchase.get_all_by_state(current_user.id)
+        for state in seller_by_state:
+            if str(state[0]) != '':
+                states.append(str(state[0]))
+                product_count.append(str(state[1]))
+
+
+    grouped_products = Purchase.get_by_product_count(current_user.id)
+    top_products = []
+    count = []
+    for product in grouped_products:
+        top_products.append(str(product[0]))
+        count.append(int(product[1]))
+
+    
+    grouped_data = Purchase.get_all_years(current_user.id)
+    selectedYears = ["All Years"]
+    availableYears = []
+    total_amount = []
+    for purchase in grouped_data:
+        selectedYears.append(int(purchase[0]))
+        availableYears.append(int(purchase[0]))
+        total_amount.append(int(purchase[1]))
+
+    spendingForm = SpendingForm()
+    spendingForm.years.choices = [(str(a), str(a)) for a in selectedYears]
+
+    productForm = ProductForm()
+
+    productForm.product.choices = ["All Categories"] + [(str(a[1])) for a in Inventory.getByCategory(current_user.id)]
+    months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+    
+    if productForm.product.data != "None" and productForm.product.data != "All Categories":
+        product_by_state = Purchase.get_all_by_state_category(current_user.id, productForm.product.data)
+        states = []
+        product_count = []
+        for product in product_by_state:
+            states.append(product[0])
+            product_count.append(int(product[1]))
+        return render_template('statistics.html', isseller=isseller, top_products=top_products, count=count, 
+                                available_years=availableYears, total_amount=total_amount, spendingForm=spendingForm, productForm=productForm,
+                                states=states, product_count=product_count, product=productForm.product.data, year=spendingForm.years.data, months=months)
+    
+    
+    if spendingForm.years.data != "All Years" and spendingForm.years.data != "None":
+        grouped_data_m = Purchase.get_by_year(current_user.id, spendingForm.years.data)
+        months_data = []
+        total_amount = []
+        for purchase in grouped_data_m:
+            months_data.append(months[int(purchase[0]) - 1])
+            total_amount.append(int(purchase[1]))
+        return render_template('statistics.html', isseller=isseller, top_products=top_products, count=count, 
+                                available_years=availableYears, year=spendingForm.years.data, total_amount=total_amount,
+                                spendingForm= SpendingForm(obj=spendingForm), productForm=productForm, months=months_data, states=states,
+                                product_count=product_count, product=productForm.product.data)
+
+
+    
+    return render_template('statistics.html', isseller=isseller, top_products=top_products, count=count, 
+                            available_years=availableYears, total_amount=total_amount, spendingForm=spendingForm, productForm=productForm,
+                              states=states, product_count=product_count, product=productForm.product.data, year=spendingForm.years.data)
+

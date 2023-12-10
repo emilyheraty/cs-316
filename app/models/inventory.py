@@ -116,6 +116,15 @@ WHERE Inventory.id = :id AND Inventory.product_name = :product_name
         return res
     
     @staticmethod
+    def getByCategory(id):
+        rows = app.db.execute('''
+SELECT DISTINCT Inventory.id, Products.category
+FROM Inventory JOIN Products ON Products.name = Inventory.product_name
+WHERE Inventory.id = :uid
+''',
+                              uid=id)
+        return rows
+
     def decreaseQuantity(id, product_name, quantity):
         res = app.db.execute('''
 UPDATE Inventory

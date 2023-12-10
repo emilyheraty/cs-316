@@ -6,6 +6,7 @@ CREATE TABLE Users (
     firstname VARCHAR(255) NOT NULL,
     lastname VARCHAR(255) NOT NULL,
     address VARCHAR(255) NOT NULL,
+    state VARCHAR(2),
     balance DECIMAL(12, 2) NOT NULL,
     is_seller INT NOT NULL CHECK(is_seller IN (0, 1))
 );
@@ -31,7 +32,7 @@ CREATE TABLE Purchases (
     time_purchased timestamp without time zone NOT NULL DEFAULT (current_timestamp AT TIME ZONE 'UTC'),
     total_amount DECIMAL(12,2) NOT NULL,
     number_of_items INT NOT NULL,
-    fulfillment_status timestamp without time zone,
+    fulfillment_status timestamp without time zone DEFAULT NULL,
     order_id INT NOT NULL
 );
 

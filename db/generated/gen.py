@@ -1,6 +1,7 @@
 from werkzeug.security import generate_password_hash
 import csv
 from faker import Faker
+import re
 
 num_users = 100
 num_products = 1000
@@ -12,6 +13,13 @@ num_inventory = 2000
 Faker.seed(0)
 fake = Faker()
 
+def getState(address):
+    regex = r',\s*([A-Za-z]{2})\s+\d{5}'
+    state = re.search(regex, address)
+    if state:
+        return state.group(1)
+    else:
+        return
 
 def get_csv_writer(f):
     return csv.writer(f, dialect='unix')
@@ -19,6 +27,7 @@ def get_csv_writer(f):
 
 def gen_users(num_users):
     sellers = []
+
     with open('Users.csv', 'w') as f:
         writer = get_csv_writer(f)
         print('Users...', end=' ', flush=True)
@@ -34,9 +43,10 @@ def gen_users(num_users):
             firstname = name_components[0]
             lastname = name_components[-1]
             address = profile['residence']
+            state = getState(address)
             balance = fake.pyfloat(right_digits=2, positive=True, min_value = 0.01, max_value = 999999999.99)
             is_seller = fake.random_int(min=0,max=1)  # need to edit this!!!
-            writer.writerow([uid, email, password, firstname, lastname, address, balance, is_seller])
+            writer.writerow([uid, email, password, firstname, lastname, address, state, balance, is_seller])
             sellers.append(is_seller)
         print(f'{num_users} generated')
     return sellers
@@ -90,11 +100,12 @@ def gen_purchases(num_purchases, available_pids):
                 print(f'{id}', end=' ', flush=True)
             uid = fake.random_int(min=0, max=num_users-1)
             pid = fake.random_element(elements=available_pids)
+            sid = fake.random_element(elements=seller_ids)
             time_purchased = fake.date_time()
             total_amount = fake.pyfloat(right_digits=2, positive=True, min_value = 0.01, max_value = 999999999.99)
             number_of_items = fake.random_int(min=0, max=100)
             fulfillment_status = fake.date_time()
-            writer.writerow([id, uid, pid, time_purchased, total_amount, number_of_items, fulfillment_status, 0])
+            writer.writerow([id, uid, pid, sid, time_purchased, total_amount, number_of_items, fulfillment_status, 0])
         print(f'{num_purchases} generated')
     return
 

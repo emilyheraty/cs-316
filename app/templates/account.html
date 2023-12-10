@@ -41,6 +41,15 @@
         <h4>Customer Feedback</h4>
         <p style="color:rgb(120, 119, 119)">View customer feedback</p>
     </a>
+    <a class="card" style="text-decoration:none; color:inherit;" href="{{ url_for('purchases.statistics') }}">
+        <h4>Statistics</h4>
+        <p style="color:rgb(120, 119, 119)">Visualize spending and selling patterns over time</p>
+    </a>
+{% else %}
+    <a class="card" style="text-decoration:none; color:inherit;" href="{{ url_for('purchases.statistics') }}">
+        <h4>Statistics</h4>
+        <p style="color:rgb(120, 119, 119)">Visualize spending patterns over time</p>
+    </a>
 {% endif %}
 
 <a class="card" style="text-decoration:none; color:inherit;" href="{{ url_for('feedback.all_feedback') }}">
