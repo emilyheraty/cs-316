@@ -125,6 +125,16 @@ WHERE Inventory.id = :uid
                               uid=id)
         return rows
 
+    def decreaseQuantity(id, product_name, quantity):
+        res = app.db.execute('''
+UPDATE Inventory
+SET number_available = number_available - :quantity
+WHERE Inventory.id = :id and Inventory.product_name = :product_name;
+''',
+                                product_name=product_name,
+                                quantity=quantity,
+                                id=id)
+        return res
 
 #     @staticmethod
 #     def addProductToInventory(id, product_name, number_available):

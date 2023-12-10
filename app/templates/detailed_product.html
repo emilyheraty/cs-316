@@ -8,13 +8,14 @@
 <div style="display: flex; justify-content: space-between;">
     <div style="text-align: left; max-width: 600px;">{{description}}</div>
     <h2 style="text-align: right;">{{price}}$ per Item</h2>
+   
 </div>
 <table class='table table-hover table-bordered container'>
   <thead class="thead-dark">
     <tr>
       <th scope="col">Seller Name</th>
       <th scope="col">Quantity Available</th>
-      <th scope="col">AddtoCart</th>
+      <th scope="col"></th>
     </tr>
   </thead>
   <tbody>
@@ -23,10 +24,39 @@
         <th scope="row">{{dp.sfirstname}} {{dp.slastname}}</th>
         <td>{{dp.qty}}</td>
         <td width=100px>
-          <a href="{{url_for('cart_bp.addItemToCart', seller_id = dp.sid, product_name = product_name) }}" type="button" class="btn btn-light">Add to Cart</a>
+          <a href="{{url_for('cart_bp.addItemToCart', seller_id = dp.sid, product_name = product_name) }}" type="button" class="btn btn-dark">Add to Cart</a>
         </td>
       </tr>
     {% endfor %}
   </tbody>
 </table>
+<br>
+  {% if has_rating %}
+  <div style="display: flex; justify-content: space-between;">
+    <div style="text-align: left; max-width: 600px;"> <h3>Recent reviews </h2></div>
+    <h4 style="text-align: right;">Average rating: {{avg_rating}} <br>
+    Number of reviews: {{num_rating}} </h4>
+   
+</div>
+<table class="table">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">Rating</th>
+            <th scope="col">Comment</th>
+            <th scope="col">Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for feedback in recent_revs %}
+        <tr>
+            <td>{{ feedback.rating}}/5</td>
+            <td>{{ feedback.comment }}</td>
+            <td>{{ feedback.time_posted }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+  {% else %}
+  <h2 style="text-align: left;">No reviews yet</h2>
+  {% endif %}
 {% endblock %}

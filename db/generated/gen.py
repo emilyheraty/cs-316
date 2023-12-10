@@ -4,11 +4,11 @@ from faker import Faker
 import re
 
 num_users = 100
-num_products = 2000
+num_products = 1000
 num_purchases = 2500
-num_carts = 1000
-num_feedback = 1000
-num_inventory = 1000
+num_carts = 200
+num_feedback = 800
+num_inventory = 2000
 
 Faker.seed(0)
 fake = Faker()
@@ -81,14 +81,12 @@ def gen_products(num_products, seller_ids):
             nameset.add(name)    
             cid = fake.random_element(elements=seller_ids)
             price = f'{str(fake.random_int(max=500))}.{fake.random_int(max=99):02}'
-            available = fake.random_element(elements=('true', 'false'))
             description = fake.sentence(nb_words=50)[:-1]
             category = fake.random_element(elements=('food', 'household products', 'clothing', 'books'))
           #rating = f'{str(fake.random_int(max=4))}.{fake.random_int(max=.9):02}'
-            if available == 'true':
-                available_pids.append(pid)
-                product_names.append(name)
-            writer.writerow([pid, description, category, cid, name, price, available])
+            available_pids.append(pid)
+            product_names.append(name)
+            writer.writerow([pid, description, category, cid, name, price])
         print(f'{num_products} generated; {len(available_pids)} available')
     return available_pids, product_names
 
@@ -105,8 +103,8 @@ def gen_purchases(num_purchases, available_pids):
             time_purchased = fake.date_time()
             total_amount = fake.pyfloat(right_digits=2, positive=True, min_value = 0.01, max_value = 999999999.99)
             number_of_items = fake.random_int(min=0, max=100)
-            fulfillment_status = fake.random_int(min=0, max=1)
-            writer.writerow([id, uid, pid, time_purchased, total_amount, number_of_items, fulfillment_status])
+            fulfillment_status = fake.date_time()
+            writer.writerow([id, uid, pid, time_purchased, total_amount, number_of_items, fulfillment_status, 0])
         print(f'{num_purchases} generated')
     return
 

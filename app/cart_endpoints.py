@@ -6,9 +6,12 @@ from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Re
 from .models.cart import Cart
 from .models.product import Product
 from .models.purchase import Purchase
+from .models.user import User
 from .models.inventory import Inventory, Listing
 from flask_paginate import Pagination, get_page_parameter
 from datetime import datetime
+
+from .models.feedback import Feedback
 
 bp = Blueprint('cart_bp', __name__)
 
@@ -18,6 +21,20 @@ class UpdateQuantity(FlaskForm):
     pid = IntegerField('Pid')
     new_quantity = IntegerField('New Quantity', validators=[validators.NumberRange(min=0, max=999, message='Quantity must be between 0 and 1000')])
     submit = SubmitField('Update')
+
+def getCartTotal():
+    if current_user.is_authenticated:
+        lineitems = Cart.getCartByBuyerId(current_user.id)
+    else:
+        return 0
+    if len(lineitems) == 0:
+        return 0
+    
+    total = 0
+    for purch in lineitems:
+        # if user can afford it
+        total += round(purch.quantity * purch.price, 2)
+    return total
 
 @bp.route('/cart', methods=['GET', 'POST'])
 def showCart():
@@ -42,7 +59,7 @@ def showCart():
         sid = form_uq.sid.data
         pid = form_uq.pid.data
         if amt == 0:
-            res = Cart.removeProductFromInventory(bid, sid, pid)
+            res = Cart.removeProductFromCart(bid, sid, pid)
         else:
             res = Cart.updateQuantity(bid, sid, pid, amt)
         if res == 0:
@@ -52,14 +69,10 @@ def showCart():
                 isseller=isseller,
                 pagination=pagination,
                 form_uq=form_uq,
-                form_dp=form_dp,
+                cart_total = getCartTotal(),
                 err_message="error: could not update quantity")
-        print("Result was not 0")
         return redirect(url_for('cart_bp.showCart'))
-    else:
-        print(":(")
-    print("Got to end of Function")
-    return render_template('cart_page.html', items=lineitems_partial, pagination=pagination, isseller=isseller, form_uq=form_uq)
+    return render_template('cart_page.html', items=lineitems_partial, pagination=pagination, isseller=isseller, form_uq=form_uq, cart_total = getCartTotal(),)
 
 @bp.route('/cart/add/<int:seller_id>/<string:product_name>', methods=['GET', 'POST'])
 def addItemToCart(seller_id, product_name):
@@ -72,8 +85,6 @@ def addItemToCart(seller_id, product_name):
     else:
         redirect('/login')
     # Should take you to order page to determine quantity, and maybe other options?
-
-    
     #bid, sid, pid, quant, price
     return redirect('/')
 
@@ -82,31 +93,46 @@ def submitCart():
     if current_user.is_authenticated:
         lineitems = Cart.getCartByBuyerId(current_user.id)
     else:
-        redirect('/login')
-
+        return redirect('/login')
+    if len(lineitems) == 0:
+        return redirect('/')
+    
     time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
-
     for purch in lineitems:
         # if user can afford it
         amount = round(purch.quantity * purch.price, 2)
+        newOId = Purchase.maxOId() + 1
         Purchase.submitPurchase(purch.buyer_id, 
                                 purch.product_id, 
                                 str(time),
                                 amount, 
-                                purch.quantity, 
-                                0
-        )
-    #uid, pid, time, sid, amount, quant, status
-    
+                                purch.quantity,
+                                newOId)
+        User.changeBalance(purch.seller_id, amount)
+        User.changeBalance(current_user.id, -1 * amount)
+        Inventory.decreaseQuantity(purch.seller_id, purch.prod_name, purch.quantity)
+
+    Cart.clearCartByUserId(current_user.id)
+    # INCREMENT BALANCES
+    # Increment quantity
     return redirect('/purchases')
 
 @bp.route('/detailed_product/<string:product_name>', methods=['GET', 'POST'])
 def detailedOrder(product_name):
     listings = Listing.get_listings_by_product_name(product_name)
-    for listing in listings:
-        print(listing.sfirstname)
     prod = Product.get_product_by_name(product_name)
     desc = prod.description
     p = prod.price
-    return render_template('detailed_product.html', items=listings, description = desc, price = p, product_name=product_name)
+    prod_id = prod.id
+    avg_rating = Feedback.avg_rating_product(prod_id)[0][0]
+    num_rating = Feedback.num_rating_product(prod_id)[0][0]
+    if avg_rating is not None:
+        avg_rating = round(avg_rating, 2)
+    has_rating = avg_rating is not None
+    if has_rating:
+        recent_revs = Feedback.get_prod_recent_feedback(prod_id, 5)
+   
+    else:
+        recent_revs = []
+    return render_template('detailed_product.html', items=listings, description = desc, price = p, product_name=product_name, 
+                           avg_rating = avg_rating, has_rating = has_rating, recent_revs = recent_revs, num_rating = num_rating)

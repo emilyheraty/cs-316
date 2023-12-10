@@ -5,13 +5,14 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, DecimalField, SelectField, TextAreaField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 from flask import jsonify
-from flask_paginate import Pagination, get_page_parameter
+from flask_paginate import Pagination, get_page_parameter, get_page_args
 
 from .models.inventory import Inventory
 from .models.feedback import Feedback
 from .models.purchase import Purchase
 from .models.product import Product
 from .models.inventory import Inventory
+from .models.user import User
 
 from flask import Blueprint
 bp = Blueprint('feedback', __name__)
@@ -33,14 +34,15 @@ def customer_feedback(seller_id):
     per_page = 4
     page = request.args.get(get_page_parameter(), type=int, default=1)
     offset = (page - 1) * per_page
+
     if current_user.is_authenticated:
         user_id = current_user.id
-        if(Inventory.isSeller(seller_id)):
-            full_feedback_seller = Feedback.get_customer_feedback_seller(seller_id)
-            partial_feedback_seller = Feedback.get_partial_customer_feedback_seller(seller_id, per_page, offset)
-            full_feedback_product = Feedback.get_customer_feedback_product(seller_id)
-            partial_feedback_product = Feedback.get_partial_customer_feedback_product(seller_id, per_page, offset)
-            search = False
+        #if(Inventory.isSeller(seller_id)[0][0]):
+        full_feedback_seller = Feedback.get_customer_feedback_seller(seller_id)
+        partial_feedback_seller = Feedback.get_partial_customer_feedback_seller(seller_id, per_page, offset)
+        full_feedback_product = Feedback.get_customer_feedback_product(seller_id)
+        partial_feedback_product = Feedback.get_partial_customer_feedback_product(seller_id, per_page, offset)
+        search = False
         q = request.args.get('q')
         if q:
             search = True
@@ -53,7 +55,7 @@ def customer_feedback(seller_id):
         partial_feedback_seller = []
         partial_feedback_product = []
     pagination = Pagination(page=page, per_page=per_page, offset=offset, total=len(full_feedback_seller), 
-                            search=search, record_name='seller revews')
+                            search=search, record_name='seller reviews')
     pagination2 = Pagination(page=page, per_page=per_page, offset=offset, total=len(full_feedback_product), 
                               search=search_2, record_name='product reviews')
     
@@ -61,13 +63,21 @@ def customer_feedback(seller_id):
                            partial_feedback_product=partial_feedback_product, pagination = pagination, pagination2 = pagination2)
 
 
-@bp.route('/all_feedback')
+@bp.route('/all_feedback', methods=['GET'])
 def all_feedback():
+    search = False
+    q = request.args.get('q')
+    if q:
+        search = True
+
     per_page = 4
     page1 = request.args.get(get_page_parameter(), type=int, default=1)
     offset1 = (page1 - 1) * per_page
+
     page2 = request.args.get(get_page_parameter(), type=int, default=1)
     offset2 = (page2 - 1) * per_page
+
+    
 
     if current_user.is_authenticated:
         user_id = current_user.id
@@ -76,27 +86,39 @@ def all_feedback():
         pending = Feedback.pending_products(user_id)
         partial_pending = Feedback.get_partial_pending(user_id, per_page, offset2)
         purchase_name_pending = Feedback.get_purchase_name_pending(user_id)
+        
+
         num = 0
         isseller = Inventory.isSeller(current_user.id)[0][0]
-        search = False
+        names = []
+        for feedback in full_feedback:
+            if (feedback.review_type == 'seller'):
+                seller_id = feedback.seller_id
+                s1 = User.get_profile_info(seller_id).firstname
+                s2 = User.get_profile_info(seller_id).lastname
+                name = " ".join([s1, s2])
+                names.append(name)
+            if (feedback.review_type == 'product'):
+                product_id = feedback.pid
+                name = Product.get(product_id).name
+                names.append(name)
         
-        q = request.args.get('q')
-        if q:
-            search = True
+       
     
 
     else:
         full_feedback=[]
         pending = []
-    pagination = Pagination(page=page, per_page=per_page, offset=offset, total=len(full_feedback), search=search, record_name='feedback')
-    pagination_2 = Pagination(page=page, per_page=per_page, offset=offset, total=len(pending), search=search, record_name='pending')
-    return render_template('all_feedback.html', partial_feedback = partial_feedback, purchase_name = purchase_name, pagination = pagination, pending = pending, partial_pending = partial_pending, pagination_2 = pagination_2)
+    pagination = Pagination(page=page1, per_page=per_page, total=len(full_feedback), search = search, offset1 = offset1, record_name = 'product reviews')
+    pagination_2 = Pagination(page=page2, per_page=per_page, total=len(purchase_name_pending), search = search, offset2 = offset2, record_name = 'purchases to review')
+    
+    return render_template('all_feedback.html', partial_feedback = partial_feedback, purchase_name_pending = purchase_name_pending, pagination = pagination, pending = pending, partial_pending = partial_pending, pagination_2 = pagination_2, names = names)
 
 class FeedbackForm(FlaskForm):
     rating = SelectField('Rating', choices=[('1', '1'), ('2', '2'), ('3', '3'),
                                              ('4', '4'), ('5', '5')],
                                               coerce = int, validators = [DataRequired()])
-    review_type = SelectField('Review product or seller?', choices = [('product', 'product'), ('seller', 'seller')], validators = [DataRequired()])
+    #review_type = SelectField('Review product or seller?', choices = [('product', 'product'), ('seller', 'seller')], validators = [DataRequired()])
     comment = TextAreaField('Review', validators= [DataRequired()])
     submit = SubmitField('Submit')
    
@@ -107,19 +129,39 @@ class FeedbackForm(FlaskForm):
 def post_feedback(pid):
     if current_user.is_authenticated is False:
         return redirect(url_for('users.login'))
-        
     user_id = current_user.id
-    seller_id = 0
+    already_reviewed = (not(Feedback.check_past(pid, user_id)))
+    seller_id = Feedback.get_seller(pid)[0][0]
     form = FeedbackForm()
     if form.is_submitted():
        # if(form.review_type.data == 'seller'):
          #   if(Feedback.seller_review_check(seller_id)):
          #       flash('Already reviewed seller')
           #      return redirect(url_for('feedback.all_feedback'))
-        if Feedback.add_product_feedback(user_id, pid, 0, form.review_type.data, form.rating.data, form.comment.data, datetime.datetime.now()):
+        if Feedback.add_product_feedback(user_id, pid, seller_id, 'product', form.rating.data, form.comment.data, datetime.datetime.now()):
             #flash('Feedback successfully submitted!')
             return redirect(url_for('feedback.all_feedback'))
-    return render_template('post_feedback.html', title='Submit', form=form)
+    return render_template('post_feedback.html', title='Submit', form=form, already_reviewed = already_reviewed)
+
+
+@bp.route('/post_feedback_seller<int:seller_id>', methods=['GET', 'POST'])
+def post_feedback_seller(seller_id):
+    if current_user.is_authenticated is False:
+        return redirect(url_for('users.login'))    
+    user_id = current_user.id
+    already_reviewed=(not( Feedback.check_past_seller(seller_id, user_id)))
+    if(not( Feedback.check_purchased(seller_id, user_id))):
+        return redirect(url_for('index.index'))
+    form = FeedbackForm()
+    if form.is_submitted():
+       # if(form.review_type.data == 'seller'):
+         #   if(Feedback.seller_review_check(seller_id)):
+         #       flash('Already reviewed seller')
+          #      return redirect(url_for('feedback.all_feedback'))
+        if Feedback.add_product_feedback(user_id, None, seller_id, 'seller', form.rating.data, form.comment.data, datetime.datetime.now()):
+            #flash('Feedback successfully submitted!')
+            return redirect(url_for('feedback.all_feedback'))
+    return render_template('post_feedback_seller.html', title='Submit', form=form, already_reviewed = already_reviewed)
 
 
 class FeedbackEditForm(FlaskForm):

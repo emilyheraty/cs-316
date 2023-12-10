@@ -10,8 +10,9 @@
 </p>
 {% if already_reviewed%}
 
-<h1>Post Product Review</h1>
+<h1>Post Seller Review</h1>
 <form action="" method="post">
+   
 <p>
     {{form.rating.label}} </br>
     {{form.rating}} </br>
@@ -36,7 +37,7 @@
 </form>
 
 {% else %}
-You already reviewed this product.
+You already reviewed this seller.
 <br>
 <p>
     <a class="btn btn-secondary" href="{{ url_for('index.index') }}" role="button">Go back to home</a>

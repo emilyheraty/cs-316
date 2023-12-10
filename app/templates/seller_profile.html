@@ -28,7 +28,13 @@
         <p>
             <a href="mailto:{{seller.email}}"> {{seller.email}}</a>
         </p>
+        <a class="btn btn-primary"  href="{{ url_for('feedback.post_feedback_seller', seller_id = seller.id) }}" role="button">Review seller</a>
     </div>
+    
+       
+    
+
+    
     <h4>Products</h4>
     {{pagination_products.info}}
     {{pagination_products.links}}
@@ -51,8 +57,17 @@
         </tbody>
     </table>
     {{pagination_products.links}}
+    
+    
+    {% if has_rating %}
+    
+        <h4>Number of seller reviews: {{num_rating}}</h4>
+        <h4>Average rating: {{avg_rating}}</h4>
 
-    <h4 style="margin-top: 50px;">Product Feedback</h4>
+        <h3>Recent reviews</h3>
+   
+
+
     {{pagination_feedback.info}}
     {{pagination_feedback.links}}
     <table class="table" style="width: 80%">
@@ -75,6 +90,9 @@
     </table>
     {{pagination_feedback.links}}
 </div>
+{% else %}
+<h4 style="text-align: left;">No reviews yet</h4>
+{% endif %}
 {% endif %}
 
 
