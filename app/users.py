@@ -183,7 +183,7 @@ def seller_public_profile(seller_id):
             product = Product.get_product_by_name(item.product_name)
             seller_products.append(product)
             
-        seller_feedback = Feedback.get_recent_feedback(seller_id, 10)
+        seller_feedback = Feedback.get_recent_customer_feedback_seller(seller_id, 5)
 
         page1, per_page1, offset1 = get_page_args(page_parameter='page1', per_page_parameter='per_page1')
         page2, per_page2, offset2 = get_page_args(page_parameter='page2', per_page_parameter='per_page2')
