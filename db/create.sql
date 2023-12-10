@@ -31,7 +31,7 @@ CREATE TABLE Purchases (
     time_purchased timestamp without time zone NOT NULL DEFAULT (current_timestamp AT TIME ZONE 'UTC'),
     total_amount DECIMAL(12,2) NOT NULL,
     number_of_items INT NOT NULL,
-    fulfillment_status timestamp without time zone,
+    fulfillment_status timestamp without time zone DEFAULT NULL,
     order_id INT NOT NULL
 );
 
