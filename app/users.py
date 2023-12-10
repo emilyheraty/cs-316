@@ -198,3 +198,7 @@ def seller_public_profile(seller_id):
     else:
         return render_template('seller_profile.html', seller=seller)
 
+@bp.route('/seller_/<int:pid>', methods=['GET'])
+def seller_public_profile_by_pid(pid):
+    cid = Product.get_cid_by_pid(pid)
+    return redirect(url_for('users.seller_public_profile', seller_id=cid))

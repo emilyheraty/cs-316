@@ -15,7 +15,7 @@
     <tr>
       <th scope="col">Seller Name</th>
       <th scope="col">Quantity Available</th>
-      <th scope="col">AddtoCart</th>
+      <th scope="col"></th>
     </tr>
   </thead>
   <tbody>
@@ -24,7 +24,7 @@
         <th scope="row">{{dp.sfirstname}} {{dp.slastname}}</th>
         <td>{{dp.qty}}</td>
         <td width=100px>
-          <a href="{{url_for('cart_bp.addItemToCart', seller_id = dp.sid, product_name = product_name) }}" type="button" class="btn btn-light">Add to Cart</a>
+          <a href="{{url_for('cart_bp.addItemToCart', seller_id = dp.sid, product_name = product_name) }}" type="button" class="btn btn-dark">Add to Cart</a>
         </td>
       </tr>
     {% endfor %}

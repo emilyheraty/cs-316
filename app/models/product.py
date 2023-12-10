@@ -62,3 +62,13 @@ WHERE name = :name
 ''',
                               name=name)
         return Product(*(rows[0])) if rows is not None else None
+    
+    @staticmethod
+    def get_cid_by_pid(pid):
+        res = app.db.execute('''
+SELECT creator_id
+FROM Products
+WHERE id = :id
+''',
+                              id=pid)
+        return res[0][0] if res is not None else None

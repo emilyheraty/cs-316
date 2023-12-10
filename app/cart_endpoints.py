@@ -93,11 +93,9 @@ def submitCart():
     if current_user.is_authenticated:
         lineitems = Cart.getCartByBuyerId(current_user.id)
     else:
-        redirect('/login')
-        return
+        return redirect('/login')
     if len(lineitems) == 0:
-        redirect('/')
-        return
+        return redirect('/')
     
     time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     for purch in lineitems:
