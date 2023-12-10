@@ -125,12 +125,14 @@ def detailedOrder(product_name):
     p = prod.price
     prod_id = prod.id
     avg_rating = Feedback.avg_rating_product(prod_id)[0][0]
+    num_rating = Feedback.num_rating_product(prod_id)[0][0]
     if avg_rating is not None:
         avg_rating = round(avg_rating, 2)
     has_rating = avg_rating is not None
     if has_rating:
         recent_revs = Feedback.get_prod_recent_feedback(prod_id, 5)
+   
     else:
         recent_revs = []
     return render_template('detailed_product.html', items=listings, description = desc, price = p, product_name=product_name, 
-                           avg_rating = avg_rating, has_rating = has_rating, recent_revs = recent_revs)
+                           avg_rating = avg_rating, has_rating = has_rating, recent_revs = recent_revs, num_rating = num_rating)

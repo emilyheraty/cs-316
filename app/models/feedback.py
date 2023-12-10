@@ -322,6 +322,18 @@ class Feedback():
         return rows
     
 
+    def get_recent_customer_feedback_seller(seller_id, limit):
+        rows = app.db.execute("""
+            SELECT *
+            FROM Feedback
+            WHERE seller_id = :seller_id AND
+            review_type = 'seller'
+            ORDER BY time_posted DESC
+            LIMIT :limit
+                              """, seller_id = seller_id, limit = limit)
+        return rows
+    
+
     @staticmethod
     def get_partial_customer_feedback_seller(seller_id, per_page, off):
         rows = app.db.execute("""
