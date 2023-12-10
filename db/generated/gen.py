@@ -130,7 +130,7 @@ def gen_products(num_products, seller_ids):
                 continue
             nameset.add(name)    
             cid = fake.random_element(elements=seller_ids)
-            price = f'{str(fake.random_int(max=75))}.{fake.random_int(max=99):02}'
+            price = f'{str(fake.random_int(min=10,max=75))}.{fake.random_int(max=99):02}'
             description = description_elements[index]
             category = category_elements[index]
           #rating = f'{str(fake.random_int(max=4))}.{fake.random_int(max=.9):02}'
