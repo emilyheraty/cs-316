@@ -100,11 +100,12 @@ def gen_purchases(num_purchases, available_pids):
                 print(f'{id}', end=' ', flush=True)
             uid = fake.random_int(min=0, max=num_users-1)
             pid = fake.random_element(elements=available_pids)
+            sid = fake.random_element(elements=seller_ids)
             time_purchased = fake.date_time()
             total_amount = fake.pyfloat(right_digits=2, positive=True, min_value = 0.01, max_value = 999999999.99)
             number_of_items = fake.random_int(min=0, max=100)
             fulfillment_status = fake.date_time()
-            writer.writerow([id, uid, pid, time_purchased, total_amount, number_of_items, fulfillment_status, 0])
+            writer.writerow([id, uid, pid, sid, time_purchased, total_amount, number_of_items, fulfillment_status, 0])
         print(f'{num_purchases} generated')
     return
 
