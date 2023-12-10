@@ -58,13 +58,20 @@ def gen_products(num_products, seller_ids):
     available_pids = []
     product_names = []
     nameset = set()
+
+    name_elements = []
+    with open('Woo_Product_Dummy_Data_Set_Simpleand_Variable.csv', newline='') as csvfile:
+        data = csv.reader(csvfile)
+        for row in data:
+            name_elements.append(row[0])
+
     with open('Products.csv', 'w') as f:
         writer = get_csv_writer(f)
         print('Products...', end=' ', flush=True)
         for pid in range(num_products):
             if pid % 100 == 0:
                 print(f'{pid}', end=' ', flush=True)
-            name = fake.sentence(nb_words=4)[:-1]
+            name = fake.random_element(elements = name_elements)
             if name in nameset:
                 pid-=1
                 continue
