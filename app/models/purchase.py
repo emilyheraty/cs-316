@@ -197,3 +197,20 @@ WHERE id = :id and Purchases.pid = Products.id
 ''',
                               id=seller_id)
         return Purchase(*(rows[0])) if rows else None
+    
+    @staticmethod
+    def getOrder(order_id):
+        rows = app.db.execute('''
+SELECT Purchases.fulfillment_status
+FROM Purchases
+WHERE order_id = :order_id
+''',
+                              order_id=order_id)
+        if rows is not None:
+            if any(element is None for element in rows[0]):
+                return "Order not Fulfilled"
+            else:
+                return "Order Fulfilled"
+        else:
+            return "Order not Found"
+        return rows if rows else None
