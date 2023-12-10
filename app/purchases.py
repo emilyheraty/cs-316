@@ -10,7 +10,7 @@ from flask_paginate import Pagination, get_page_parameter
 from flask import Blueprint
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, DecimalField, IntegerField, SearchField, DateTimeField, SelectField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
-
+import datetime
 
 bp = Blueprint('purchases', __name__)
 
@@ -129,9 +129,13 @@ def orders():
             print("WHY IS IT NOT WORKING")
             order_time = form_fulfilled.time.data
             bid = form_fulfilled.buyer.data
-            fulfilled = form_fulfilled.status.data
-            print("fulfilled?: ", fulfilled)
-            result = Order.updateFulfillmentStatus(current_user.id, order_time, bid, fulfilled)
+            status = form_fulfilled.status.data
+            if status:
+                fulfilled_time = datetime.datetime.now()
+            else:
+                fulfilled_time = None
+            print("fulfilled?: ", fulfilled_time)
+            result = Order.updateFulfillmentStatus(current_user.id, order_time, bid, fulfilled_time)
             print("WHAT")
             if result == 0:
                 return render_template('orders.html', 
@@ -145,41 +149,41 @@ def orders():
         else:
             print("Fulfillment Form validation failed:", form_fulfilled.errors)
 
-        # if searchForm.is_submitted():
-        #     print("HELLO?")
-        #     str = searchForm.keyword.data
-        #     orders = Order.searchProductName(current_user.id, str, per_page, offset)
-        #     print("GET ANY ORDERS BACK?: ", orders)
-        #     pagination = Pagination(page=page, per_page=per_page, total=len(orders))
-        #     return render_template('orders.html', 
-        #                                 items=orders, 
-        #                                 pagination=pagination, 
-        #                                 isseller=isseller,
-        #                                 form_fulfilled=form_fulfilled,
-        #                                 searchForm=searchForm,
-        #                                 filterForm=filterForm)
-        # else:
-        #     print("search form data: ", request.form)
-        #     print("Search Form validation failed: ", searchForm.errors)
+        if searchForm.is_submitted():
+            print("HELLO?")
+            str = searchForm.keyword.data
+            orders = Order.searchProductName(current_user.id, str, per_page, offset)
+            print("GET ANY ORDERS BACK?: ", orders)
+            pagination = Pagination(page=page, per_page=per_page, total=len(orders))
+            return render_template('orders.html', 
+                                        items=orders, 
+                                        pagination=pagination, 
+                                        isseller=isseller,
+                                        form_fulfilled=form_fulfilled,
+                                        searchForm=searchForm,
+                                        filterForm=filterForm)
+        else:
+            print("search form data: ", request.form)
+            print("Search Form validation failed: ", searchForm.errors)
     
 
-        # if filterForm.is_submitted():
-        #     if filterForm.status.data == 'fulfilled':
-        #         status = True
-        #     elif filterForm.status.data == 'not_fulfilled':
-        #         status = False
-        #     else:
-        #         return redirect(url_for('purchases.orders'))
-        #     print("status: ", status)
-        #     orders = Order.getOrdersByStatus(status, current_user.id, per_page, offset)
-        #     pagination = Pagination(page=page, per_page=per_page, total=len(orders))
-        #     return render_template('orders.html', 
-        #                                 items=orders, 
-        #                                 pagination=pagination, 
-        #                                 isseller=isseller,
-        #                                 form_fulfilled=form_fulfilled,
-        #                                 searchForm=searchForm,
-        #                                 filterForm=filterForm)
+        if filterForm.is_submitted():
+            if filterForm.status.data == 'fulfilled':
+                status = True
+            elif filterForm.status.data == 'not_fulfilled':
+                status = False
+            else:
+                return redirect(url_for('purchases.orders'))
+            print("status: ", status)
+            orders = Order.getOrdersByStatus(status, current_user.id, per_page, offset)
+            pagination = Pagination(page=page, per_page=per_page, total=len(orders))
+            return render_template('orders.html', 
+                                        items=orders, 
+                                        pagination=pagination, 
+                                        isseller=isseller,
+                                        form_fulfilled=form_fulfilled,
+                                        searchForm=searchForm,
+                                        filterForm=filterForm)
 
         return render_template('orders.html', items=lineitems_partial, pagination=pagination, isseller=isseller, form_fulfilled=form_fulfilled,searchForm=searchForm, filterForm=filterForm)
 
