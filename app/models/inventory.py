@@ -114,6 +114,16 @@ WHERE Inventory.id = :id AND Inventory.product_name = :product_name
                                 id=id)
         print("updating")
         return res
+    
+    @staticmethod
+    def getByCategory(id):
+        rows = app.db.execute('''
+SELECT DISTINCT Inventory.id, Products.category
+FROM Inventory JOIN Products ON Products.name = Inventory.product_name
+WHERE Inventory.id = :uid
+''',
+                              uid=id)
+        return rows
 
 
 #     @staticmethod

@@ -143,15 +143,16 @@ GROUP BY Users.state
         return rows
     
     @staticmethod
-    def get_all_by_state_product(uid, name):
+    def get_all_by_state_category(uid, category):
         rows = app.db.execute('''
-SELECT Users.state, SUM(Purchases.total_amount) as total_amount
+SELECT Users.state, SUM(Purchases.number_of_items) as number_of_items
 FROM Purchases
 JOIN Users ON Purchases.uid = Users.id
-JOIN (SELECT * FROM Products WHERE Products.creator_id = :uid AND Products.name = :name) as d1 ON Purchases.pid = d1.id                  
+JOIN (SELECT * FROM Products WHERE Products.creator_id = :uid AND Products.category = :category) as d1 ON Purchases.pid = d1.id                  
+WHERE category = :category
 GROUP BY Users.state
 ''',
-                              uid=uid, name=name)
+                              uid=uid, category=category)
         return rows
 
     @staticmethod
