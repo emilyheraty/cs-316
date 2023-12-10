@@ -111,14 +111,22 @@ def gen_products(num_products, seller_ids):
             if pid % 100 == 0:
                 print(f'{pid}', end=' ', flush=True)
             name = fake.random_element(elements = name_elements)
+            count = 0
+            index = 0
+            for i in name_elements:
+                if i == name :
+                    index = count
+                else:
+                    count = count + 1
+
             if name in nameset:
                 pid-=1
                 continue
             nameset.add(name)    
             cid = fake.random_element(elements=seller_ids)
             price = f'{str(fake.random_int(max=500))}.{fake.random_int(max=99):02}'
-            description = fake.random_element(elements = description_elements)
-            category = fake.random_element(elements=category_elements)
+            description = description_elements[index]
+            category = category_elements[index]
           #rating = f'{str(fake.random_int(max=4))}.{fake.random_int(max=.9):02}'
             available_pids.append(pid)
             product_names.append(name)
