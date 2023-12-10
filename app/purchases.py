@@ -264,10 +264,9 @@ def statistics():
         for purchase in grouped_data_m:
             months_data.append(months[int(purchase[0]) - 1])
             total_amount.append(int(purchase[1]))
- 
         return render_template('statistics.html', isseller=isseller, top_products=top_products, count=count, 
                                 available_years=availableYears, year=spendingForm.years.data, total_amount=total_amount,
-                                spendingForm=spendingForm, productForm=productForm, months=months_data, states=states,
+                                spendingForm= SpendingForm(obj=spendingForm), productForm=productForm, months=months_data, states=states,
                                 product_count=product_count, product=productForm.product.data)
 
 

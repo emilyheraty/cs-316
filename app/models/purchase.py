@@ -105,6 +105,7 @@ SELECT EXTRACT(Year FROM Purchases.time_purchased) AS Year, SUM(total_amount) as
 FROM Purchases
 WHERE uid = :uid
 GROUP BY Year
+ORDER BY Year ASC
 ''',
                               uid=uid)
         return rows
@@ -128,6 +129,7 @@ SELECT EXTRACT(Month FROM Purchases.time_purchased) AS Month, SUM(total_amount) 
 FROM Purchases
 WHERE uid = :uid AND EXTRACT(Year FROM Purchases.time_purchased) = :year
 GROUP BY Month
+ORDER BY Month ASC
 ''',
                               uid=uid, year=year)
         return rows
