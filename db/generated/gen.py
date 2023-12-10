@@ -119,7 +119,7 @@ def gen_purchases(num_purchases, available_pids):
         print(f'{num_purchases} generated')
     return
 
-def gen_carts(num_carts, seller_ids):
+def gen_carts(num_carts, seller_ids, pids):
     keyset = set()
     num = num_carts
     with open('Carts.csv', 'w') as f:
@@ -130,7 +130,7 @@ def gen_carts(num_carts, seller_ids):
                 print(f'{i}', end=' ', flush=True)
             bid = fake.random_int(min=0, max=num_users-1)
             sid = fake.random_element(elements=seller_ids)
-            pid = fake.random_int(min=0, max=num_products-1)
+            pid = fake.random_element(elements=pids)
             if (bid, pid) in keyset or bid==sid:
                 num -= 1
                 continue
@@ -185,6 +185,6 @@ sellers = gen_users(num_users)
 seller_ids = gen_sellers(sellers)
 available_pids, product_names = gen_products(num_products, seller_ids)
 gen_purchases(num_purchases, available_pids)
-gen_carts(num_carts, seller_ids)
+gen_carts(num_carts, seller_ids, available_pids)
 gen_inventory(num_inventory, seller_ids, product_names)
 gen_feedback(num_feedback, available_pids, seller_ids)
