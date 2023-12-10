@@ -110,6 +110,7 @@ def gen_products(num_products, seller_ids):
             price = f'{str(fake.random_int(max=500))}.{fake.random_int(max=99):02}'
             description = fake.random_element(elements = description_elements)
             category = fake.random_element(elements=category_elements)
+            
           #rating = f'{str(fake.random_int(max=4))}.{fake.random_int(max=.9):02}'
             available_pids.append(pid)
             product_names.append(name)
