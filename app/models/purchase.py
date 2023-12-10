@@ -189,16 +189,21 @@ FROM Purchases
             print(str(e))
 
     @staticmethod
-    def get_by_sellerid(seller_id):
+    def getOrder(order_id):
         rows = app.db.execute('''
-SELECT Purchases.id, Purchases.uid, Purchases.pid, Purchases.time_purchased, Purchases.total_amount, Purchases.number_of_items, Purchases.fulfillment_status, Purchases.order_id, Products.name
-FROM Purchases, Products
-WHERE id = :id and Purchases.pid = Products.id
+SELECT Purchases.fulfillment_status
+FROM Purchases
+WHERE order_id = :order_id
 ''',
-                              id=seller_id)
-        return Purchase(*(rows[0])) if rows else None
-
-
+                              order_id=order_id)
+        if rows is not None:
+            if any(element is None for element in rows[0]):
+                return "Order not Fulfilled"
+            else:
+                return "Order Fulfilled"
+        else:
+            return "Order not Found"
+        
     @staticmethod
     def get_by_sellerid(seller_id):
         rows = app.db.execute('''
@@ -208,3 +213,4 @@ WHERE id = :id and Purchases.pid = Products.id
 ''',
                               id=seller_id)
         return Purchase(*(rows[0])) if rows else None
+
