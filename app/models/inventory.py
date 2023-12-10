@@ -37,6 +37,7 @@ OFFSET :off
 
     @staticmethod
     def getInventoryProducts(str, per_page, off, id):
+        print("trying out this")
         rows = app.db.execute('''
 SELECT id, product_name, number_available
 FROM Inventory
@@ -50,6 +51,7 @@ OFFSET :off
                                 str=str,
                                 per_page=per_page,
                                 off=off)
+        print("still trying man")
         return [Inventory(*row) for row in rows]
 
     @staticmethod
@@ -60,10 +62,11 @@ FROM Users
 WHERE Users.id=:id
 ''',
                                 id=id)
+        print(sid)
         return sid # edit this for listing product name and num available
 
     @staticmethod
-    def isSeller(id): # is the user a seller
+    def isSeller(id):
         bool = app.db.execute('''
 SELECT DISTINCT is_seller
 FROM Users
@@ -100,6 +103,7 @@ WHERE Inventory.id = :id AND Inventory.product_name = :product_name
 
     @staticmethod
     def updateProductQuantity(id, product_name, number_available):
+        print("hereeeee")
         res = app.db.execute('''
 UPDATE Inventory
 SET number_available = :number_available
@@ -108,6 +112,39 @@ WHERE Inventory.id = :id AND Inventory.product_name = :product_name
                                 product_name=product_name,
                                 number_available=number_available,
                                 id=id)
+        print("updating")
+        return res
+    
+    @staticmethod
+    def getByCategory(id):
+        rows = app.db.execute('''
+SELECT DISTINCT Inventory.id, Products.category
+FROM Inventory JOIN Products ON Products.name = Inventory.product_name
+WHERE Inventory.id = :uid
+''',
+                              uid=id)
+        return rows
+
+    def decreaseQuantity(id, product_name, quantity):
+        res = app.db.execute('''
+UPDATE Inventory
+SET number_available = number_available - :quantity
+WHERE Inventory.id = :id and Inventory.product_name = :product_name;
+''',
+                                product_name=product_name,
+                                quantity=quantity,
+                                id=id)
+        return res
+    
+    @staticmethod
+    def getQuantityBySidPname(sid, pname):
+        res = app.db.execute('''
+SELECT number_available
+FROM Inventory
+WHERE Inventory.id = :sid and Inventory.product_name = :product_name;
+''',
+                                product_name=pname,
+                                sid=sid)
         return res
 
 #     @staticmethod
@@ -120,3 +157,19 @@ WHERE Inventory.id = :id AND Inventory.product_name = :product_name
 # AND Sellers.id = :id)
 # ''',
 #                                 id=id)
+class Listing:
+    def __init__(self, sid, sfirstname, slastname, qty):
+        self.sid = sid
+        self.sfirstname = sfirstname
+        self.slastname = slastname
+        self.qty = qty
+    
+    @staticmethod
+    def get_listings_by_product_name(name):
+        rows = app.db.execute('''
+SELECT Inventory.id, Users.firstname, Users.lastname, Inventory.number_available
+FROM Inventory, Users
+WHERE Inventory.product_name = :name and Inventory.id = Users.id
+''',
+                              name=name)
+        return [Listing(*row) for row in rows] if rows is not None else None
