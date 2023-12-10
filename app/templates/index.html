@@ -17,8 +17,8 @@
   <tbody>
     {% for product in avail_products%}
       <tr>
-        <td width=100px>
-          <img src="{{product.category}}.jpg"></img>
+        <td width=100px height="100px">
+          <img src="static/css/{{product.category}}.jpg" width="200" height="200"></img>
         </td>        
         <td><a href="/detailed_product/{{product.name}}">{{product.name}}</a></td>
         <td>{{product.get_rating(product.id)}}</td>
