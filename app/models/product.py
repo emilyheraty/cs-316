@@ -124,3 +124,13 @@ WHERE category LIKE '%' || :str || '%'
 ''',
                                 str=str)
         return [Product(*row) for row in rows]
+
+    @staticmethod
+    def searchProduct(str):
+        rows = app.db.execute('''
+SELECT *
+FROM Products
+WHERE name LIKE '%' || :str || '%'
+''',
+                                str=str)
+        return [Product(*row) for row in rows]

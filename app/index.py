@@ -48,6 +48,13 @@ def index():
         search = True
 
     filterForm = FilterForm()
+    searchForm = SearchForm()
+    
+    if searchForm.is_submitted():
+        products = Product.searchProduct(searchForm.keyword.data)
+        pagination = Pagination(page=page, per_page=per_page, offset=offset, total=len(products), search=search, record_name='products')
+        return render_template('index.html', avail_products=products[offset: offset + per_page], isseller=is_seller, pagination=pagination, filterForm=filterForm, searchForm=searchForm)
+
     if filterForm.is_submitted():
         if filterForm.status.data == 'hoodies_sweatshirts':
             str = "Hoodies"
@@ -72,7 +79,7 @@ def index():
         products = Product.getOneCategory(str)
         print("Number of products in category: ", len(products))
         pagination = Pagination(page=page, per_page=per_page, offset=offset, total=len(products), search=search, record_name='products')
-        return render_template('index.html', avail_products=products[offset: offset + per_page], isseller=is_seller, pagination=pagination, filterForm=filterForm)
+        return render_template('index.html', avail_products=products[offset: offset + per_page], isseller=is_seller, pagination=pagination, filterForm=filterForm, searchForm=searchForm)
 
         # pagination = Pagination(page=page, per_page=per_page, total=len(purchases))
         # return render_template('index.html',
@@ -83,5 +90,5 @@ def index():
     pagination = Pagination(page=page, per_page=per_page, offset=offset, total=len(products_all), search=search, record_name='products')
 
     # render the page by adding information to the index.html file
-    return render_template('index.html', avail_products=products_all[offset: offset + per_page], isseller=is_seller, pagination=pagination, filterForm=filterForm)
+    return render_template('index.html', avail_products=products_all[offset: offset + per_page], isseller=is_seller, pagination=pagination, filterForm=filterForm, searchForm=searchForm)
 

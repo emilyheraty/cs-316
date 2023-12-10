@@ -5,7 +5,14 @@
 <br><br>
 
 <h2>Products for sale:</h2>
+<br><br>
 
+<form action="" method="post">
+  {{ searchForm.hidden_tag() }}
+  <p>
+    {{ searchForm.keyword.label }}: {{ searchForm.keyword(size=32) }} {{ searchForm.submit() }}
+  </p>
+</form>
 <div>
   <a href="{{ url_for('index.index') }}" type="button" class="btn btn-light">View All Products</a>
   <form action="" method="post" style="text-align: right;">
