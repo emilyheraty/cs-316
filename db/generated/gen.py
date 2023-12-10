@@ -76,7 +76,13 @@ def gen_products(num_products, seller_ids):
     with open('Woo_Product_Dummy_Data_Set_Simple_and_Variable.csv', newline='') as csvfile:
         data = csv.reader(csvfile)
         for row in data:
-            name_elements.append(row[0])
+            new_name = row[0].split('-')
+            if len(new_name) >= 2:
+                new_name2=new_name[0]
+                new_name3 = new_name2.join(new_name[1])
+                name_elements.append(new_name2)
+            else:
+                name_elements.append(row[0])
             content = re.search(r'<p>(.*?)</p>', row[1], re.DOTALL)
             if content:
                 content = content.group(1)
