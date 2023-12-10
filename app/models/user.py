@@ -131,4 +131,18 @@ WHERE id = :id
         except Exception as e:
             print (str(e))
             return 0
+        
+    @staticmethod
+    def getBalanceById(id):
+        try:
+            bal = app.db.execute("""
+SELECT balance
+FROM Users
+WHERE id = :id
+""",
+                            id=id)
+            return bal
+        except Exception as e:
+            print (str(e))
+            return 0
 

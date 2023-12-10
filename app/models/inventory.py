@@ -126,6 +126,17 @@ WHERE Inventory.id = :id and Inventory.product_name = :product_name;
                                 quantity=quantity,
                                 id=id)
         return res
+    
+    @staticmethod
+    def getQuantityBySidPname(sid, pname):
+        res = app.db.execute('''
+SELECT number_available
+FROM Inventory
+WHERE Inventory.id = :sid and Inventory.product_name = :product_name;
+''',
+                                product_name=pname,
+                                sid=sid)
+        return res
 
 #     @staticmethod
 #     def addProductToInventory(id, product_name, number_available):
