@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Edit Product</h1>
+
+{% if error == 1 %}
+<h3 style="color:red">Could not edit product, please try again</h3>
+{% endif %}
+
+<h2>
+    Product Name: {{ product_name }}
+</h2>
+
+<form action="" method="post">
+    {{ form.hidden_tag() }}
+    <p>
+        {{ form.product_description.label }}<br/>
+        {{ form.product_description(value=description, size=100) }}<br/>
+        {% for error in form.product_description.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.product_category.label }}<br/>
+        {{ form.product_category(value=category, size=100) }}<br/>
+        {% for error in form.product_category.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.product_price.label }}<br/>
+        {{ form.product_price(value=price, size=32) }}<br/>
+        {% for error in form.product_price.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+    <p>{{ form.submit() }}</p>
+  </form>
+  
+  {% endblock %}

@@ -11,6 +11,7 @@ from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 from flask_paginate import Pagination, get_page_parameter
 
 from .models.inventory import Inventory
+from .models.product import Product
 
 
 from flask import Blueprint
@@ -34,11 +35,20 @@ class Search(FlaskForm):
     search_input = SearchField('Product Name', validators=[DataRequired()])
     submit = SubmitField('Search')
 
+class CreateNewProduct(FlaskForm):
+    product_name = StringField('Product Name', validators=[DataRequired()])
+    product_description = StringField('Product Description', validators=[DataRequired()])
+    product_category = StringField('Category', validators=[DataRequired()])
+    product_price = DecimalField('Price', validators=[DataRequired()])
+    add_to_inventory = BooleanField('Check to Add to Inventory')
+    quantity = IntegerField('Quantity to Add to Inventory')
+    submit = SubmitField('Create')
+
 @bp.route('/inventory/<int:seller_id>', methods = ['GET', 'POST'])
 def inventory(seller_id):
     # get all available products for sale:
     items = Inventory.getInventory(seller_id)
-    per_page = 4
+    per_page = 10
     page = request.args.get(get_page_parameter(), type=int, default=1)
     offset = (page - 1) * per_page
     items_partial = Inventory.getPartialInventory(seller_id, per_page, offset)
@@ -187,3 +197,25 @@ def update_products(seller_id):
                 return render_template('inventory-updateproduct.html', form=form,isseller=1, error=1)
             return redirect(url_for('inventory.inventory', seller_id=current_user.id))
     return render_template('inventory-updateproduct.html', form=form, isseller=1, error=0)
+
+@bp.route('/inventory/<int:seller_id>/create', methods = ['GET', 'POST'])
+def create_products(seller_id):
+    seller_info = Inventory.getSellerInfo(seller_id)
+    if current_user.is_authenticated:
+        items = Inventory.getInventory(current_user.id)
+        form = CreateNewProduct()
+        if form.validate_on_submit():
+            name = form.product_name.data
+            description = form.product_description.data
+            category = form.product_category.data
+            price = form.product_price.data
+            cid = seller_id
+            result = Product.create_new_product(description, category, cid, name, price)
+            if result == 0:
+                return render_template('create_product.html', form=form,isseller=1, error=1)
+            add_to_inventory = form.add_to_inventory.data
+            quantity = form.quantity.data
+            if add_to_inventory and (quantity != 0):
+                Inventory.addToInventory(seller_id, name, quantity)
+            return redirect(url_for('inventory.inventory', seller_id=current_user.id))
+    return render_template('create_product.html', form=form, isseller=1, error=0)

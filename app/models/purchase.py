@@ -95,3 +95,14 @@ WHERE id = :id and Purchases.pid = Products.id
 ''',
                               id=seller_id)
         return Purchase(*(rows[0])) if rows else None
+
+
+    @staticmethod
+    def get_by_sellerid(seller_id):
+        rows = app.db.execute('''
+SELECT Purchases.id, Purchases.uid, Purchases.pid, Purchases.time_purchased, Purchases.total_amount, Purchases.number_of_items, Purchases.fulfillment_status, Purchases.order_id, Products.name
+FROM Purchases, Products
+WHERE id = :id and Purchases.pid = Products.id
+''',
+                              id=seller_id)
+        return Purchase(*(rows[0])) if rows else None
