@@ -124,11 +124,9 @@ def detailedOrder(product_name):
     desc = prod.description
     p = prod.price
     prod_id = prod.id
-    avg_rating = Feedback.avg_rating_product(prod_id)[0][0]
-    num_rating = Feedback.num_rating_product(prod_id)[0][0]
-    if avg_rating is not None:
-        avg_rating = round(avg_rating, 2)
-    has_rating = avg_rating is not None
+    avg_rating = Feedback.avg_rating_product(prod_id)
+    num_rating = Feedback.num_rating_product(prod_id)
+    has_rating = Feedback.prod_feedback_exists(prod.id)
     if has_rating:
         recent_revs = Feedback.get_prod_recent_feedback(prod_id, 5)
    
