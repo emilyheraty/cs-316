@@ -37,6 +37,7 @@ def customer_feedback(seller_id):
 
     if current_user.is_authenticated:
         user_id = current_user.id
+        is_seller = Inventory.isSeller(current_user.id)[0][0]
         #if(Inventory.isSeller(seller_id)[0][0]):
         full_feedback_seller = Feedback.get_customer_feedback_seller(seller_id)
         partial_feedback_seller = Feedback.get_partial_customer_feedback_seller(seller_id, per_page, offset)
@@ -60,7 +61,7 @@ def customer_feedback(seller_id):
                               search=search_2, record_name='product reviews')
     
     return render_template('customer_feedback.html',partial_feedback_seller=partial_feedback_seller, 
-                           partial_feedback_product=partial_feedback_product, pagination = pagination, pagination2 = pagination2)
+                           partial_feedback_product=partial_feedback_product, pagination = pagination, pagination2 = pagination2, isseller=is_seller)
 
 
 @bp.route('/all_feedback', methods=['GET'])
@@ -81,6 +82,7 @@ def all_feedback():
 
     if current_user.is_authenticated:
         user_id = current_user.id
+        is_seller = Inventory.isSeller(current_user.id)[0][0]
         full_feedback = Feedback.get_all_feedback(user_id)
         partial_feedback = Feedback.get_partial_feedback(user_id, per_page, offset1)
         pending = Feedback.pending_products(user_id)
@@ -112,7 +114,7 @@ def all_feedback():
     pagination = Pagination(page=page1, per_page=per_page, total=len(full_feedback), search = search, offset1 = offset1, record_name = 'product reviews')
     pagination_2 = Pagination(page=page2, per_page=per_page, total=len(purchase_name_pending), search = search, offset2 = offset2, record_name = 'purchases to review')
     
-    return render_template('all_feedback.html', partial_feedback = partial_feedback, purchase_name_pending = purchase_name_pending, pagination = pagination, pending = pending, partial_pending = partial_pending, pagination_2 = pagination_2, names = names)
+    return render_template('all_feedback.html', partial_feedback = partial_feedback, purchase_name_pending = purchase_name_pending, pagination = pagination, pending = pending, partial_pending = partial_pending, pagination_2 = pagination_2, names = names, isseller=is_seller)
 
 class FeedbackForm(FlaskForm):
     rating = SelectField('Rating', choices=[('1', '1'), ('2', '2'), ('3', '3'),
@@ -129,6 +131,9 @@ class FeedbackForm(FlaskForm):
 def post_feedback(pid):
     if current_user.is_authenticated is False:
         return redirect(url_for('users.login'))
+    else:
+        is_seller = Inventory.isSeller(current_user.id)[0][0]
+
     user_id = current_user.id
     already_reviewed = (not(Feedback.check_past(pid, user_id)))
     seller_id = Feedback.get_seller(pid)[0][0]
@@ -141,13 +146,16 @@ def post_feedback(pid):
         if Feedback.add_product_feedback(user_id, pid, seller_id, 'product', form.rating.data, form.comment.data, datetime.datetime.now()):
             #flash('Feedback successfully submitted!')
             return redirect(url_for('feedback.all_feedback'))
-    return render_template('post_feedback.html', title='Submit', form=form, already_reviewed = already_reviewed)
+    return render_template('post_feedback.html', title='Submit', form=form, already_reviewed = already_reviewed, isseller=is_seller)
 
 
 @bp.route('/post_feedback_seller<int:seller_id>', methods=['GET', 'POST'])
 def post_feedback_seller(seller_id):
     if current_user.is_authenticated is False:
-        return redirect(url_for('users.login'))    
+        return redirect(url_for('users.login'))
+    else:
+        is_seller = Inventory.isSeller(current_user.id)[0][0]
+    
     user_id = current_user.id
     already_reviewed=(not( Feedback.check_past_seller(seller_id, user_id)))
     if(not( Feedback.check_purchased(seller_id, user_id))):
@@ -161,7 +169,7 @@ def post_feedback_seller(seller_id):
         if Feedback.add_product_feedback(user_id, None, seller_id, 'seller', form.rating.data, form.comment.data, datetime.datetime.now()):
             #flash('Feedback successfully submitted!')
             return redirect(url_for('feedback.all_feedback'))
-    return render_template('post_feedback_seller.html', title='Submit', form=form, already_reviewed = already_reviewed)
+    return render_template('post_feedback_seller.html', title='Submit', form=form, already_reviewed = already_reviewed, isseller=is_seller)
 
 
 class FeedbackEditForm(FlaskForm):
@@ -175,12 +183,15 @@ class FeedbackEditForm(FlaskForm):
 def edit_feedback(id):
     if current_user.is_authenticated is False:
         return redirect(url_for('users.login'))
+    else:
+        is_seller = Inventory.isSeller(current_user.id)[0][0]
+
     form = FeedbackEditForm()
     if form.is_submitted():
         if Feedback.edit_feedback(id, form.rating.data, form.comment.data, datetime.datetime.now()):
             #flash('Feedback successfully edited!')
             return redirect(url_for('feedback.all_feedback'))
-    return render_template('edit_feedback.html', title='Submit', form=form)
+    return render_template('edit_feedback.html', title='Submit', form=form, isseller=is_seller)
 
 
 class FeedbackDeleteForm(FlaskForm):
@@ -190,11 +201,13 @@ class FeedbackDeleteForm(FlaskForm):
 def delete_feedback(id):
     if current_user.is_authenticated is False:
         return redirect(url_for('users.login'))
+    else:
+        is_seller = Inventory.isSeller(current_user.id)[0][0]
     review = Feedback.get_feedback_info(id)
     form = FeedbackDeleteForm()
     if form.is_submitted():
         if Feedback.delete_feedback(id):
             #flash('Feedback successfully deleted.')
             return redirect(url_for('feedback.all_feedback'))
-    return render_template('delete_feedback.html', review = review, title = 'Delete', form = form)
+    return render_template('delete_feedback.html', review = review, title = 'Delete', form = form, isseller=is_seller)
     

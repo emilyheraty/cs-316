@@ -2,6 +2,14 @@
 
 {% block content %}
 
+<p style="margin-top: 10px;">
+  <a href="{{ url_for('index.index') }}">Home</a>
+  /
+  <a href="{{ url_for('users.account') }}">Account</a> 
+  /
+  <a href="{{ url_for('inventory.inventory', seller_id=current_user.id) }}">Inventory</a>
+  / Add
+</p>
 <h1>Add Product to Inventory</h1>
 
 {% if error == 1 %}

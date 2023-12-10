@@ -50,7 +50,7 @@ ORDER BY time_purchased DESC
     @staticmethod
     def get_by_natural_time(uid):
         rows = app.db.execute('''
-SELECT time_purchased, total_amount, number_of_items
+SELECT Purchases.id, Purchases.uid, Purchases.pid, Purchases.time_purchased, Purchases.total_amount, Purchases.number_of_items, Purchases.fulfillment_status, Purchases.order_id, Products.name
 FROM Purchases, Products
 WHERE uid = :uid and Purchases.pid = Products.id
 ORDER BY time_purchased ASC
@@ -61,7 +61,7 @@ ORDER BY time_purchased ASC
     @staticmethod
     def get_by_product_name(name, uid):
         rows = app.db.execute('''
-SELECT Purchases.id, uid, pid, time_purchased, total_amount, number_of_items, fulfillment_status
+SELECT Purchases.id, uid, pid, time_purchased, total_amount, number_of_items, fulfillment_status, Purchases.order_id, Products.name
 FROM (Purchases JOIN Products ON Purchases.pid = Products.id)
 WHERE name = :name AND uid = :uid
                               ''',
@@ -71,9 +71,9 @@ WHERE name = :name AND uid = :uid
     @staticmethod
     def get_by_ascending_amount(uid):
         rows = app.db.execute('''
-SELECT id, uid, pid, time_purchased, total_amount, number_of_items, fulfillment_status
-FROM Purchases
-WHERE uid = :uid
+SELECT Purchases.id, Purchases.uid, Purchases.pid, Purchases.time_purchased, Purchases.total_amount, Purchases.number_of_items, Purchases.fulfillment_status, Purchases.order_id, Products.name
+FROM Purchases, Products
+WHERE uid = :uid and Purchases.pid = Products.id
 ORDER BY total_amount ASC
                               ''', uid=uid)
         return [Purchase(*row) for row in rows]
@@ -81,22 +81,31 @@ ORDER BY total_amount ASC
     @staticmethod
     def get_by_descending_amount(uid):
         rows = app.db.execute('''
-SELECT id, uid, pid, time_purchased, total_amount, number_of_items, fulfillment_status
-FROM Purchases
-WHERE uid = :uid
+SELECT Purchases.id, Purchases.uid, Purchases.pid, Purchases.time_purchased, Purchases.total_amount, Purchases.number_of_items, Purchases.fulfillment_status, Purchases.order_id, Products.name
+FROM Purchases, Products
+WHERE uid = :uid and Purchases.pid = Products.id
 ORDER BY total_amount DESC
                               ''', uid=uid)
         return [Purchase(*row) for row in rows]
 
     @staticmethod
     def get_by_status(status, uid):
-        rows = app.db.execute('''
-SELECT id, uid, pid, time_purchased, total_amount, number_of_items, fulfillment_status
+        if(status):
+            rows = app.db.execute('''
+SELECT *
 FROM Purchases
-WHERE fulfillment_status = :status AND uid = :uid
-                              ''',
-                              status=status, uid=uid)
+WHERE fulfillment_status IS NOT NULL AND uid = :uid
+                                ''',
+                                status=status, uid=uid)
+        else:
+            rows = app.db.execute('''
+SELECT *
+FROM Purchases
+WHERE fulfillment_status IS NULL AND uid = :uid
+                                ''',
+                                status=status, uid=uid)
         return [Purchase(*row) for row in rows]
+
         
     @staticmethod
     def get_all_years(uid):
