@@ -141,20 +141,56 @@ def submitCart():
     # Increment quantity
     return redirect('/purchases')
 
+
+class EditProduct(FlaskForm):
+    product_description = StringField('Product Description', validators=[DataRequired()])
+    product_category = StringField('Category', validators=[DataRequired()])
+    product_price = DecimalField('Price', validators=[DataRequired()])
+    submit = SubmitField('Save')
+
 @bp.route('/detailed_product/<string:product_name>', methods=['GET', 'POST'])
 def detailedOrder(product_name):
     listings = Listing.get_listings_by_product_name(product_name)
     prod = Product.get_product_by_name(product_name)
     desc = prod.description
     p = prod.price
+    cid = prod.cid
     prod_id = prod.id
     avg_rating = Feedback.avg_rating_product(prod_id)
     num_rating = Feedback.num_rating_product(prod_id)
     has_rating = Feedback.prod_feedback_exists(prod.id)
     if has_rating:
         recent_revs = Feedback.get_prod_recent_feedback(prod_id, 5)
-   
+
     else:
         recent_revs = []
     return render_template('detailed_product.html', items=listings, description = desc, price = p, product_name=product_name, 
-                           avg_rating = avg_rating, has_rating = has_rating, recent_revs = recent_revs, num_rating = num_rating)
+                           avg_rating = avg_rating, has_rating = has_rating, recent_revs = recent_revs, num_rating = num_rating, cid=cid)
+
+
+
+@bp.route('/detailed_product/<string:product_name>/edit', methods=['GET', 'POST'])
+def editProductDetails(product_name):
+    prod = Product.get_product_by_name(product_name)
+    desc = prod.description
+    p = prod.price
+    cid = prod.cid
+    prod_id = prod.id
+    category = prod.category
+    form = EditProduct()
+    if form.validate_on_submit():
+        description = form.product_description.data
+        category = form.product_category.data
+        price = form.product_price.data
+        cid = current_user.id
+        result = Product.update_product_details(cid, product_name, description, category, price)
+        if result == 0:
+            return render_template('edit_product.html',form=form, description = desc, price = p, 
+                            product_name=product_name, 
+                            category=category,
+                            cid=cid, error=1)
+        return redirect(url_for('cart_bp.detailedOrder', product_name = product_name))
+    return render_template('edit_product.html',form=form, description = desc, price = p, 
+                            product_name=product_name, 
+                            category=category,
+                            cid=cid, error=0)

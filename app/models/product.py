@@ -72,3 +72,31 @@ WHERE id = :id
 ''',
                               id=pid)
         return res[0][0] if res is not None else None
+
+    @staticmethod
+    def create_new_product(description, category, cid, name, price):
+        res = app.db.execute('''
+INSERT INTO Products (description, category, creator_id, name, price)
+VALUES(:description, :category, :cid, :name, :price)
+''',
+                              description=description,
+                              category=category,
+                              cid=cid,
+                              name=name,
+                              price=price)
+        return res
+
+
+    @staticmethod
+    def update_product_details(cid, name, description, category, price):
+        res = app.db.execute('''
+UPDATE Products
+SET description = :description, category = :category, price = :price
+WHERE creator_id = :cid AND name = :name
+''',
+                              description=description,
+                              category=category,
+                              cid=cid,
+                              name=name,
+                              price=price)
+        return res
