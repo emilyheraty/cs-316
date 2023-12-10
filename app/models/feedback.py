@@ -102,6 +102,15 @@ class Feedback():
         """, pid = pid, limit = limit)
         return rows
     
+    @staticmethod
+    def prod_feedback_exists(pid):
+        rows = app.db.execute( """
+        SELECT * FROM Feedback
+        WHERE pid = :pid
+        
+        """, pid = pid)
+        return len(rows)>0
+    
     
     @staticmethod
     def check_past_seller(seller_id, user_id):
@@ -250,45 +259,54 @@ class Feedback():
 
     @staticmethod
     def avg_rating_product(pid):
-        avg = app.db.execute("""
-                SELECT AVG(Feedback.rating)
-                FROM Feedback
-                WHERE pid = :pid
-                AND review_type = 'product'
-                             """, pid = pid)
-        return avg
+        result = app.db.execute('''
+        SELECT AVG(rating)
+        FROM Feedback
+        WHERE pid = :pid
+        ''', pid=pid)
+        if result[0][0] is None:
+            return None
+        else:
+            return round(result[0][0], 2)
 
 
     @staticmethod
     def avg_rating_seller(seller_id):
         avg = app.db.execute("""
-                SELECT AVG(Feedback.rating)
+                SELECT AVG(rating)
                 FROM Feedback
                 WHERE seller_id = :seller_id
                 AND review_type = 'seller'
                              """, seller_id = seller_id)
-        return avg
+        if avg[0][0] is None:
+            return None
+        else:
+            return round(avg[0][0], 2)
 
 
     @staticmethod
     def num_rating_seller(seller_id):
-        num = app.db.execute("""
-                SELECT COUNT(*)
-                FROM Feedback
-                WHERE seller_id = :seller_id
-                AND review_type = 'seller'
-                             """, seller_id = seller_id)
-        return num
+        result = app.db.execute('''
+        SELECT COUNT(rating)
+        FROM Feedback
+        WHERE seller_id = :seller_id
+        ''', seller_id = seller_id)
+        if result[0][0] is None:
+          return "No Reviews"
+        else:
+            return int(result[0][0])
     
     @staticmethod
     def num_rating_product(pid):
-        num = app.db.execute("""
-                SELECT COUNT(*)
-                FROM Feedback
-                WHERE pid = :pid
-                AND review_type = 'product'
-                             """, pid = pid)
-        return num
+        result = app.db.execute('''
+        SELECT COUNT(rating)
+        FROM Feedback
+        WHERE pid = :pid
+        ''', pid = pid)
+        if result[0][0] is None:
+          return "No Reviews"
+        else:
+            return int(result[0][0])
 
 
     @staticmethod

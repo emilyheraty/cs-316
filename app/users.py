@@ -185,11 +185,9 @@ def seller_public_profile(seller_id):
             
         seller_feedback = Feedback.get_recent_customer_feedback_seller(seller_id, 5)
 
-        avg_rating = Feedback.avg_rating_seller(seller_id)[0][0]
-        if avg_rating is not None:
-            avg_rating = round(avg_rating, 2)
+        avg_rating = Feedback.avg_rating_seller(seller_id)
         has_rating = avg_rating is not None
-        num_rating = Feedback.num_rating_seller(seller_id)[0][0]
+        num_rating = Feedback.num_rating_seller(seller_id)
         
 
         page1, per_page1, offset1 = get_page_args(page_parameter='page1', per_page_parameter='per_page1')
