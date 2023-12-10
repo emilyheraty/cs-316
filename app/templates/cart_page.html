@@ -2,8 +2,12 @@
 
 {% block content %}
 
-<br><br>
-
+<p style="margin-top: 10px;">
+  <a href="{{ url_for('index.index') }}">Home</a>
+  /
+  <a href="{{ url_for('users.account') }}">Account</a> 
+  / Cart
+</p>
 <h2>Items in Cart:</h2>
 {{ pagination.info }}
 <table class='table table-hover table-bordered container'>

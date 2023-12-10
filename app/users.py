@@ -100,9 +100,12 @@ def account():
 @bp.route('/account/profile', methods=['GET'])
 def profile():
     if current_user.is_authenticated is False:
+        isseller = 0
         return redirect(url_for('users.login'))
+    else:
+        isseller = Inventory.isSeller(current_user.id)[0][0]
     user = User.get_profile_info(current_user.id)
-    return render_template('profile.html', user=user)
+    return render_template('profile.html', user=user, isseller=isseller)
 
 
 class EditForm(FlaskForm):
@@ -133,7 +136,10 @@ class EditPasswordForm(FlaskForm):
 @bp.route('/account/profile/edit', methods=['GET', 'POST'])
 def edit():
     if current_user.is_authenticated is False:
+        isseller = 0
         return redirect(url_for('users.login'))
+    else:
+        isseller = Inventory.isSeller(current_user.id)[0][0]
     user = User.get_profile_info(current_user.id)
     form = EditForm(obj=user)
     if (form.validate_on_submit):
@@ -149,13 +155,16 @@ def edit():
                     return redirect(url_for('users.profile'))
         elif(form.cancel.data):
             return redirect(url_for('users.profile'))
-    return render_template('edit.html', form=form, user=user)
+    return render_template('edit.html', form=form, user=user, isseller=isseller)
 
 
 @bp.route('/account/profile/changepassword', methods=['GET', 'POST'])
 def changepassword():
     if current_user.is_authenticated is False:
+        isseller = 0
         return redirect(url_for('users.login'))
+    else:
+        isseller = Inventory.isSeller(current_user.id)[0][0]
     form = EditPasswordForm()
     if(form.cancel.data):
         return redirect(url_for('users.profile'))
@@ -167,7 +176,7 @@ def changepassword():
         if User.update_password(current_user.id, form.password.data):
             flash('Password successfully changed')
             return redirect(url_for('users.profile'))
-    return render_template('changepassword.html', form=form)
+    return render_template('changepassword.html', form=form, isseller=isseller)
 
 
 @bp.route('/seller/<int:seller_id>', methods=['GET'])

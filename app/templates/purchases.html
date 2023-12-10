@@ -55,9 +55,8 @@
         {% else %}
         <td>Not Fulfilled</td>
         {% endif %}
-        <td></td>
+        <td>{{purchase.getOrder(purchase.order_id)}}</td>
         <td><a class="btn btn-secondary" href="{{ url_for('users.seller_public_profile_by_pid', pid = purchase.pid) }}" role="button">Go to seller</a> </td>
-        
         {% if purchase.fulfillment_status%}
         <td> <a class="btn btn-secondary" href="{{ url_for('feedback.post_feedback', pid = purchase.pid) }}" role="button">Post review</a> </td>
         {% else %}

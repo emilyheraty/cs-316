@@ -150,6 +150,10 @@ class EditProduct(FlaskForm):
 
 @bp.route('/detailed_product/<string:product_name>', methods=['GET', 'POST'])
 def detailedOrder(product_name):
+    if current_user.is_authenticated:
+        is_seller = Inventory.isSeller(current_user.id)[0][0]
+    else:
+        is_seller = False
     listings = Listing.get_listings_by_product_name(product_name)
     prod = Product.get_product_by_name(product_name)
     desc = prod.description
@@ -165,7 +169,7 @@ def detailedOrder(product_name):
     else:
         recent_revs = []
     return render_template('detailed_product.html', items=listings, description = desc, price = p, product_name=product_name, 
-                           avg_rating = avg_rating, has_rating = has_rating, recent_revs = recent_revs, num_rating = num_rating, cid=cid)
+                           avg_rating = avg_rating, has_rating = has_rating, recent_revs = recent_revs, num_rating = num_rating, cid=cid, isseller=is_seller)
 
 
 

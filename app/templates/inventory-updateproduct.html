@@ -2,6 +2,14 @@
 
 {% block content %}
 
+<p style="margin-top: 10px;">
+  <a href="{{ url_for('index.index') }}">Home</a>
+  /
+  <a href="{{ url_for('users.account') }}">Account</a> 
+  /
+  <a href="{{ url_for('inventory.inventory', seller_id=current_user.id) }}">Inventory</a>
+  / Update
+</p>
 <h1>Update Inventory Product Quantity</h1>
 
 {% if error == 1 %}

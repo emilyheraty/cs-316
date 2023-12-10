@@ -71,12 +71,38 @@ def gen_products(num_products, seller_ids):
 
     name_elements = []
     description_elements = []
+    category_elements = []
 
     with open('Woo_Product_Dummy_Data_Set_Simple_and_Variable.csv', newline='') as csvfile:
         data = csv.reader(csvfile)
         for row in data:
             name_elements.append(row[0])
-            des = re.finditer(r'<p>.*?</p>', row[1])
+            content = re.search(r'<p>(.*?)</p>', row[1], re.DOTALL)
+            if content:
+                content = content.group(1)
+            else:
+                content = 'No content found'
+
+    
+            sentences = re.split(r'(?<=[.!?]) +', content)
+
+    
+            if sentences :
+                description_elements.append(sentences[0])
+            else:
+                description_elements.append('No sentences found')
+
+            
+            cat = row[2].split('>')
+            
+            if len(cat) >= 4:
+                cat2 = cat[3].split('|')
+                category_elements.append(cat2[0])
+            else:
+                category_elements.append(cat[0])
+
+            
+            
 
     with open('Products.csv', 'w') as f:
         writer = get_csv_writer(f)
@@ -85,14 +111,22 @@ def gen_products(num_products, seller_ids):
             if pid % 100 == 0:
                 print(f'{pid}', end=' ', flush=True)
             name = fake.random_element(elements = name_elements)
+            count = 0
+            index = 0
+            for i in name_elements:
+                if i == name :
+                    index = count
+                else:
+                    count = count + 1
+
             if name in nameset:
                 pid-=1
                 continue
             nameset.add(name)    
             cid = fake.random_element(elements=seller_ids)
             price = f'{str(fake.random_int(max=500))}.{fake.random_int(max=99):02}'
-            description = fake.sentence(nb_words=50)[:-1]
-            category = fake.random_element(elements=('food', 'household products', 'clothing', 'books'))
+            description = description_elements[index]
+            category = category_elements[index]
           #rating = f'{str(fake.random_int(max=4))}.{fake.random_int(max=.9):02}'
             available_pids.append(pid)
             product_names.append(name)
