@@ -9,7 +9,7 @@
 <br></br>
 <h2>Orders (Sellers)</h2>
 
-<form action="{{ url_for('purchases.orders') }}" method="post">
+<!-- <form action="{{ url_for('purchases.orders') }}" method="post">
   {{ searchForm.hidden_tag() }}
   {{ searchForm.keyword.label }}
   {{ searchForm.keyword(size=32) }}
@@ -23,9 +23,9 @@
     {{ filterForm.hidden_tag() }}
       {{ filterForm.status() }} {{ filterForm.submit() }}</p>
   </form>
-</div>
+</div> -->
 
-<a href="{{ url_for('purchases.orders') }}" type="button" class="btn btn-light">View All Orders</a>
+<!-- <a href="{{ url_for('purchases.orders') }}" type="button" class="btn btn-light">View All Orders</a> -->
 <br><br>
 {{ pagination.info }}
 <table class='table table-hover table-bordered container'>
