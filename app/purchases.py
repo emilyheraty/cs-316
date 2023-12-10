@@ -121,14 +121,11 @@ def orders():
         # Use the correct method to get partial orders (assuming such a method exists)
         lineitems = Order.getOrdersBySellerId(current_user.id)
         lineitems_partial = Order.getPartialOrdersBySellerId(current_user.id, per_page, offset)
-        print("orders original:", lineitems_partial)
         
         pagination = Pagination(page=page, per_page=per_page, offset=offset, total=len(lineitems_partial), search=search, record_name='lineitems')
-        print("GETTING HERE")
 
         if form_fulfilled.is_submitted():
             lineitems_partial = Order.getPartialOrdersBySellerId(current_user.id, per_page, offset)
-            print("WHY IS IT NOT WORKING")
             order_time = form_fulfilled.time.data
             bid = form_fulfilled.buyer.data
             status = form_fulfilled.status.data
@@ -136,9 +133,7 @@ def orders():
                 fulfilled_time = datetime.datetime.now()
             else:
                 fulfilled_time = None
-            print("fulfilled?: ", fulfilled_time)
             result = Order.updateFulfillmentStatus(current_user.id, order_time, bid, fulfilled_time)
-            print("WHAT")
             if result == 0:
                 return render_template('orders.html', 
                                         items=lineitems_partial, 
@@ -152,10 +147,8 @@ def orders():
             print("Fulfillment Form validation failed:", form_fulfilled.errors)
 
         if searchForm.is_submitted():
-            print("HELLO?")
             str = searchForm.keyword.data
             orders = Order.searchProductName(current_user.id, str, per_page, offset)
-            print("GET ANY ORDERS BACK?: ", orders)
             pagination = Pagination(page=page, per_page=per_page, total=len(orders))
             return render_template('orders.html', 
                                         items=orders, 
@@ -176,7 +169,6 @@ def orders():
                 status = False
             else:
                 return redirect(url_for('purchases.orders'))
-            print("status: ", status)
             orders = Order.getOrdersByStatus(status, current_user.id, per_page, offset)
             pagination = Pagination(page=page, per_page=per_page, total=len(orders))
             return render_template('orders.html', 

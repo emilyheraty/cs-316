@@ -65,13 +65,9 @@ def inventory(seller_id):
     form_uq = UpdateQuantity()
     form_dp = DeleteProduct()
     if form_search.validate_on_submit():
-        print("Heyyyy")
         search_str = form_search.search_input.data
-        print(search_str)
         result = Inventory.getInventoryProducts(search_str, per_page, offset, seller_id)
-        print("got hereeee ")
         if len(result) == 0:
-            print("no results lol")
             return render_template('inventory.html',
                             id=seller_info[0][0],
                             name=seller_info[0][1],
@@ -83,7 +79,6 @@ def inventory(seller_id):
                             form_search=form_search,
                             err_message="No search results found")
         else:
-            print(result)
             return render_template('inventory.html',
                             id=seller_info[0][0],
                             name=seller_info[0][1],
@@ -97,13 +92,9 @@ def inventory(seller_id):
     if current_user.is_authenticated:
         if current_user.id == seller_info[0][0]:
             isseller = 1
-            print("got here")
             if form_uq.validate_on_submit():
-                print("HELLO?")
                 pname = form_uq.product_name.data
-                print("HELEPEOO")
                 amt = form_uq.new_quantity.data
-                print(amt)
                 result = Inventory.updateProductQuantity(seller_id, pname, amt)
                 if result == 0:
                     return render_template('inventory.html',
@@ -118,13 +109,10 @@ def inventory(seller_id):
                             err_message="error: could not update quantity")
                 return redirect(url_for('inventory.inventory', seller_id=current_user.id))
             else:
-                print("what the fuck")
                 print(form_uq.errors)
             
             if form_dp.validate_on_submit():
-                print("HELLO?")
                 pname = form_dp.product_name.data
-                print("HELEPEOO")
                 result = Inventory.removeProductFromInventory(seller_id, pname)
                 if result == 0:
                     return render_template('inventory.html',
@@ -139,7 +127,6 @@ def inventory(seller_id):
                             err_message="error: could not remove product")
                 return redirect(url_for('inventory.inventory', seller_id=current_user.id))
             else:
-                print("what the fuck")
                 print(form_uq.errors)
     # return jsonify([item.__dict__ for item in items])
     return render_template('inventory.html',
@@ -192,7 +179,6 @@ def update_products(seller_id):
             pname = form.product_name.data
             amt = form.new_quantity.data
             result = Inventory.updateProductQuantity(seller_id, pname, amt)
-            print(result)
             if result == 0:
                 return render_template('inventory-updateproduct.html', form=form,isseller=1, error=1)
             return redirect(url_for('inventory.inventory', seller_id=current_user.id))
