@@ -3,7 +3,12 @@
 {% block content %}
 
 <br><br>
-
+<p style="margin-top: 10px;">
+  <a href="{{ url_for('index.index') }}">Home</a>
+  /
+  <a href="{{ url_for('users.account') }}">Account</a>
+  / Inventory
+</p>
 <h2> Inventory for {{name}} </h2>
 <form method="post" action="{{ url_for('inventory.inventory', seller_id=id) }}">
   {{ form_search.csrf_token }}
