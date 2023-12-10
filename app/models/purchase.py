@@ -160,14 +160,15 @@ GROUP BY Users.state
         return rows
 
     @staticmethod
-    def submitPurchase(uid, pid, time, amount, quantity, oid):
+    def submitPurchase(uid, pid, sid, time, amount, quantity, oid):
         try:
             rows = app.db.execute("""
-INSERT INTO Purchases(uid, pid, time_purchased, total_amount, number_of_items, fulfillment_status, order_id)
-VALUES(:uid, :pid, :time, :amount, :qty, :status, :oid)
+INSERT INTO Purchases(uid, pid, sid, time_purchased, total_amount, number_of_items, fulfillment_status, order_id)
+VALUES(:uid, :pid, :sid, :time, :amount, :qty, :status, :oid)
 """,
                                   uid=uid,
                                   pid=pid,
+                                  sid=sid,
                                   time=time,
                                   amount=amount,
                                   qty=quantity,

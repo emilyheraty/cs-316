@@ -126,6 +126,7 @@ def submitCart():
 
         Purchase.submitPurchase(purch.buyer_id, 
                                 purch.product_id, 
+                                purch.seller_id,
                                 str(time),
                                 amount, 
                                 purch.quantity,
