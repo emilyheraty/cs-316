@@ -7,11 +7,10 @@ from .models.cart import Cart
 from .models.product import Product
 from .models.purchase import Purchase
 from .models.user import User
+from .models.feedback import Feedback
 from .models.inventory import Inventory, Listing
 from flask_paginate import Pagination, get_page_parameter
 from datetime import datetime
-
-from .models.feedback import Feedback
 
 bp = Blueprint('cart_bp', __name__)
 
@@ -70,9 +69,9 @@ def showCart():
                 pagination=pagination,
                 form_uq=form_uq,
                 cart_total = getCartTotal(),
-                err_message="error: could not update quantity")
+                error="error: could not update quantity")
         return redirect(url_for('cart_bp.showCart'))
-    return render_template('cart_page.html', items=lineitems_partial, pagination=pagination, isseller=isseller, form_uq=form_uq, cart_total = getCartTotal(),)
+    return render_template('cart_page.html', items=lineitems_partial, pagination=pagination, isseller=isseller, form_uq=form_uq, cart_total = getCartTotal())
 
 @bp.route('/cart/add/<int:seller_id>/<string:product_name>', methods=['GET', 'POST'])
 def addItemToCart(seller_id, product_name):
@@ -93,21 +92,45 @@ def submitCart():
     if current_user.is_authenticated:
         lineitems = Cart.getCartByBuyerId(current_user.id)
     else:
-        return redirect('/login')
+        redirect('/login')
+        return
     if len(lineitems) == 0:
-        return redirect('/')
-    
+        redirect('/')
+        return
+    # Check balances and quantities
+    total = getCartTotal()
+    form_uq = UpdateQuantity()
+    isseller = Inventory.isSeller(current_user.id)[0][0]
+    per_page = 8
+    page = request.args.get(get_page_parameter(), type=int, default=1)
+    offset = (page - 1) * per_page
+    lineitems_partial = Cart.getPartialCartByBuyerId(current_user.id, per_page, offset)
+    search = request.args.get('q')
+    pagination = Pagination(page=page, per_page=per_page, offset=offset, total=len(lineitems), search=search, record_name='lineitems')
+    if total > User.getBalanceById(current_user.id)[0][0]:
+        print(User.getBalanceById(current_user.id))
+        return render_template('cart_page.html', items=lineitems_partial, pagination=pagination, isseller=isseller, form_uq=form_uq, cart_total = total, error="Error: Insufficient Funds")
+    for purch in lineitems:
+        pname = purch.prod_name
+        sid = purch.seller_id
+        requestedQuantity = purch.quantity
+        available = Inventory.getQuantityBySidPname(sid, pname)
+        if available is None or requestedQuantity > available[0][0]:
+            return render_template('cart_page.html', items=lineitems_partial, pagination=pagination, isseller=isseller, form_uq=form_uq, cart_total = total, error="Error: One or more of the item quantities you requested is more than is in the seller's inventory")
+    # Legal Transaction
     time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     for purch in lineitems:
         # if user can afford it
         amount = round(purch.quantity * purch.price, 2)
         newOId = Purchase.maxOId() + 1
+
         Purchase.submitPurchase(purch.buyer_id, 
                                 purch.product_id, 
                                 str(time),
                                 amount, 
                                 purch.quantity,
-                                newOId)
+                                newOId
+        )
         User.changeBalance(purch.seller_id, amount)
         User.changeBalance(current_user.id, -1 * amount)
         Inventory.decreaseQuantity(purch.seller_id, purch.prod_name, purch.quantity)

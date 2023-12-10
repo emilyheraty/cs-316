@@ -53,7 +53,10 @@
   </tbody>
 </table>
 {{ pagination.links }}
-<a href="/cart/submit" type="button" class="btn btn-dark">Submit Cart as Order</a>
+<p>
+  <span><a href="/cart/submit" type="button" class="btn btn-dark">Submit Cart as Order</a></span>
+  <span>{{error}}</span>
+</p>
 {% endblock %}
 
 
