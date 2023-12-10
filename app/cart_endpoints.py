@@ -7,6 +7,7 @@ from .models.cart import Cart
 from .models.product import Product
 from .models.purchase import Purchase
 from .models.user import User
+from .models.feedback import Feedback
 from .models.inventory import Inventory, Listing
 from flask_paginate import Pagination, get_page_parameter
 from datetime import datetime
