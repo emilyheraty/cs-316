@@ -59,4 +59,10 @@
   {% else %}
   <h2 style="text-align: left;">No reviews yet</h2>
   {% endif %}
+
+{% if current_user.is_authenticated %}
+  {% if current_user.id == cid %}
+    <a href="{{ url_for('cart_bp.editProductDetails', product_name=product_name, error=0) }}" type="button" class="btn btn-light">Edit Product Details</a>
+  {% endif %}
+{% endif %}
 {% endblock %}

@@ -35,8 +35,9 @@
       <th scope="col">Buyer</th>
       <th scope="col">Buyer Address</th>
       <th scope="col">Quantity</th>
-      <th scope="col">Time</th>
+      <th scope="col">Time Ordered</th>
       <th scope="col">Fulfilled</th>
+      <th scope="col">Time Fulfilled</th>
     </tr>
   </thead>
   <tbody>
@@ -57,6 +58,7 @@
             {{ form_fulfilled.submit() }}
           </form>
         </td>
+        <td>{{order.status}}</td>
       </tr>
     {% endfor %}
   </tbody>

@@ -68,21 +68,57 @@ def gen_products(num_products, seller_ids):
     available_pids = []
     product_names = []
     nameset = set()
+
+    name_elements = []
+    description_elements = []
+    category_elements = []
+
+    with open('Woo_Product_Dummy_Data_Set_Simple_and_Variable.csv', newline='') as csvfile:
+        data = csv.reader(csvfile)
+        for row in data:
+            name_elements.append(row[0])
+            content = re.search(r'<p>(.*?)</p>', row[1], re.DOTALL)
+            if content:
+                content = content.group(1)
+            else:
+                content = 'No content found'
+
+    
+            sentences = re.split(r'(?<=[.!?]) +', content)
+
+    
+            if sentences :
+                description_elements.append(sentences[0])
+            else:
+                description_elements.append('No sentences found')
+
+            
+            cat = row[2].split('>')
+            
+            if len(cat) >= 4:
+                cat2 = cat[3].split('|')
+                category_elements.append(cat2[0])
+            else:
+                category_elements.append(cat[0])
+
+            
+            
+
     with open('Products.csv', 'w') as f:
         writer = get_csv_writer(f)
         print('Products...', end=' ', flush=True)
         for pid in range(num_products):
             if pid % 100 == 0:
                 print(f'{pid}', end=' ', flush=True)
-            name = fake.sentence(nb_words=4)[:-1]
+            name = fake.random_element(elements = name_elements)
             if name in nameset:
                 pid-=1
                 continue
             nameset.add(name)    
             cid = fake.random_element(elements=seller_ids)
             price = f'{str(fake.random_int(max=500))}.{fake.random_int(max=99):02}'
-            description = fake.sentence(nb_words=50)[:-1]
-            category = fake.random_element(elements=('food', 'household products', 'clothing', 'books'))
+            description = fake.random_element(elements = description_elements)
+            category = fake.random_element(elements=category_elements)
           #rating = f'{str(fake.random_int(max=4))}.{fake.random_int(max=.9):02}'
             available_pids.append(pid)
             product_names.append(name)
@@ -109,7 +145,7 @@ def gen_purchases(num_purchases, available_pids):
         print(f'{num_purchases} generated')
     return
 
-def gen_carts(num_carts, seller_ids):
+def gen_carts(num_carts, seller_ids, pids):
     keyset = set()
     num = num_carts
     with open('Carts.csv', 'w') as f:
@@ -120,7 +156,7 @@ def gen_carts(num_carts, seller_ids):
                 print(f'{i}', end=' ', flush=True)
             bid = fake.random_int(min=0, max=num_users-1)
             sid = fake.random_element(elements=seller_ids)
-            pid = fake.random_int(min=0, max=num_products-1)
+            pid = fake.random_element(elements=pids)
             if (bid, pid) in keyset or bid==sid:
                 num -= 1
                 continue
@@ -175,6 +211,6 @@ sellers = gen_users(num_users)
 seller_ids = gen_sellers(sellers)
 available_pids, product_names = gen_products(num_products, seller_ids)
 gen_purchases(num_purchases, available_pids)
-gen_carts(num_carts, seller_ids)
+gen_carts(num_carts, seller_ids, available_pids)
 gen_inventory(num_inventory, seller_ids, product_names)
 gen_feedback(num_feedback, available_pids, seller_ids)

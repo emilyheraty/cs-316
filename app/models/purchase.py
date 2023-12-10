@@ -169,14 +169,15 @@ GROUP BY Users.state
         return rows
 
     @staticmethod
-    def submitPurchase(uid, pid, time, amount, quantity, oid):
+    def submitPurchase(uid, pid, sid, time, amount, quantity, oid):
         try:
             rows = app.db.execute("""
-INSERT INTO Purchases(uid, pid, time_purchased, total_amount, number_of_items, fulfillment_status, order_id)
-VALUES(:uid, :pid, :time, :amount, :qty, :status, :oid)
+INSERT INTO Purchases(uid, pid, sid, time_purchased, total_amount, number_of_items, fulfillment_status, order_id)
+VALUES(:uid, :pid, :sid, :time, :amount, :qty, :status, :oid)
 """,
                                   uid=uid,
                                   pid=pid,
+                                  sid=sid,
                                   time=time,
                                   amount=amount,
                                   qty=quantity,
@@ -197,6 +198,22 @@ FROM Purchases
             print(str(e))
 
     @staticmethod
+    def getOrder(order_id):
+        rows = app.db.execute('''
+SELECT Purchases.fulfillment_status
+FROM Purchases
+WHERE order_id = :order_id
+''',
+                              order_id=order_id)
+        if rows is not None:
+            if any(element is None for element in rows[0]):
+                return "Order not Fulfilled"
+            else:
+                return "Order Fulfilled"
+        else:
+            return "Order not Found"
+        
+    @staticmethod
     def get_by_sellerid(seller_id):
         rows = app.db.execute('''
 SELECT Purchases.id, Purchases.uid, Purchases.pid, Purchases.time_purchased, Purchases.total_amount, Purchases.number_of_items, Purchases.fulfillment_status, Purchases.order_id, Products.name
@@ -205,3 +222,4 @@ WHERE id = :id and Purchases.pid = Products.id
 ''',
                               id=seller_id)
         return Purchase(*(rows[0])) if rows else None
+
