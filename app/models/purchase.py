@@ -92,15 +92,15 @@ ORDER BY total_amount DESC
     def get_by_status(status, uid):
         if(status):
             rows = app.db.execute('''
-SELECT *
-FROM Purchases
+SELECT Purchases.id, Purchases.uid, Purchases.pid, Purchases.time_purchased, Purchases.total_amount, Purchases.number_of_items, Purchases.fulfillment_status, Purchases.order_id, Products.name
+FROM Purchases, Products
 WHERE fulfillment_status IS NOT NULL AND uid = :uid
                                 ''',
                                 status=status, uid=uid)
         else:
             rows = app.db.execute('''
-SELECT *
-FROM Purchases
+SELECT Purchases.id, Purchases.uid, Purchases.pid, Purchases.time_purchased, Purchases.total_amount, Purchases.number_of_items, Purchases.fulfillment_status, Purchases.order_id, Products.name
+FROM Purchases, Products
 WHERE fulfillment_status IS NULL AND uid = :uid
                                 ''',
                                 status=status, uid=uid)
