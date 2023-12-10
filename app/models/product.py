@@ -100,3 +100,27 @@ WHERE creator_id = :cid AND name = :name
                               name=name,
                               price=price)
         return res
+
+
+    @staticmethod
+    def getPartialProducts(per_page, off):
+        rows = app.db.execute('''
+SELECT *
+FROM Products
+LIMIT :per_page
+OFFSET :off
+''',
+                                per_page=per_page,
+                                off=off)
+        return [Product(*row) for row in rows]
+
+
+    @staticmethod
+    def getOneCategory(str):
+        rows = app.db.execute('''
+SELECT *
+FROM Products
+WHERE category LIKE '%' || :str || '%'
+''',
+                                str=str)
+        return [Product(*row) for row in rows]

@@ -5,6 +5,17 @@
 <br><br>
 
 <h2>Products for sale:</h2>
+
+<div>
+  <a href="{{ url_for('index.index') }}" type="button" class="btn btn-light">View All Products</a>
+  <form action="" method="post" style="text-align: right;">
+    {{ filterForm.hidden_tag() }}
+      {{ filterForm.status() }} {{ filterForm.submit() }}</p>
+  </form>
+</div>
+
+{{ pagination.info }}
+{{ pagination.links }}
 <table class='table table-hover table-bordered container'>
   <thead class="thead-dark">
     <tr>
@@ -27,5 +38,6 @@
     {% endfor %}
   </tbody>
 </table>
+{{ pagination.links }}
 {% endblock %}
 
