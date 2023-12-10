@@ -76,7 +76,13 @@ def gen_products(num_products, seller_ids):
     with open('Woo_Product_Dummy_Data_Set_Simple_and_Variable.csv', newline='') as csvfile:
         data = csv.reader(csvfile)
         for row in data:
-            name_elements.append(row[0])
+            new_name = row[0].split('-')
+            if len(new_name) >= 2:
+                new_name2=new_name[0]
+                new_name3 = new_name2.join(new_name[1])
+                name_elements.append(new_name2)
+            else:
+                name_elements.append(row[0])
             content = re.search(r'<p>(.*?)</p>', row[1], re.DOTALL)
             if content:
                 content = content.group(1)
@@ -124,7 +130,7 @@ def gen_products(num_products, seller_ids):
                 continue
             nameset.add(name)    
             cid = fake.random_element(elements=seller_ids)
-            price = f'{str(fake.random_int(max=500))}.{fake.random_int(max=99):02}'
+            price = f'{str(fake.random_int(max=75))}.{fake.random_int(max=99):02}'
             description = description_elements[index]
             category = category_elements[index]
           #rating = f'{str(fake.random_int(max=4))}.{fake.random_int(max=.9):02}'
