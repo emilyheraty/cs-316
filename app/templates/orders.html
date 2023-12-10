@@ -2,7 +2,11 @@
 
 {% block content %}
 
-<br><br>
+<a href="{{ url_for('index.index') }}">Home</a>
+/
+<a href="{{ url_for('users.account') }}">Account</a>
+/ Orders
+<br></br>
 <h2>Orders (Sellers)</h2>
 
 <form action="{{ url_for('purchases.orders') }}" method="post">

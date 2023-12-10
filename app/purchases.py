@@ -2,6 +2,7 @@ from flask import render_template, redirect, Blueprint, request, session, url_fo
 from flask_wtf import FlaskForm
 from flask_login import current_user
 from flask_paginate import Pagination, get_page_args
+from sqlalchemy import null
 from .models.order import Order
 from .models.purchase import Purchase
 from .models.inventory import Inventory
@@ -47,11 +48,11 @@ def purchases():
     searchForm = SearchForm()
     filterForm = FilterForm()
     
-    if filterForm.is_submitted():
+    if filterForm.validate_on_submit():
         if filterForm.status.data == 'fulfilled':
-            status = 1
+            status = True
         elif filterForm.status.data == 'not_fulfilled':
-            status = 0
+            status = False
         else:
             return redirect(url_for('purchases.purchases'))
         purchases = Purchase.get_by_status(status, current_user.id)
@@ -59,7 +60,8 @@ def purchases():
         return render_template('purchases.html',
                             purchases=purchases[offset: offset + per_page], pagination=pagination, isseller=isseller,
                             searchForm=searchForm, sortForm=sortForm, filterForm=filterForm)
-    if sortForm.is_submitted():
+                            
+    if sortForm.validate_on_submit():
         if sortForm.sort.data == 'amount_asce':
             purchases = Purchase.get_by_ascending_amount(current_user.id)
             pagination = Pagination(page=page, per_page=per_page, total=len(purchases))
@@ -73,7 +75,7 @@ def purchases():
                             purchases=purchases[offset: offset + per_page], pagination=pagination, isseller=isseller,
                             searchForm=searchForm, sortForm=sortForm, filterForm=filterForm)
     
-    if searchForm.is_submitted():
+    if searchForm.validate_on_submit():
         purchases = Purchase.get_by_product_name(searchForm.keyword.data, current_user.id)
         pagination = Pagination(page=page, per_page=per_page, total=len(purchases))
         return render_template('purchases.html',
@@ -245,7 +247,7 @@ def statistics():
     productForm.product.choices = ["All Categories"] + [(str(a[1])) for a in Inventory.getByCategory(current_user.id)]
     months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
     
-    if productForm.product.data != "None" and productForm.product.data != "All Categories":
+    if (productForm.validate_on_submit() and productForm.product.data != "None" and productForm.product.data != "All Categories"):
         product_by_state = Purchase.get_all_by_state_category(current_user.id, productForm.product.data)
         states = []
         product_count = []
@@ -257,7 +259,7 @@ def statistics():
                                 states=states, product_count=product_count, product=productForm.product.data, year=spendingForm.years.data, months=months)
     
     
-    if spendingForm.years.data != "All Years" and spendingForm.years.data != "None":
+    if (spendingForm.validate_on_submit() and spendingForm.years.data != "All Years" and spendingForm.years.data != "None"):
         grouped_data_m = Purchase.get_by_year(current_user.id, spendingForm.years.data)
         months_data = []
         total_amount = []
@@ -266,12 +268,12 @@ def statistics():
             total_amount.append(int(purchase[1]))
         return render_template('statistics.html', isseller=isseller, top_products=top_products, count=count, 
                                 available_years=availableYears, year=spendingForm.years.data, total_amount=total_amount,
-                                spendingForm= SpendingForm(obj=spendingForm), productForm=productForm, months=months_data, states=states,
+                                spendingForm=spendingForm, productForm=productForm, months=months_data, states=states,
                                 product_count=product_count, product=productForm.product.data)
 
 
     
     return render_template('statistics.html', isseller=isseller, top_products=top_products, count=count, 
                             available_years=availableYears, total_amount=total_amount, spendingForm=spendingForm, productForm=productForm,
-                              states=states, product_count=product_count, product=productForm.product.data, year=spendingForm.years.data)
+                              states=states, product_count=product_count, product=productForm.product.data, year=spendingForm.years.data, months=[])
 
