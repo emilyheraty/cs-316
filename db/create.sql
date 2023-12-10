@@ -6,6 +6,7 @@ CREATE TABLE Users (
     firstname VARCHAR(255) NOT NULL,
     lastname VARCHAR(255) NOT NULL,
     address VARCHAR(255) NOT NULL,
+    state VARCHAR(2),
     balance DECIMAL(12, 2) NOT NULL,
     is_seller INT NOT NULL CHECK(is_seller IN (0, 1))
 );

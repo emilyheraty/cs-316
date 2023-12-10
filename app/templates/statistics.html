@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if current_user.is_authenticated %}
+<p style="margin-top: 10px;">
+  <a href="{{ url_for('index.index') }}">Home</a>
+  /
+  <a href="{{ url_for('users.account') }}">Account</a>
+  / Statistics
+</p>
+<h2>Statistics</h2>
+{% if isseller %}
+<p>Visualize your spending and selling patterns</p>
+{% else %}
+<p>Visualize your spending patterns</p>
+{% endif %}
+<h5>Spending Statistics</h5>
+<form method="post" style="text-align: left;">
+    {{ spendingForm.hidden_tag() }}
+      {{ spendingForm.years() }}
+      {{ spendingForm.submit() }}
+  </form>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<body>
+    <div class = "row">
+        <div id="spending" style="width:50%"></div>
+        <div id="items" style="width:50%;"></div>
+    </div>
+    <script>
+        var selectedYear = "{{ year }}";
+        var available_years =  JSON.parse("{{ available_years | safe }}");
+        var total_amount =  JSON.parse("{{ total_amount | safe }}");
+        var top_products = {{ top_products | safe }};
+        var count =  JSON.parse("{{ count | safe }}");
+        if(selectedYear != "All Years" && selectedYear != "None"){
+            var months =  {{ months | safe }};
+            var total_amounts = {{ total_amount }};
+
+            const data_new = [{
+                x: months,
+                y: total_amounts,
+                mode: "line"
+            }];
+                
+            const layout_new = {
+                xaxis: {label: ['January', "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"], title: "Month"},
+                yaxis: {title: "Total Amount"},
+                title: "Spending Over the Year "+ selectedYear
+                
+            };
+            Plotly.newPlot('spending', data_new, layout_new);
+        } 
+        else {
+            const data = [{
+            x: available_years,
+            y: total_amount,
+            mode: "line"
+                
+        }];
+                
+        const layout = {
+            xaxis: {title: "Years"},
+            yaxis: {title: "Total Amount"},
+            title: "Spending Over Time"
+                
+            };
+        Plotly.newPlot('spending', data, layout);
+        }
+
+        const items = [{
+            x: top_products,
+            y: count,
+            type: "bar"
+                
+        }];
+                
+        const layout1 = {
+            xaxis: {title: "Products", automargin: true},
+            yaxis: {title: "Count"},
+            title: "Top 10 Most Purchased Products"
+            };
+        Plotly.newPlot('items', items, layout1);
+
+    </script>
+</body>
+{% if isseller %}
+<h4>Selling Statistics</h4>
+<p>Visualize which states are most popular with your products</p>
+<form method="post" style="text-align: left;">
+    {{ productForm.hidden_tag() }}
+      {{ productForm.product() }}
+      {{ productForm.submit() }}
+</form>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<body>
+    <div class = "row">
+        <div id="sales" style="width:100%;max-width:700px"></div>
+    </div>
+    <script>
+        var product = "{{ product | safe }}";
+        console.log(product != "None" && product != "All Categories")
+        if (product != "None" && product != "All Categories"){
+            var states_new = {{ states | safe }};
+            console.log(states_new)
+            var product_count = {{ product_count | safe }};
+
+            const data2_new= [{
+            type: 'choropleth',
+            locationmode: 'USA-states',
+            locations: states_new,
+            z: product_count,
+            colorscale: "Viridis"
+        }];
+
+                
+        const layout2_new = {
+            title: "Total Number of " + product + " Purchased Per State",
+            geo:{
+                scope: 'usa'
+            },
+        };
+
+        Plotly.newPlot('sales', data2_new, layout2_new);
+        } 
+
+        else {
+            var states = {{ states | safe }};
+            var product_count = {{ product_count | safe }};
+
+            const data2= [{
+                    type: 'choropleth',
+                    locationmode: 'USA-states',
+                    locations: states,
+                    z: product_count,
+                    text: states,
+                    colorscale: "Viridis"
+            }];
+
+                    
+            const layout2 = {
+                    title: "Total Items Purchased Per State",
+                    geo:{
+                        scope: 'usa'
+                    }
+            };
+            Plotly.newPlot('sales', data2, layout2);
+        }
+        
+
+    </script>
+</body>
+{%endif%}
+
+{%endif%}
+{% endblock %}
