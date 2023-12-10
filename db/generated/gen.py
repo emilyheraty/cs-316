@@ -1,6 +1,7 @@
 from werkzeug.security import generate_password_hash
 import csv
 from faker import Faker
+import re
 
 num_users = 100
 num_products = 1000
@@ -60,10 +61,13 @@ def gen_products(num_products, seller_ids):
     nameset = set()
 
     name_elements = []
-    with open('Woo_Product_Dummy_Data_Set_Simpleand_Variable.csv', newline='') as csvfile:
+    description_elements = []
+
+    with open('Woo_Product_Dummy_Data_Set_Simple_and_Variable.csv', newline='') as csvfile:
         data = csv.reader(csvfile)
         for row in data:
             name_elements.append(row[0])
+            des = re.finditer(r'<p>.*?</p>', row[1])
 
     with open('Products.csv', 'w') as f:
         writer = get_csv_writer(f)
